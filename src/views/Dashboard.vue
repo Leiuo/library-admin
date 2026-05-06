@@ -1,0 +1,573 @@
+<template>
+    <div class="dashboard-container">
+        <!-- 顶部统计卡片 -->
+        <div class="stats-row">
+            <el-card class="stat-card" shadow="hover">
+                <div class="stat-icon blue">
+                    <el-icon>
+                        <Notebook />
+                    </el-icon>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.totalBooks || 0 }}</div>
+                    <div class="stat-label">馆藏总量</div>
+                </div>
+            </el-card>
+
+            <el-card class="stat-card" shadow="hover">
+                <div class="stat-icon green">
+                    <el-icon>
+                        <Stamp />
+                    </el-icon>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.borrowedBooks || 0 }}</div>
+                    <div class="stat-label">当前借出</div>
+                </div>
+            </el-card>
+
+            <el-card class="stat-card" shadow="hover">
+                <div class="stat-icon orange">
+                    <el-icon>
+                        <User />
+                    </el-icon>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.totalReaders || 0 }}</div>
+                    <div class="stat-label">注册读者</div>
+                </div>
+            </el-card>
+
+            <el-card class="stat-card" shadow="hover">
+                <div class="stat-icon purple">
+                    <el-icon>
+                        <TrendCharts />
+                    </el-icon>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.activeBorrows || 0 }}</div>
+                    <div class="stat-label">进行中借阅</div>
+                </div>
+            </el-card>
+        </div>
+
+        <!-- 图表区域（仅在有数据时渲染） -->
+        <div class="charts-row" v-if="!loading">
+            <el-card class="chart-card" shadow="hover">
+                <template #header>
+                    <div class="card-header">
+                        <span>📊 图书状态分布</span>
+                    </div>
+                </template>
+                <div ref="statusChartRef" class="chart-container"></div>
+            </el-card>
+
+            <el-card class="chart-card" shadow="hover">
+                <template #header>
+                    <div class="card-header">
+                        <span>📈 月度借阅趋势</span>
+                        <el-radio-group v-model="trendYear" size="small" @change="updateTrendChart">
+                            <el-radio-button :label="2025">2025</el-radio-button>
+                            <el-radio-button :label="2026">2026</el-radio-button>
+                        </el-radio-group>
+                    </div>
+                </template>
+                <div ref="trendChartRef" class="chart-container"></div>
+            </el-card>
+        </div>
+
+        <div class="charts-row" v-if="!loading">
+            <el-card class="chart-card" shadow="hover">
+                <template #header>
+                    <div class="card-header">
+                        <span>🏆 热门图书 TOP5（按借阅次数）</span>
+                    </div>
+                </template>
+                <div ref="hotBooksChartRef" class="chart-container"></div>
+            </el-card>
+
+            <el-card class="chart-card" shadow="hover">
+                <template #header>
+                    <div class="card-header">
+                        <span>👥 读者借阅排行 TOP5</span>
+                    </div>
+                </template>
+                <div ref="topReadersChartRef" class="chart-container"></div>
+            </el-card>
+        </div>
+    </div>
+</template>
+
+<script setup>
+import { reactive, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import * as echarts from 'echarts';
+import { getBooks, getBorrows, getReaders } from '../api/mock';
+
+// 统计数据
+const stats = reactive({
+    totalBooks: 0,
+    borrowedBooks: 0,
+    totalReaders: 0,
+    activeBorrows: 0
+});
+
+// 原始数据
+const books = ref([]);
+const borrows = ref([]);
+const readers = ref([]);
+
+const loading = ref(false);
+
+// DOM 引用
+const statusChartRef = ref(null);
+const trendChartRef = ref(null);
+const hotBooksChartRef = ref(null);
+const topReadersChartRef = ref(null);
+
+// 图表实例
+let statusChart = null;
+let trendChart = null;
+let hotBooksChart = null;
+let topReadersChart = null;
+
+const trendYear = ref(2025);  // 趋势图年份
+
+// 计算统计数据
+const computeStats = () => {
+    stats.totalBooks = books.value.length;
+    stats.borrowedBooks = books.value.filter(book => book.status === 1).length;
+    stats.totalReaders = readers.value.length;
+    stats.activeBorrows = borrows.value.filter(borrow => borrow.status === 0).length;
+
+    console.log('统计数据已更新:', stats);
+};
+
+// 准备图书状态扇形图数据
+const getStatusChartData = () => {
+    const availableBooks = books.value.filter(book => book.status === 0).length;
+    const borrowed = books.value.filter(book => book.status === 1).length;
+
+    return [
+        { name: '可借', value: availableBooks, itemStyle: { color: '#67C23A' } },
+        { name: '借出', value: borrowed, itemStyle: { color: '#F56C6C' } }
+    ];
+};
+
+// 绘制图书状态扇形图
+const renderStatusChart = () => {
+    if (!statusChartRef.value) return;  // 如果图表 DOM 不存在，直接返回
+    if (statusChart) statusChart.dispose();  // 释放 ECharts 实例占用的 DOM 和内存资源，防止组件卸载后发生内存泄漏
+
+    console.log('图书状态扇形图DOM：', statusChartRef.value);
+    statusChart = echarts.init(statusChartRef.value);
+    const data = getStatusChartData();
+    statusChart.setOption({
+        // title: {
+        //     text: 'Referer of a Website',
+        //     subtext: 'Fake Data',
+        //     left: 'center'
+        // },
+        tooltip: {
+            trigger: 'item',
+            formatter: '{b}: {d}% ({c}册)'
+        },
+        legend: {
+            orient: 'vertical',
+            left: 'left',
+            data: data.map(d => d.name)
+        },
+        series: [
+            {
+                // name: 'Access From',
+                type: 'pie',
+                radius: '55%',
+                center: ['50%', '50%'],
+                data,
+                emphasis: {
+                    scale: true
+                },
+                label: {
+                    show: true,
+                    formatter: '{b}: {d}%'
+                }
+            }
+        ]
+    });
+};
+
+// 准备月度借阅趋势的数据
+const getMonthlyTrendData = (year) => {
+    // 当年的所有借阅
+    const yearBorrows = borrows.value.filter(borrow => {
+        const borrowYear = Number(borrow.borrowDate.split('-')[0]);
+        return borrowYear === year;
+    });
+
+    // 统计每个月的借阅数目
+    const monthlyCount = Array(12).fill(0);
+    yearBorrows.forEach(borrow => {
+        const month = Number(borrow.borrowDate.split('-')[1]) - 1;
+        monthlyCount[month]++;
+    });
+
+    return monthlyCount;
+};
+
+// 绘制月度借阅趋势折线图
+const renderTrendChart = () => {
+    if (!trendChartRef.value) return;
+    if (trendChart) trendChart.dispose();
+    trendChart = echarts.init(trendChartRef.value);
+
+    const monthlyData = getMonthlyTrendData(trendYear.value);
+    trendChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' }
+        },
+        xAxis: {
+            type: 'category',
+            data: ['1月', '2月', '3月', '4月', '5月', '6月', '7月', '8月', '9月', '10月', '11月', '12月']
+        },
+        yAxis: {
+            type: 'value',
+            name: '借阅次数'
+        },
+        series: [{
+            type: 'line',
+            data: monthlyData,
+            smooth: true,
+            lineStyle: {
+                color: '#409EFF',
+                width: 3
+            },
+            areaStyle: {
+                opacity: 0.1,
+                color: '#409EFF'
+            },
+            symbol: 'circle',
+            symbolSize: 8,
+            itemStyle: { color: '#409EFF' }
+        }]
+    });
+};
+
+// 更新趋势图
+const updateTrendChart = () => {
+    renderTrendChart();
+};
+
+// 准备热门图书 TOP5
+const getHotBooksData = () => {
+    const borrowCount = {};
+    borrows.value.forEach(borrow => {
+        // if (!borrowCount[borrow.bookId]) {
+        //     borrowCount[borrow.bookId] = 0;
+        // } else {
+        //     borrowCount[borrow.bookId]++;
+        // }
+
+        borrowCount[borrow.bookId] = (borrowCount[borrow.bookId] || 0) + 1;
+    });
+
+    const hotBooks = [];
+    for (let bookId in borrowCount) {
+        const book = books.value.find(book => book.id === Number(bookId));
+        if (book) {
+            hotBooks.push({
+                name: book.title,
+                count: borrowCount[bookId]
+            });
+        }
+    }
+    hotBooks.sort((a, b) => b.count - a.count);  // 热门图书按借阅数目降序排列
+
+    return hotBooks.slice(0, 5);  // 取前五个
+};
+
+// 绘制热门图书条形图
+const renderHotBooksChart = () => {
+    if (!hotBooksChartRef.value) return;
+    if (hotBooksChart) hotBooksChart.dispose();
+    hotBooksChart = echarts.init(hotBooksChartRef.value);
+
+    const data = getHotBooksData();
+    const names = data.map(d => d.name.length > 12 ? d.name.slice(0, 10) + '…' : d.name);
+    const counts = data.map(d => d.count);
+
+    hotBooksChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' }
+        },
+        grid: {
+            left: '15%',
+            right: '5%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            name: '借阅次数',
+            nameLocation: 'middle',
+            nameGap: 30
+        },
+        yAxis: {
+            type: 'category',
+            data: names,
+            axisLabel: {
+                rotate: 0,
+                fontSize: 11
+            },
+            name: '图书名',
+            nameLocation: 'middle',
+            nameGap: 80
+        },
+        series: [{
+            type: 'bar',
+            data: counts,
+            itemStyle: {
+                color: '#E6A23C',
+                borderRadius: [0, 4, 4, 0]
+            },
+            label: {
+                show: true,
+                position: 'right'
+            }
+        }]
+    })
+};
+
+// 准备读者借阅排行 TOP5
+const getTopReadersData = () => {
+    const readerCount = new Map();
+    borrows.value.forEach(b => {
+        const count = readerCount.get(b.readerId) || 0;
+        readerCount.set(b.readerId, count + 1);
+    })
+
+    const topReaders = [];
+    readerCount.forEach((count, readerId) => {
+        const reader = readers.value.find(r => r.id === readerId);
+        if (reader) {
+            topReaders.push({
+                name: reader.name,
+                cardNo: reader.cardNo,
+                count
+            });
+        }
+    })
+
+    topReaders.sort((a, b) => b.count - a.count);
+    return topReaders.slice(0, 5);
+};
+
+// 绘制读者排行条形图
+const renderTopReadersChart = () => {
+    if (!topReadersChartRef.value) return;
+    if (topReadersChart) topReadersChart.dispose();
+    topReadersChart = echarts.init(topReadersChartRef.value);
+
+    const data = getTopReadersData();
+    const names = data.map(d => `${d.name} (${d.cardNo})`);
+    const counts = data.map(d => d.count);
+
+    topReadersChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' }
+        },
+        grid: {
+            left: '20%',
+            right: '5%',
+            containLabel: true
+        },
+        xAxis: {
+            type: 'value',
+            name: '借阅次数',
+            nameLocation: 'middle',
+            nameGap: 30
+        },
+        yAxis: {
+            type: 'category',
+            data: names,
+            axisLabel: { fontSize: 11 },
+            name: '读者名',
+            nameLocation: 'middle',
+            nameGap: 80
+        },
+        series: [{
+            type: 'bar',
+            data: counts,
+            itemStyle: {
+                color: '#909399',
+                borderRadius: [0, 4, 4, 0]
+            },
+            label: {
+                show: true,
+                position: 'right'
+            }
+        }]
+    });
+};
+
+// // 响应窗口大小变化
+// const handleResize = () => {
+//     nextTick(() => {
+//         ;[statusChart, trendChart, hotBooksChart, topReadersChart].forEach(chart => {
+//             chart && chart.resize() && chart.setOption(chart.getOption(), true);
+//         });
+//     });
+// };
+
+// 防抖 + nextTick + 安全的 resize
+let resizeTimer = null;
+const handleResize = () => {
+    if (resizeTimer) clearTimeout(resizeTimer);
+    resizeTimer = setTimeout(() => {
+        nextTick(() => {
+            const charts = [statusChart, trendChart, hotBooksChart, topReadersChart];
+            charts.forEach(chart => {
+                if (chart && typeof chart.resize === 'function') {
+                    chart.resize();
+                }
+            })
+        });
+    }, 100)
+};
+
+// 获取所有数据。并刷新所有图表
+const fetchAllData = async () => {
+    loading.value = true;
+    try {
+        books.value = await getBooks();
+        borrows.value = await getBorrows();
+        readers.value = await getReaders();
+        refreshAllCharts();
+    } catch (error) {
+        console.error('获取数据失败：', error);
+    } finally {
+        loading.value = false;
+    }
+};
+
+// 刷新所有图表
+const refreshAllCharts = () => {
+    computeStats();
+    nextTick(() => {
+        renderStatusChart();
+        renderTrendChart();
+        renderHotBooksChart();
+        renderTopReadersChart();
+    });
+};
+
+onMounted(() => {
+    fetchAllData();
+    window.addEventListener('resize', handleResize);  // 窗口尺寸变化时，重塑图表尺寸
+});
+
+// 组件卸载时销毁图表
+onUnmounted(() => {
+    window.removeEventListener('resize', handleResize);
+    [statusChart, trendChart, hotBooksChart, topReadersChart].forEach(chart => {
+        chart && chart.dispose();
+    })
+})
+</script>
+
+<style lang="less" scoped>
+.dashboard-container {
+    .stats-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 24px;
+
+        .stat-card {
+            flex: 1;
+            min-width: 180px;
+            display: flex;
+            // flex-direction: row;
+            align-items: center;
+            justify-content: center;
+            cursor: pointer;
+
+            &:hover {
+                transform: translateY(-3px);
+            }
+
+            .stat-icon {
+                width: 52px;
+                height: 52px;
+                border-radius: 12px;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+
+                .el-icon {
+                    font-size: 30px;
+                    color: #fff;
+                }
+            }
+
+            .blue {
+                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            }
+
+            .green {
+                background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+            }
+
+            .orange {
+                background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+            }
+
+            .purple {
+                background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+            }
+
+            .stat-info {
+                text-align: center;
+                margin-top: 5px;
+
+                .stat-value {
+                    font-size: 32px;
+                    font-weight: 600;
+                }
+
+                .stat-label {
+                    color: #909399;
+                    font-size: 14px;
+                    margin-top: 5px;
+                }
+            }
+        }
+    }
+
+    .charts-row {
+        display: flex;
+        gap: 15px;
+        margin-bottom: 15px;
+        flex-wrap: wrap;
+        // overflow: auto;
+
+        .chart-card {
+            min-width: 400px;
+            flex: 1;
+
+            .card-header {
+                display: flex;
+                justify-content: space-between;
+                align-items: center;
+                // font-weight: 550;
+            }
+
+            .chart-container {
+                width: 100%;
+                height: 320px;
+                min-width: 0;
+                flex: 1;
+            }
+        }
+    }
+}
+</style>

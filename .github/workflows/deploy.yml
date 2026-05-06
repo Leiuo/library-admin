@@ -1,0 +1,46 @@
+name: 自动部署到 GitHub Pages
+
+on:
+  push:
+    branches: ["main"]   # 当 main 分支有推送时触发，如果你的默认分支是 master，请修改
+  workflow_dispatch:     # 允许从 Actions 选项卡手动触发
+
+permissions:
+  contents: read
+  pages: write
+  id-token: write
+
+concurrency:
+  group: "pages"
+  cancel-in-progress: false
+
+jobs:
+  build-and-deploy:
+    environment:
+      name: github-pages
+      url: ${{ steps.deployment.outputs.page_url }}
+    runs-on: ubuntu-latest
+    steps:
+      - name: 1. 检出代码
+        uses: actions/checkout@v4
+
+      - name: 2. 设置 Node.js
+        uses: actions/setup-node@v4
+        with:
+          node-version: '20'
+          cache: 'npm'     # 或 'yarn' / 'pnpm'
+
+      - name: 3. 安装依赖
+        run: npm install        # 使用 npm ci 代替 install 会更快更稳定
+
+      - name: 4. 打包项目
+        run: npm run build
+
+      - name: 5. 上传打包产物
+        uses: actions/upload-pages-artifact@v3
+        with:
+          path: ./dist     # Vite 默认打包输出目录，如果不是请修改为 'docs' 等
+
+      - name: 6. 部署到 GitHub Pages
+        id: deployment
+        uses: actions/deploy-pages@v4
