@@ -23,7 +23,7 @@ function initMockData() {
         const borrows = [
             { id: 1, bookId: 3, readerId: 1, borrowDate: '2025-04-01', dueDate: '2025-04-15', status: 1 },
             { id: 2, bookId: 1, readerId: 2, borrowDate: '2025-04-10', dueDate: '2025-04-24', status: 1 },
-            { id: 3, bookId: 4, readerId: 3, borrowDate: '2025-05-12', dueDate: '2025-05-25', status: 0 }
+            { id: 3, bookId: 4, readerId: 3, borrowDate: '2026-05-12', dueDate: '2026-05-25', status: 0 }
         ];
         localStorage.setItem(STORAGE_KEYS.BORROWS, JSON.stringify(borrows));
     }
