@@ -1,44 +1,147 @@
 # Vue 3 图书馆后台管理系统
 
-## 项目结构
+一个基于 Vue 3 + Element Plus 构建的现代化图书馆后台管理系统，提供图书管理、借阅管理、读者管理和数据统计等功能。
 
-```tex
-|-- library-admin
-    |-- .gitignore
-    |-- index.html
-    |-- package-lock.json
-    |-- package.json
-    |-- README.md
-    |-- test.js
-    |-- vite.config.js
-    |-- .github
-    |   |-- workflows
-    |       |-- deploy.yml
-    |-- .vscode
-    |   |-- extensions.json
-    |-- public
-    |   |-- favicon.svg
-    |   |-- icons.svg
-    |-- src
-        |-- App.vue
-        |-- main.js
-        |-- style.css
-        |-- api
-        |   |-- mock.js
-        |-- assets
-        |   |-- hero.png
-        |   |-- vite.svg
-        |   |-- vue.svg
-        |-- components
-        |-- router
-        |   |-- index.js
-        |-- stores
-        |   |-- user.js
-        |-- views
-            |-- BookList.vue
-            |-- BorrowList.vue
-            |-- Dashboard.vue
-            |-- Layout.vue
-            |-- Login.vue
-            |-- ReaderList.vue
+## ✨ 功能特性
+
+### 📚 图书管理
+- 图书列表展示与搜索
+- 图书信息的新增、编辑、删除
+- 图书状态管理（可借/借出）
+
+### 🔄 借阅管理
+- 借阅记录列表展示
+- 图书借出与归还操作
+- 借阅日期自动计算
+
+### 👥 读者管理
+- 读者信息管理
+- 读者借阅记录关联
+
+### 📊 数据统计
+- 馆藏总量、借出数量统计
+- 图书状态分布饼图
+- 月度借阅趋势折线图
+- 热门图书 TOP5 排行
+- 读者借阅排行 TOP5
+
+## 🛠️ 技术栈
+
+| 技术 | 版本 | 说明 |
+|------|------|------|
+| Vue | 3.5+ | 渐进式 JavaScript 框架 |
+| Vite | 8.0+ | 下一代前端构建工具 |
+| Element Plus | 2.13+ | Vue 3 组件库 |
+| Pinia | 3.0+ | Vue 状态管理库 |
+| Vue Router | 5.0+ | Vue 路由管理器 |
+| ECharts | 6.0+ | 数据可视化图表库 |
+
+## 📁 项目结构
+
+```plaintext
+library-admin/
+├── .github/workflows/       # GitHub Actions 部署配置
+├── .vscode/                 # VS Code 配置
+├── public/                  # 静态资源
+├── src/
+│   ├── api/                 # Mock API 接口
+│   │   └── mock.js          # 数据接口与本地存储
+│   ├── assets/              # 静态资源文件
+│   ├── router/              # 路由配置
+│   │   └── index.js         # 路由定义与守卫
+│   ├── stores/              # Pinia 状态管理
+│   │   └── user.js          # 用户状态管理
+│   ├── views/               # 页面视图组件
+│   │   ├── Login.vue        # 登录页面
+│   │   ├── Layout.vue       # 布局组件
+│   │   ├── Dashboard.vue    # 数据统计首页
+│   │   ├── BookList.vue     # 图书管理页面
+│   │   ├── BorrowList.vue   # 借阅管理页面
+│   │   └── ReaderList.vue   # 读者管理页面
+│   ├── App.vue              # 根组件
+│   ├── main.js              # 应用入口
+│   └── style.css            # 全局样式
+├── index.html               # HTML 模板
+├── package.json             # 依赖配置
+├── vite.config.js           # Vite 配置
+└── README.md                # 项目说明文档
 ```
+
+## 🚀 快速开始
+
+### 安装依赖
+
+```bash
+npm install
+```
+
+### 开发模式运行
+
+```bash
+npm run dev
+```
+
+### 构建生产版本
+
+```bash
+npm run build
+```
+
+### 预览生产版本
+
+```bash
+npm run preview
+```
+
+## 🔑 登录信息
+
+- **用户名**: 任意用户名
+- **密码**: `123456`
+
+> 提示：系统使用 Mock 数据，登录验证仅检查密码是否为 `123456`
+
+## 📖 使用说明
+
+1. **登录系统**: 打开浏览器访问 `http://localhost:5173`，输入用户名和密码登录
+2. **导航菜单**: 左侧侧边栏提供系统功能导航，支持折叠展开
+3. **数据统计**: 首页展示图书馆运营数据统计和可视化图表
+4. **图书管理**: 在图书列表中进行新增、编辑、删除操作
+5. **借阅管理**: 管理图书借出和归还，查看借阅历史
+6. **读者管理**: 管理读者信息，维护读者档案
+
+## 🎨 界面预览
+
+### 登录页面
+- 渐变背景登录卡片
+- 表单验证与加载状态
+
+### 管理后台
+- 响应式布局设计
+- 侧边栏可折叠菜单
+- 面包屑导航
+- 页面切换过渡动画
+
+### 数据可视化
+- 统计卡片展示关键指标
+- 交互式图表支持悬停提示
+- 图表自适应窗口大小
+
+## 📋 功能清单
+
+- [x] 用户登录/登出
+- [x] 图书 CRUD 操作
+- [x] 借阅管理（借出/归还）
+- [x] 读者 CRUD 操作
+- [x] 数据统计仪表盘
+- [x] ECharts 图表可视化
+- [x] 本地存储 Mock 数据
+- [x] Element Plus 组件库
+- [x] 响应式布局
+
+## 📝 License
+
+MIT License
+
+## 🤝 贡献
+
+欢迎提交 Issue 和 Pull Request！
