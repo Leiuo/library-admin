@@ -51,7 +51,7 @@
                     </el-breadcrumb>
                 </div>
                 <div class="header-right">
-                    <span>{{ userStore.username }}</span>
+                    <span>{{ userStore.user_name }}</span>
                     <el-button type="danger" size="small" @click="logout">退出登录</el-button>
                 </div>
             </el-header>
