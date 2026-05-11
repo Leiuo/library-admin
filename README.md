@@ -2,7 +2,7 @@
 
 ## 项目结构
 
-```txt
+```tex
 |-- library-admin
     |-- .gitignore
     |-- index.html
