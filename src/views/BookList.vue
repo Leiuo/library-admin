@@ -86,6 +86,10 @@ const rules = {
 };
 
 const openAddDialog = () => {
+    bookForm.value = { title: '', author: '', publisher: '' };
+    if (formRef.value) {
+        formRef.value.resetFields();
+    }
     dialogTitle.value = '新增图书';
     dialogVisible.value = true;
 };

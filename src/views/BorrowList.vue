@@ -107,6 +107,7 @@ const openBorrowDialog = async () => {
         borrowDate: '',
         dueDate: ''
     };
+    if (borrowFormRef.value) borrowFormRef.value.resetFields();
     dialogVisible.value = true;
 };
 
