@@ -479,20 +479,23 @@ onUnmounted(() => {
 .dashboard-container {
     .stats-row {
         display: flex;
-        gap: 15px;
+        gap: 10px;
         margin-bottom: 24px;
 
         .stat-card {
             flex: 1;
             min-width: 180px;
-            display: flex;
-            // flex-direction: row;
-            align-items: center;
-            justify-content: center;
             cursor: pointer;
 
             &:hover {
                 transform: translateY(-3px);
+            }
+
+            :deep(.el-card__body) {
+                display: flex;
+                flex-direction: column;
+                align-items: center;
+                justify-content: center;
             }
 
             .stat-icon {
@@ -502,6 +505,8 @@ onUnmounted(() => {
                 display: flex;
                 align-items: center;
                 justify-content: center;
+                flex-shrink: 0;
+                margin-bottom: 5px;
 
                 .el-icon {
                     font-size: 30px;
@@ -527,7 +532,6 @@ onUnmounted(() => {
 
             .stat-info {
                 text-align: center;
-                margin-top: 5px;
 
                 .stat-value {
                     font-size: 32px;
