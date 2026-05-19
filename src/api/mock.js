@@ -23,7 +23,7 @@ function initMockData() {
         const borrows = [
             { id: 1, bookId: 3, readerId: 1, borrowDate: '2025-04-01', dueDate: '2025-04-15', status: 1 },
             { id: 2, bookId: 1, readerId: 2, borrowDate: '2025-04-10', dueDate: '2025-04-24', status: 1 },
-            { id: 3, bookId: 4, readerId: 3, borrowDate: '2026-05-12', dueDate: '2026-05-25', status: 0 }
+            { id: 3, bookId: 4, readerId: 3, borrowDate: '2026-05-12', dueDate: '2026-05-19', status: 0 }
         ];
         localStorage.setItem(STORAGE_KEYS.BORROWS, JSON.stringify(borrows));
     }
@@ -119,7 +119,7 @@ export const returnBook = (borrowId) => {
     let borrows = getData(STORAGE_KEYS.BORROWS);
     const borrowIdx = borrows.findIndex(borrow => borrow.id === borrowId);
 
-    if (borrowId === -1) {
+    if (borrowIdx === -1) {
         return Promise.reject(new Error('借阅记录不存在'));
     } else if (borrows[borrowIdx].status === 1) {
         return Promise.reject(new Error('该图书已归还'));
@@ -168,6 +168,51 @@ export const addBorrow = (bookId, readerId, borrowDate, dueDate) => {
     book.status = 1;
     setData(STORAGE_KEYS.BOOKS, books);
     return Promise.resolve(newBorrow);
+}
+
+// 编辑借阅
+export const updateBorrow = (id, bookId, readerId, borrowDate, dueDate, status) => {
+    let borrows = getData(STORAGE_KEYS.BORROWS);
+    const borrowIdx = borrows.findIndex(borrow => borrow.id === id);
+    if (borrowIdx === -1) return Promise.reject(new Error('借阅记录不存在'));
+
+    const oldBorrow = borrows[borrowIdx];
+    let books = getData(STORAGE_KEYS.BOOKS);
+
+    // 如果更换了图书，需要同步新旧图书的状态
+    if (oldBorrow.bookId !== bookId) {
+        const oldBook = books.find(b => b.id === oldBorrow.bookId);
+        const newBook = books.find(b => b.id === bookId);
+        if (!newBook) return Promise.reject(new Error('图书不存在'));
+
+        // 只有当前借阅未归还时，才需要处理图书状态流转
+        if (oldBorrow.status === 0) {
+            if (newBook.status === 1 && newBook.id !== oldBorrow.bookId) {
+                return Promise.reject(new Error('该图书已被借出'));
+            }
+            if (oldBook) oldBook.status = 0;   // 旧书恢复可借
+            newBook.status = 1;                  // 新书标记借出
+        }
+    }
+
+    // 如果归还状态发生变化，同步图书状态
+    const oldStatus = oldBorrow.status;
+    const newStatus = status !== undefined ? status : oldStatus;
+    if (oldStatus === 0 && newStatus === 1) {
+        const book = books.find(b => b.id === bookId);
+        if (book) book.status = 0;  // 归还后图书恢复可借
+    } else if (oldStatus === 1 && newStatus === 0) {
+        const book = books.find(b => b.id === bookId);
+        if (book && book.status === 1) {
+            return Promise.reject(new Error('该图书已被借出，无法重新借出'));
+        }
+        if (book) book.status = 1;  // 重新借出
+    }
+
+    setData(STORAGE_KEYS.BOOKS, books);
+    borrows[borrowIdx] = { ...oldBorrow, bookId, readerId, borrowDate, dueDate, status: newStatus };
+    setData(STORAGE_KEYS.BORROWS, borrows);
+    return Promise.resolve(borrows[borrowIdx]);
 }
 
 

@@ -1,7 +1,7 @@
 <template>
     <div class="readerlist-container">
         <div class="top-button">
-            <el-button type="primary" @click="openBorrowDialog">+ 新增读者</el-button>
+            <el-button type="primary" @click="openReaderDialog">+ 新增读者</el-button>
         </div>
 
         <el-table :data="readers" border stripe>
@@ -17,7 +17,7 @@
             </el-table-column>
         </el-table>
 
-        <!-- 借书对话框 -->
+        <!-- 读者对话框 -->
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
             <el-form :model="readerForm" :rules="readerRules" ref="readerFormRef" label-width="80px">
                 <el-form-item label="借书证号" prop="cardNo">
@@ -65,7 +65,7 @@ const fetchReaders = async () => {
     readers.value = await getReaders();
 }
 
-const openBorrowDialog = () => {
+const openReaderDialog = () => {
     dialogTitle.value = '新增读者';
     readerForm.value = {
         cardNo: '',

@@ -19,18 +19,19 @@
             </el-table-column>
             <el-table-column label="操作" width="120">
                 <template #default="{ row }">
+                    <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
                     <el-button v-if="row.status === 0" link type="danger" @click="handleReturn(row.id)">归还</el-button>
                 </template>
             </el-table-column>
         </el-table>
 
-        <!-- 借书对话框 -->
-        <el-dialog v-model="dialogVisible" title="借书" width="30%">
+        <!-- 借阅对话框 -->
+        <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
             <el-form :model="borrowForm" :rules="borrowRules" ref="borrowFormRef" label-width="80px">
                 <el-form-item label="图书" prop="bookId">
-                    <el-select v-model="borrowForm.bookId" placeholder="请选择可借图书" filterable>
+                    <el-select v-model="borrowForm.bookId" placeholder="请选择图书" filterable>
                         <el-option v-for="book in availableBooks" :key="book.id"
-                            :label="`${book.title} (${book.author})`" :value="book.id" />
+                            :label="`${book.title} (${book.author})${book.status === 1 ? ' [已借出]' : ''}`" :value="book.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="读者" prop="readerId">
@@ -47,10 +48,16 @@
                     <el-date-picker v-model="borrowForm.dueDate" type="date" placeholder="选择日期" format="YYYY-MM-DD"
                         value-format="YYYY-MM-DD" />
                 </el-form-item>
+                <el-form-item v-if="editingId" label="状态" prop="status">
+                    <el-select v-model="borrowForm.status" placeholder="请选择状态">
+                        <el-option label="借出中" :value="0" />
+                        <el-option label="已归还" :value="1" />
+                    </el-select>
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="dialogVisible = false">取消</el-button>
-                <el-button type="primary" @click="submitBorrow">确认借书</el-button>
+                <el-button type="primary" @click="submitBorrow">确认</el-button>
             </template>
         </el-dialog>
     </div>
@@ -59,13 +66,13 @@
 <script setup>
 import { ref, onMounted } from 'vue';
 import { ElMessage } from 'element-plus';
-import { getBooks, getBorrows, returnBook, getReaders, addBorrow } from '../api/mock';
-import { fa } from 'element-plus/es/locale/index.mjs';
+import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow } from '../api/mock';
 
 const borrows = ref([]);
+const dialogTitle = ref('');
+const editingId = ref(null);
 
 const fetchBorrows = async () => {
-    // console.log(await getBorrows());
     borrows.value = await getBorrows();
 }
 
@@ -81,7 +88,8 @@ const borrowForm = ref({
     bookId: '',
     readerId: '',
     borrowDate: '',
-    dueDate: ''
+    dueDate: '',
+    status: 0
 });
 const borrowFormRef = ref(null);
 const borrowRules = {
@@ -90,35 +98,63 @@ const borrowRules = {
     borrowDate: [{ required: true, message: '请选择借书日期', trigger: 'change' }],
     dueDate: [{ required: true, message: '请选择应还日期', trigger: 'change' }]
 };
-const availableBooks = ref([]);  // status为0的可借图书
+const availableBooks = ref([]);
 const readers = ref([]);
 
-const fetchSeletData = async () => {
+const fetchSeletData = async (currentBookId = null) => {
     const allBooks = await getBooks();
     availableBooks.value = allBooks.filter(book => book.status === 0);
+    // 编辑时，当前已借出的书也需要出现在下拉列表中
+    if (currentBookId) {
+        const currentBook = allBooks.find(b => b.id === currentBookId);
+        if (currentBook && !availableBooks.value.find(b => b.id === currentBookId)) {
+            availableBooks.value.push(currentBook);
+        }
+    }
     readers.value = await getReaders();
 }
 
 const openBorrowDialog = async () => {
+    dialogTitle.value = '新增借阅';
+    editingId.value = null;
     await fetchSeletData();
     borrowForm.value = {
         bookId: '',
         readerId: '',
         borrowDate: '',
-        dueDate: ''
+        dueDate: '',
+        status: 0
     };
     if (borrowFormRef.value) borrowFormRef.value.resetFields();
     dialogVisible.value = true;
-};
+}
+
+const openEditDialog = async (row) => {
+    dialogTitle.value = '编辑借阅';
+    await fetchSeletData(row.bookId);
+    editingId.value = row.id;
+    borrowForm.value = {
+        bookId: row.bookId,
+        readerId: row.readerId,
+        borrowDate: row.borrowDate,
+        dueDate: row.dueDate,
+        status: row.status
+    };
+    if (borrowFormRef.value) borrowFormRef.value.resetFields();
+    dialogVisible.value = true;
+}
 
 const submitBorrow = async () => {
-    // console.log(borrowFormRef.value);
-    await borrowFormRef.value.validate();  // 等待表单校验
+    await borrowFormRef.value.validate();
     try {
-        // 尝试新增借阅
-        await addBorrow(borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate);
-        ElMessage.success('借书成功');
-        dialogVisible.value = false;  // 关闭对话框
+        if (editingId.value) {
+            await updateBorrow(editingId.value, borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate, borrowForm.value.status);
+            ElMessage.success('更新成功');
+        } else {
+            await addBorrow(borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate);
+            ElMessage.success('借书成功');
+        }
+        dialogVisible.value = false;
         fetchBorrows();
     } catch (error) {
         ElMessage.error(error.message);
