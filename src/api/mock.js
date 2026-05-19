@@ -13,7 +13,8 @@ function initMockData() {
             { id: 2, title: 'Vue.js设计与实现', author: '尤雨溪', publisher: '人民邮电出版社', status: 0 },
             { id: 3, title: 'CSS揭秘', author: 'Lea Verou', publisher: '人民邮电出版社', status: 0 },
             { id: 4, title: '深入理解ES6', author: 'Nicholas C. Zakas', publisher: '电子工业出版社', status: 0 },
-            { id: 5, title: '时间简史', author: 'Stephen Hawking', publisher: '北京联合出版公司', status: 0 }
+            { id: 5, title: '时间简史', author: 'Stephen Hawking', publisher: '北京联合出版公司', status: 0 },
+            { id: 6, title: '人类简史', author: 'Yuval Noah Harari', publisher: '中信出版社', status: 0 }
         ];
         localStorage.setItem(STORAGE_KEYS.BOOKS, JSON.stringify(books));
     }
@@ -31,9 +32,12 @@ function initMockData() {
     // 读者
     if (!localStorage.getItem(STORAGE_KEYS.READERS)) {
         const readers = [
-            { id: 1, cardNo: 'R001', name: '张三', phone: '13324523561' },
-            { id: 2, cardNo: 'R002', name: '李四', phone: '15544672422' },
-            { id: 3, cardNo: 'R003', name: '王五', phone: '19768754545' }
+            { id: 1, cardNo: 'R001', name: '唐三藏', phone: '13324523561' },
+            { id: 2, cardNo: 'R002', name: '孙行者', phone: '15544672422' },
+            { id: 3, cardNo: 'R003', name: '保罗·乔治', phone: '19768754545' },
+            { id: 4, cardNo: 'R004', name: '唐纳德·特朗普', phone: '911-110' },
+            { id: 5, cardNo: 'R005', name: '唐老鸭', phone: '15376234362' },
+            { id: 6, cardNo: 'R006', name: '汤姆猫', phone: '41137324879' }
         ];
         localStorage.setItem(STORAGE_KEYS.READERS, JSON.stringify(readers));
     }
