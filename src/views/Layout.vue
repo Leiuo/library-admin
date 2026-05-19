@@ -103,17 +103,6 @@ const breadcrumbs = computed(() => {
 </script>
 
 <style lang="less" scoped>
-/* 渐隐渐现效果 */
-.fade-enter-active,
-.fade-leave-active {
-    transition: opacity 0.3s ease;
-}
-
-.fade-enter-from,
-.fade-leave-to {
-    opacity: 0;
-}
-
 .layout-aside {
     background-color: #304156;
     transition: width 0.3s ease;
