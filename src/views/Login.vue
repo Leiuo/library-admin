@@ -73,10 +73,25 @@ const handleLogin = async () => {
 <style lang="less" scoped>
 .login-container {
     height: 100%;
-    background-color: rgb(222, 119, 231);
+    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%);
     display: flex;
     align-items: center;
     justify-content: center;
+    position: relative;
+    overflow: hidden;
+
+    &::before {
+        content: '';
+        position: absolute;
+        top: -50%;
+        left: -50%;
+        width: 200%;
+        height: 200%;
+        background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
+                    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
+                    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
+        pointer-events: none;
+    }
 
     .login-card {
         width: 450px;
