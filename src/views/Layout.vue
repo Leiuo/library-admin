@@ -107,6 +107,7 @@ const breadcrumbs = computed(() => {
     background-color: #304156;
     transition: width 0.3s ease;
     white-space: nowrap;
+    overflow: hidden;
 
     .aside-title {
         color: #fff;
