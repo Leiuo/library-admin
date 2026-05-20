@@ -320,7 +320,7 @@ const renderHotBooksChart = () => {
             },
             name: '图书名',
             nameLocation: 'middle',
-            nameGap: 80
+            nameGap: 140
         },
         series: [{
             type: 'bar',
@@ -393,7 +393,7 @@ const renderTopReadersChart = () => {
             axisLabel: { fontSize: 11 },
             name: '读者名',
             nameLocation: 'middle',
-            nameGap: 80
+            nameGap: 180
         },
         series: [{
             type: 'bar',
