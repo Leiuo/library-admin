@@ -8,7 +8,7 @@
                 <h3 v-if="!isCollapse">图书馆管理系统</h3>
             </div>
             <el-menu :default-active="$route.path" :collapse="isCollapse" :collapse-transition="false" router
-                background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff">
+                background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff" class="aside-menu">
                 <el-menu-item index="/dashboard">
                     <el-icon>
                         <DataLine />
@@ -116,6 +116,10 @@ const breadcrumbs = computed(() => {
         align-items: center;
         justify-content: center;
         margin: 20px 0;
+    }
+
+    .aside-menu {
+        border-right: none;
     }
 }
 
