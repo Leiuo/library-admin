@@ -411,14 +411,18 @@ const renderTopReadersChart = () => {
     });
 };
 
-// 防抖 + nextTick + 安全的 resize
+// 防抖 resize
 let resizeTimer = null;
 const handleResize = () => {
+    // console.log('窗口 resize 事件触发');
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
         const charts = [statusChart, trendChart, hotBooksChart, topReadersChart];
+        // console.log('图表实例状态:', charts.map(c => c ? (c.isDisposed?.() ? '已销毁' : '正常') : 'null'));
         charts.forEach(chart => {
             if (chart && !chart.isDisposed()) {
+                // const dom = chart.getDom();
+                // console.log(`图表容器尺寸: ${dom.offsetWidth}x${dom.offsetHeight}`);
                 chart.resize();
             }
         })
