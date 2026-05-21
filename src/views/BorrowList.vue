@@ -4,26 +4,28 @@
             <el-button type="primary" @click="openBorrowDialog">+ 借书</el-button>
         </div>
 
-        <el-table :data="borrows" border stripe>
-            <el-table-column prop="id" label="记录ID" width="70" />
-            <el-table-column prop="bookTitle" label="图书名称" />
-            <el-table-column prop="readerName" label="借阅人" width="240" />
-            <el-table-column prop="borrowDate" label="借书日期" width="120" />
-            <el-table-column prop="dueDate" label="应还日期" width="120" />
-            <el-table-column prop="status" label="状态" width="100">
-                <template #default="{ row }">
-                    <el-tag :type="row.status === 0 ? 'warning' : 'info'">
-                        {{ row.status === 0 ? '借出中' : '已归还' }}
-                    </el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" width="120">
-                <template #default="{ row }">
-                    <el-button link type="primary" @click="openEditDialog(row)" :disabled="row.status === 1">编辑</el-button>
-                    <el-button v-if="row.status === 0" link type="danger" @click="handleReturn(row.id)">归还</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+        <div class="table-wrapper">
+            <el-table :data="borrows" border stripe>
+                <el-table-column prop="id" label="记录ID" width="70" />
+                <el-table-column prop="bookTitle" label="图书名称" />
+                <el-table-column prop="readerName" label="借阅人" width="240" />
+                <el-table-column prop="borrowDate" label="借书日期" width="120" />
+                <el-table-column prop="dueDate" label="应还日期" width="120" />
+                <el-table-column prop="status" label="状态" width="100">
+                    <template #default="{ row }">
+                        <el-tag :type="row.status === 0 ? 'warning' : 'info'">
+                            {{ row.status === 0 ? '借出中' : '已归还' }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="120">
+                    <template #default="{ row }">
+                        <el-button link type="primary" @click="openEditDialog(row)" :disabled="row.status === 1">编辑</el-button>
+                        <el-button v-if="row.status === 0" link type="danger" @click="handleReturn(row.id)">归还</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
 
         <!-- 借阅对话框 -->
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
@@ -172,6 +174,22 @@ onMounted(() => {
 .borrowlist-container {
     .top-button {
         margin-bottom: 16px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    :deep(.el-dialog) {
+        width: 90% !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    :deep(.el-dialog) {
+        width: 60% !important;
     }
 }
 </style>

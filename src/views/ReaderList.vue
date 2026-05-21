@@ -4,18 +4,20 @@
             <el-button type="primary" @click="openReaderDialog">+ 新增读者</el-button>
         </div>
 
-        <el-table :data="readers" border stripe>
-            <el-table-column prop="id" label="ID" width="60" />
-            <el-table-column prop="cardNo" label="借书证号" />
-            <el-table-column prop="name" label="姓名" />
-            <el-table-column prop="phone" label="电话" />
-            <el-table-column label="操作" width="180">
-                <template #default="{ row }">
-                    <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
-                    <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+        <div class="table-wrapper">
+            <el-table :data="readers" border stripe>
+                <el-table-column prop="id" label="ID" width="60" />
+                <el-table-column prop="cardNo" label="借书证号" />
+                <el-table-column prop="name" label="姓名" />
+                <el-table-column prop="phone" label="电话" />
+                <el-table-column label="操作" width="180">
+                    <template #default="{ row }">
+                        <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
+                        <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
 
         <!-- 读者对话框 -->
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
@@ -125,6 +127,22 @@ onMounted(() => {
 .readerlist-container {
     .top-button {
         margin-bottom: 16px;
+    }
+
+    .table-wrapper {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    :deep(.el-dialog) {
+        width: 90% !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    :deep(.el-dialog) {
+        width: 60% !important;
     }
 }
 </style>

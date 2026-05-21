@@ -425,8 +425,8 @@ const handleResize = () => {
                 // console.log(`图表容器尺寸: ${dom.offsetWidth}x${dom.offsetHeight}`);
                 chart.resize();
             }
-        })
-    }, 100)
+        });
+    }, 100);
 };
 
 // 获取所有数据。并刷新所有图表
@@ -476,10 +476,11 @@ onUnmounted(() => {
         display: flex;
         gap: 10px;
         margin-bottom: 24px;
+        flex-wrap: wrap;
 
         .stat-card {
-            flex: 1;
-            min-width: 180px;
+            flex: 1 1 180px;
+            min-width: 140px;
             cursor: pointer;
 
             &:hover {
@@ -565,6 +566,97 @@ onUnmounted(() => {
                 height: 320px;
                 min-width: 0;
                 flex: 1;
+            }
+        }
+    }
+}
+
+// 平板：图表堆叠，卡片两列
+@media (max-width: 1023px) {
+    .dashboard-container {
+        .stats-row {
+            gap: 8px;
+            margin-bottom: 16px;
+
+            .stat-card {
+                flex: 1 1 calc(50% - 4px);
+                min-width: 150px;
+
+                .stat-icon {
+                    width: 42px;
+                    height: 42px;
+                    border-radius: 10px;
+
+                    .el-icon {
+                        font-size: 24px;
+                    }
+                }
+
+                .stat-info .stat-value {
+                    font-size: 26px;
+                }
+            }
+        }
+
+        .charts-row {
+            gap: 12px;
+            margin-bottom: 12px;
+
+            .chart-card {
+                min-width: 300px;
+
+                .chart-container {
+                    height: 280px;
+                }
+            }
+        }
+    }
+}
+
+// 手机：图表全宽堆叠
+@media (max-width: 767px) {
+    .dashboard-container {
+        .stats-row {
+            gap: 6px;
+            margin-bottom: 12px;
+
+            .stat-card {
+                flex: 1 1 calc(50% - 3px);
+                min-width: 0;
+
+                .stat-icon {
+                    width: 36px;
+                    height: 36px;
+                    border-radius: 8px;
+
+                    .el-icon {
+                        font-size: 20px;
+                    }
+                }
+
+                .stat-info {
+                    .stat-value {
+                        font-size: 22px;
+                    }
+
+                    .stat-label {
+                        font-size: 12px;
+                    }
+                }
+            }
+        }
+
+        .charts-row {
+            gap: 10px;
+            margin-bottom: 10px;
+
+            .chart-card {
+                min-width: 0;
+                flex: 1 1 100%;
+
+                .chart-container {
+                    height: 250px;
+                }
             }
         }
     }

@@ -6,26 +6,28 @@
             <el-button type="success" @click="openAddDialog">+ 新增图书</el-button>
         </div>
 
-        <el-table :data="filteredBooks" border stripe>
-            <el-table-column prop="id" label="ID" width="60" />
-            <el-table-column prop="title" label="书名" />
-            <el-table-column prop="author" label="作者" />
-            <el-table-column prop="publisher" label="出版社" />
-            <el-table-column prop="quantity" label="数量" width="80" />
-            <el-table-column prop="status" label="状态" width="100">
-                <template #default="{ row }">
-                    <el-tag :type="row.quantity > 0 ? 'success' : 'danger'">
-                        {{ row.quantity > 0 ? '可借' : '不可借' }}
-                    </el-tag>
-                </template>
-            </el-table-column>
-            <el-table-column label="操作" width="120">
-                <template #default="{ row }">
-                    <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
-                    <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
-                </template>
-            </el-table-column>
-        </el-table>
+        <div class="table-wrapper">
+            <el-table :data="filteredBooks" border stripe>
+                <el-table-column prop="id" label="ID" width="60" />
+                <el-table-column prop="title" label="书名" />
+                <el-table-column prop="author" label="作者" />
+                <el-table-column prop="publisher" label="出版社" />
+                <el-table-column prop="quantity" label="数量" width="80" />
+                <el-table-column prop="status" label="状态" width="100">
+                    <template #default="{ row }">
+                        <el-tag :type="row.quantity > 0 ? 'success' : 'danger'">
+                            {{ row.quantity > 0 ? '可借' : '不可借' }}
+                        </el-tag>
+                    </template>
+                </el-table-column>
+                <el-table-column label="操作" width="120">
+                    <template #default="{ row }">
+                        <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
+                        <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
+                    </template>
+                </el-table-column>
+            </el-table>
+        </div>
 
         <!-- 新增/编辑对话框 -->
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
@@ -151,14 +153,37 @@ onMounted(() => {
 .booklist-container {
     .search-area {
         margin-bottom: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
 
         .el-input {
             width: 250px;
         }
+    }
 
-        .search-btn {
-            margin-left: 8px;
+    .table-wrapper {
+        overflow-x: auto;
+    }
+}
+
+@media (max-width: 767px) {
+    .booklist-container {
+        .search-area {
+            .el-input {
+                width: 100%;
+            }
         }
+    }
+
+    :deep(.el-dialog) {
+        width: 90% !important;
+    }
+}
+
+@media (min-width: 768px) and (max-width: 1023px) {
+    :deep(.el-dialog) {
+        width: 60% !important;
     }
 }
 </style>

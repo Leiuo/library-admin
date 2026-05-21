@@ -95,6 +95,7 @@ const handleLogin = async () => {
 
     .login-card {
         width: 450px;
+        max-width: 90vw;
         border-radius: 10px;
         transition: transform 0.3s ease;
 

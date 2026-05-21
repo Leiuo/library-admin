@@ -1,49 +1,57 @@
 <template>
     <el-container style="height: 100%;">
-        <el-aside class="layout-aside" :width="isCollapse ? '66px' : '220px'">
+        <!-- 移动端遮罩层 -->
+        <div v-if="isMobile && !isCollapse" class="aside-overlay" @click="isCollapse = true"></div>
+
+        <el-aside
+            class="layout-aside"
+            :class="{ 'aside-mobile-open': isMobile && !isCollapse }"
+            :width="isMobile || !isCollapse ? '220px' : '66px'"
+        >
             <div class="aside-title">
                 <el-icon size="24">
                     <Reading />
                 </el-icon>
-                <h3 v-if="!isCollapse">图书馆管理系统</h3>
+                <h3 v-if="isMobile || !isCollapse">图书馆管理系统</h3>
             </div>
-            <el-menu :default-active="$route.path" :collapse="isCollapse" :collapse-transition="false" router
-                background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff" class="aside-menu">
+            <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false" router
+                background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff" class="aside-menu"
+                @select="onMenuSelect">
                 <el-menu-item index="/dashboard">
                     <el-icon>
                         <DataLine />
                     </el-icon>
-                    <span v-if="!isCollapse">数据统计</span>
+                    <span>数据统计</span>
                 </el-menu-item>
                 <el-menu-item index="/books">
                     <el-icon>
                         <Management />
                     </el-icon>
-                    <span v-if="!isCollapse">图书管理</span>
+                    <span>图书管理</span>
                 </el-menu-item>
                 <el-menu-item index="/borrows">
                     <el-icon>
                         <Stamp />
                     </el-icon>
-                    <span v-if="!isCollapse">借阅管理</span>
+                    <span>借阅管理</span>
                 </el-menu-item>
                 <el-menu-item index="/readers">
                     <el-icon>
                         <User />
                     </el-icon>
-                    <span v-if="!isCollapse">读者管理</span>
+                    <span>读者管理</span>
                 </el-menu-item>
             </el-menu>
         </el-aside>
 
-        <el-container>
+        <el-container class="layout-right">
             <el-header class="layout-header">
                 <div class="header-left">
                     <el-icon size="20" @click="toggleCollapse">
                         <Expand v-if="isCollapse" />
                         <Fold v-else />
                     </el-icon>
-                    <el-breadcrumb separator="|">
+                    <el-breadcrumb separator="|" class="header-breadcrumb">
                         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
                         <el-breadcrumb-item v-for="item in breadcrumbs" :key="item.path">
                             {{ item.title }}
@@ -53,7 +61,7 @@
                 <div class="header-right">
                     <div class="userInfo">
                         <el-avatar :src="userStore.user_avatar" :size="30" />
-                        <span>{{ userStore.user_name }}</span>
+                        <span class="user-name">{{ userStore.user_name }}</span>
                     </div>
                     <el-button type="danger" size="small" @click="logout">退出登录</el-button>
                 </div>
@@ -78,7 +86,7 @@
 <script setup>
 import { useUserStore } from '../stores/user';
 import { useRoute, useRouter } from 'vue-router';
-import { ref, computed } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { DataLine } from '@element-plus/icons-vue';
 
 const userStore = useUserStore();
@@ -86,15 +94,46 @@ const route = useRoute();
 const router = useRouter();
 
 const isCollapse = ref(false);
+const isMobile = ref(window.innerWidth < 768);
+
+const handleWindowResize = () => {
+    isMobile.value = window.innerWidth < 768;
+    if (isMobile.value) {
+        isCollapse.value = true;
+    }
+};
+
+onMounted(() => {
+    window.addEventListener('resize', handleWindowResize);
+    if (isMobile.value) {
+        isCollapse.value = true;
+    }
+});
+
+onUnmounted(() => {
+    window.removeEventListener('resize', handleWindowResize);
+});
 
 const logout = () => {
     userStore.logout();
     router.push('/login');
-}
+};
 
 const toggleCollapse = () => {
     isCollapse.value = !isCollapse.value;
-}
+    // 桌面端侧边栏切换后，触发图表 resize
+    if (!isMobile.value) {
+        setTimeout(() => {
+            window.dispatchEvent(new Event('resize'));
+        }, 350);
+    }
+};
+
+const onMenuSelect = () => {
+    if (isMobile.value) {
+        isCollapse.value = true;
+    }
+};
 
 const breadcrumbs = computed(() => {
     const matched = route.matched.filter(item => item.meta?.title);
@@ -102,7 +141,7 @@ const breadcrumbs = computed(() => {
         path: item.path,
         title: item.meta.title
     }));
-})
+});
 </script>
 
 <style lang="less" scoped>
@@ -111,6 +150,7 @@ const breadcrumbs = computed(() => {
     transition: width 0.3s ease;
     white-space: nowrap;
     overflow: hidden;
+    z-index: 1000;
 
     .aside-title {
         color: #fff;
@@ -120,11 +160,27 @@ const breadcrumbs = computed(() => {
         align-items: center;
         justify-content: center;
         margin: 20px 0;
+
+        h3 {
+            white-space: nowrap;
+        }
     }
 
     .aside-menu {
         border-right: none;
     }
+}
+
+.aside-overlay {
+    position: fixed;
+    inset: 0;
+    background: rgba(0, 0, 0, 0.5);
+    z-index: 999;
+}
+
+.layout-right {
+    min-width: 0;
+    overflow: hidden;
 }
 
 .layout-header {
@@ -137,9 +193,15 @@ const breadcrumbs = computed(() => {
         display: flex;
         gap: 20px;
         align-items: center;
+        min-width: 0;
 
         .el-icon {
             cursor: pointer;
+            flex-shrink: 0;
+        }
+
+        .header-breadcrumb {
+            min-width: 0;
         }
     }
 
@@ -147,6 +209,7 @@ const breadcrumbs = computed(() => {
         display: flex;
         align-items: center;
         gap: 10px;
+        flex-shrink: 0;
 
         .userInfo {
             display: flex;
@@ -155,13 +218,14 @@ const breadcrumbs = computed(() => {
 
             .el-avatar {
                 transition: all 0.3s ease;
+                flex-shrink: 0;
 
                 &:hover {
                     transform: scale(1.05);
                 }
             }
 
-            span {
+            .user-name {
                 color: #606266;
                 font-size: 12px;
 
@@ -175,6 +239,46 @@ const breadcrumbs = computed(() => {
         .el-button {
             border-radius: 4px;
         }
+    }
+}
+
+// 移动端：侧边栏变为覆盖式
+@media (max-width: 767px) {
+    .layout-aside {
+        position: fixed;
+        top: 0;
+        left: 0;
+        height: 100%;
+        width: 220px !important;
+        transform: translateX(-100%);
+        transition: transform 0.3s ease;
+
+        &.aside-mobile-open {
+            transform: translateX(0);
+        }
+    }
+
+    .layout-header {
+        padding: 0 12px;
+
+        .header-left {
+            gap: 10px;
+
+            .header-breadcrumb {
+                display: none;
+            }
+        }
+
+        .header-right .user-name {
+            display: none;
+        }
+    }
+}
+
+// 平板端：侧边栏默认折叠
+@media (min-width: 768px) and (max-width: 1023px) {
+    .layout-header {
+        padding: 0 16px;
     }
 }
 </style>
