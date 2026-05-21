@@ -24,7 +24,14 @@ function initMockData() {
         const borrows = [
             { id: 1, bookId: 3, readerId: 1, borrowDate: '2025-04-01', dueDate: '2025-04-15', status: 1 },
             { id: 2, bookId: 1, readerId: 2, borrowDate: '2025-04-10', dueDate: '2025-04-24', status: 1 },
-            { id: 3, bookId: 4, readerId: 3, borrowDate: '2026-05-12', dueDate: '2026-05-19', status: 1 }
+            { id: 3, bookId: 4, readerId: 3, borrowDate: '2025-05-12', dueDate: '2025-05-19', status: 1 },
+            { id: 4, bookId: 2, readerId: 4, borrowDate: '2025-06-01', dueDate: '2025-06-15', status: 1 },
+            { id: 5, bookId: 5, readerId: 5, borrowDate: '2026-04-05', dueDate: '2026-04-19', status: 1 },
+            { id: 6, bookId: 6, readerId: 6, borrowDate: '2026-04-10', dueDate: '2026-04-24', status: 1 },
+            { id: 7, bookId: 1, readerId: 7, borrowDate: '2026-05-15', dueDate: '2026-05-20', status: 1 },
+            { id: 8, bookId: 2, readerId: 8, borrowDate: '2026-06-20', dueDate: '2026-07-04', status: 0 },
+            { id: 9, bookId: 3, readerId: 9, borrowDate: '2026-06-25', dueDate: '2026-07-09', status: 0 },
+            { id: 10, bookId: 4, readerId: 10, borrowDate: '2026-06-30', dueDate: '2026-07-14', status: 0 }
         ];
         localStorage.setItem(STORAGE_KEYS.BORROWS, JSON.stringify(borrows));
     }
@@ -37,7 +44,11 @@ function initMockData() {
             { id: 3, cardNo: 'R003', name: '保罗·乔治', phone: '19768754545' },
             { id: 4, cardNo: 'R004', name: '唐纳德·特朗普', phone: '911-110' },
             { id: 5, cardNo: 'R005', name: '唐老鸭', phone: '15376234362' },
-            { id: 6, cardNo: 'R006', name: '汤姆猫', phone: '41137324879' }
+            { id: 6, cardNo: 'R006', name: '汤姆猫', phone: '41137324879' },
+            { id: 7, cardNo: 'R007', name: '杰瑞鼠', phone: '13245678901' },
+            { id: 8, cardNo: 'R008', name: '勒布朗·詹姆斯', phone: '19876543210' },
+            { id: 9, cardNo: 'R009', name: '林黛玉', phone: '13987654321' },
+            { id: 10, cardNo: 'R010', name: '萨勒芬妮', phone: '18812345678' }
         ];
         localStorage.setItem(STORAGE_KEYS.READERS, JSON.stringify(readers));
     }
