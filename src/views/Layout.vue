@@ -51,7 +51,10 @@
                     </el-breadcrumb>
                 </div>
                 <div class="header-right">
-                    <span>{{ userStore.user_name }}</span>
+                    <div class="userInfo">
+                        <el-avatar :src="userStore.user_avatar" :size="30" />
+                        <span>{{ userStore.user_name }}</span>
+                    </div>
                     <el-button type="danger" size="small" @click="logout">退出登录</el-button>
                 </div>
             </el-header>
@@ -141,8 +144,36 @@ const breadcrumbs = computed(() => {
     }
 
     .header-right {
-        span {
-            margin-right: 16px
+        display: flex;
+        align-items: center;
+        gap: 10px;
+
+        .userInfo {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+
+            .el-avatar {
+                transition: all 0.3s ease;
+
+                &:hover {
+                    transform: scale(1.05);
+                }
+            }
+
+            span {
+                color: #606266;
+                font-size: 12px;
+
+                &:hover {
+                    color: #409eff;
+                    cursor: pointer;
+                }
+            }
+        }
+
+        .el-button {
+            border-radius: 4px;
         }
     }
 }
