@@ -10,19 +10,7 @@
                 </div>
                 <div class="stat-info">
                     <div class="stat-value">{{ stats.totalBooks || 0 }}</div>
-                    <div class="stat-label">馆藏总量</div>
-                </div>
-            </el-card>
-
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon green">
-                    <el-icon>
-                        <Stamp />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.borrowedBooks || 0 }}</div>
-                    <div class="stat-label">当前借出</div>
+                    <div class="stat-label">目前馆藏总量</div>
                 </div>
             </el-card>
 
@@ -35,6 +23,18 @@
                 <div class="stat-info">
                     <div class="stat-value">{{ stats.totalReaders || 0 }}</div>
                     <div class="stat-label">注册读者</div>
+                </div>
+            </el-card>
+
+            <el-card class="stat-card" shadow="hover">
+                <div class="stat-icon green">
+                    <el-icon>
+                        <Stamp />
+                    </el-icon>
+                </div>
+                <div class="stat-info">
+                    <div class="stat-value">{{ stats.borrowedBooks || 0 }}</div>
+                    <div class="stat-label">总借阅数量</div>
                 </div>
             </el-card>
 
@@ -56,7 +56,7 @@
             <el-card class="chart-card" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <span>📊 图书状态分布</span>
+                        <span>📊 当前图书状态分布</span>
                     </div>
                 </template>
                 <div ref="statusChartRef" class="chart-container"></div>
@@ -130,12 +130,12 @@ let trendChart = null;
 let hotBooksChart = null;
 let topReadersChart = null;
 
-const trendYear = ref(2025);  // 趋势图年份
+const trendYear = ref(2026);  // 趋势图年份
 
 // 计算统计数据
 const computeStats = () => {
-    stats.totalBooks = books.value.length;
-    stats.borrowedBooks = books.value.filter(book => book.status === 1).length;
+    stats.totalBooks = books.value.reduce((sum, book) => sum + book.quantity, 0);  // 馆藏总量为所有图书的数量之和
+    stats.borrowedBooks = borrows.value.length;  // 总借阅数量为所有借阅记录的数量
     stats.totalReaders = readers.value.length;
     stats.activeBorrows = borrows.value.filter(borrow => borrow.status === 0).length;
 
@@ -144,12 +144,13 @@ const computeStats = () => {
 
 // 准备图书状态扇形图数据
 const getStatusChartData = () => {
-    const availableBooks = books.value.filter(book => book.status === 0).length;
-    const borrowed = books.value.filter(book => book.status === 1).length;
+    const availableBooks = books.value.filter(book => book.quantity > 0);
+    const availableValue = availableBooks.reduce((sum, book) => sum + book.quantity, 0);  // 可借数量为剩余数量大于 0 的图书的数量之和
+    const borrowedValue = borrows.value.filter(borrow => borrow.status === 0).length;  // 借出数量为状态为 0 的借阅记录数
 
     return [
-        { name: '可借', value: availableBooks, itemStyle: { color: '#67C23A' } },
-        { name: '借出', value: borrowed, itemStyle: { color: '#F56C6C' } }
+        { name: '可借', value: availableValue, itemStyle: { color: '#67C23A' } },
+        { name: '借出', value: borrowedValue, itemStyle: { color: '#F56C6C' } }
     ];
 };
 
@@ -158,7 +159,7 @@ const renderStatusChart = () => {
     if (!statusChartRef.value) return;  // 如果图表 DOM 不存在，直接返回
     if (statusChart) statusChart.dispose();  // 释放 ECharts 实例占用的 DOM 和内存资源，防止组件卸载后发生内存泄漏
 
-    console.log('图书状态扇形图DOM：', statusChartRef.value);
+    console.log('图书状态扇形图 DOM：', statusChartRef.value);
     statusChart = echarts.init(statusChartRef.value);
     const data = getStatusChartData();
     statusChart.setOption({
@@ -320,7 +321,7 @@ const renderHotBooksChart = () => {
             },
             name: '图书名',
             nameLocation: 'middle',
-            nameGap: 140
+            nameGap: 120
         },
         series: [{
             type: 'bar',
@@ -393,7 +394,7 @@ const renderTopReadersChart = () => {
             axisLabel: { fontSize: 11 },
             name: '读者名',
             nameLocation: 'middle',
-            nameGap: 180
+            nameGap: 120
         },
         series: [{
             type: 'bar',
@@ -410,28 +411,17 @@ const renderTopReadersChart = () => {
     });
 };
 
-// // 响应窗口大小变化
-// const handleResize = () => {
-//     nextTick(() => {
-//         ;[statusChart, trendChart, hotBooksChart, topReadersChart].forEach(chart => {
-//             chart && chart.resize() && chart.setOption(chart.getOption(), true);
-//         });
-//     });
-// };
-
 // 防抖 + nextTick + 安全的 resize
 let resizeTimer = null;
 const handleResize = () => {
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-        nextTick(() => {
-            const charts = [statusChart, trendChart, hotBooksChart, topReadersChart];
-            charts.forEach(chart => {
-                if (chart && typeof chart.resize === 'function') {
-                    chart.resize();
-                }
-            })
-        });
+        const charts = [statusChart, trendChart, hotBooksChart, topReadersChart];
+        charts.forEach(chart => {
+            if (chart && !chart.isDisposed()) {
+                chart.resize();
+            }
+        })
     }, 100)
 };
 
@@ -468,6 +458,7 @@ onMounted(() => {
 
 // 组件卸载时销毁图表
 onUnmounted(() => {
+    clearTimeout(resizeTimer);
     window.removeEventListener('resize', handleResize);
     [statusChart, trendChart, hotBooksChart, topReadersChart].forEach(chart => {
         chart && chart.dispose();

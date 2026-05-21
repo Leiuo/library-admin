@@ -7,7 +7,7 @@
         <el-table :data="borrows" border stripe>
             <el-table-column prop="id" label="记录ID" width="70" />
             <el-table-column prop="bookTitle" label="图书名称" />
-            <el-table-column prop="readerName" label="借阅人" />
+            <el-table-column prop="readerName" label="借阅人" width="240" />
             <el-table-column prop="borrowDate" label="借书日期" width="120" />
             <el-table-column prop="dueDate" label="应还日期" width="120" />
             <el-table-column prop="status" label="状态" width="100">
@@ -19,7 +19,7 @@
             </el-table-column>
             <el-table-column label="操作" width="120">
                 <template #default="{ row }">
-                    <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
+                    <el-button link type="primary" @click="openEditDialog(row)" :disabled="row.status === 1">编辑</el-button>
                     <el-button v-if="row.status === 0" link type="danger" @click="handleReturn(row.id)">归还</el-button>
                 </template>
             </el-table-column>
@@ -31,7 +31,7 @@
                 <el-form-item label="图书" prop="bookId">
                     <el-select v-model="borrowForm.bookId" placeholder="请选择图书" filterable>
                         <el-option v-for="book in availableBooks" :key="book.id"
-                            :label="`${book.title} (${book.author})${book.status === 1 ? ' [已借出]' : ''}`" :value="book.id" />
+                            :label="`${book.title} (${book.author})${book.status === 1 ? ' [已借出，剩余' + book.quantity + '本]' : ''}`" :value="book.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="读者" prop="readerId">
@@ -101,11 +101,12 @@ const borrowRules = {
 const availableBooks = ref([]);
 const readers = ref([]);
 
+// 获取可借图书和读者列表
 const fetchSeletData = async (currentBookId = null) => {
     const allBooks = await getBooks();
-    availableBooks.value = allBooks.filter(book => book.status === 0);
-    // 编辑时，当前已借出的书也需要出现在下拉列表中
-    if (currentBookId) {
+    availableBooks.value = allBooks.filter(book => book.quantity > 0 || book.id === currentBookId);  // 可借图书为剩余数量大于 0 的图书，或者当前正在编辑的借阅记录的图书（如果有的话）
+    
+    if (currentBookId) {  // 编辑时需要将当前借阅的图书也加入可选列表（如果它当前不可借）
         const currentBook = allBooks.find(b => b.id === currentBookId);
         if (currentBook && !availableBooks.value.find(b => b.id === currentBookId)) {
             availableBooks.value.push(currentBook);
@@ -130,6 +131,7 @@ const openBorrowDialog = async () => {
 }
 
 const openEditDialog = async (row) => {
+    console.log(row);
     dialogTitle.value = '编辑借阅';
     await fetchSeletData(row.bookId);
     editingId.value = row.id;
@@ -147,10 +149,10 @@ const openEditDialog = async (row) => {
 const submitBorrow = async () => {
     await borrowFormRef.value.validate();
     try {
-        if (editingId.value) {
+        if (editingId.value) {  // 如果正在编辑，则调用更新接口
             await updateBorrow(editingId.value, borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate, borrowForm.value.status);
             ElMessage.success('更新成功');
-        } else {
+        } else {  // 否则调用新增接口
             await addBorrow(borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate);
             ElMessage.success('借书成功');
         }

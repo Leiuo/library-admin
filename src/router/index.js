@@ -52,17 +52,17 @@ const router = createRouter({
     routes
 })
 
-// // 路由守卫
-// router.beforeEach((to, from, next) => {
-//     const userStore = useUserStore();
+// 路由守卫
+router.beforeEach((to, from, next) => {
+    const userStore = useUserStore();
 
-//     if (to.meta.requiresAuth && !userStore.isLoggedIn) {
-//         next('/login');
-//     } else if (to.path === '/login' && userStore.isLoggedIn) {
-//         next('/');
-//     } else {
-//         next();
-//     }
-// })
+    if (to.meta.requiresAuth && !userStore.isLoggedIn) {  // 需要认证但未登录，重定向到登录页
+        next('/login');
+    } else if (to.path === '/login' && userStore.isLoggedIn) {  // 已登录但访问登录页，重定向到首页
+        next('/');
+    } else {  // 其他情况正常导航
+        next();  // 继续导航到目标路由
+    }
+})
 
 export default router

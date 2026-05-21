@@ -11,14 +11,15 @@
             <el-table-column prop="title" label="书名" />
             <el-table-column prop="author" label="作者" />
             <el-table-column prop="publisher" label="出版社" />
+            <el-table-column prop="quantity" label="数量" width="80" />
             <el-table-column prop="status" label="状态" width="100">
                 <template #default="{ row }">
-                    <el-tag :type="row.status === 0 ? 'success' : 'danger'">
-                        {{ row.status === 0 ? '可借' : '借出' }}
+                    <el-tag :type="row.quantity > 0 ? 'success' : 'danger'">
+                        {{ row.quantity > 0 ? '可借' : '不可借' }}
                     </el-tag>
                 </template>
             </el-table-column>
-            <el-table-column label="操作" width="180">
+            <el-table-column label="操作" width="120">
                 <template #default="{ row }">
                     <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
                     <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
@@ -38,6 +39,9 @@
                 <el-form-item label="出版社" prop="publisher">
                     <el-input v-model="bookForm.publisher" />
                 </el-form-item>
+                <el-form-item label="数量" prop="quantity">
+                    <el-input v-model.number="bookForm.quantity" type="number" min="0" />
+                </el-form-item>
             </el-form>
             <template #footer>
                 <el-button @click="dialogVisible = false">取消</el-button>
@@ -49,7 +53,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { ElMessage, ElMessageBox } from 'element-plus';
+import { ElFormItem, ElMessage, ElMessageBox } from 'element-plus';
 import { getBooks, deleteBook, updateBook, addBook } from '../api/mock';
 
 const searchKeyword = ref('');
@@ -74,7 +78,8 @@ const dialogTitle = ref('');
 const bookForm = ref({
     title: '',
     author: '',
-    publisher: ''
+    publisher: '',
+    quantity: 0
 });
 const formRef = ref(null);
 let editingId = null;  // 当前正在编辑的图书编号
@@ -82,11 +87,12 @@ let editingId = null;  // 当前正在编辑的图书编号
 const rules = {
     title: [{ required: true, message: '书名不能为空', tigger: 'blur' }],
     author: [{ required: true, message: '作者不能为空', tigger: 'blur' }],
-    publisher: [{ required: true, message: '出版社不能为空', tigger: 'blur' }]
+    publisher: [{ required: true, message: '出版社不能为空', tigger: 'blur' }],
+    quantity: [{ type: 'number', min: 0, message: '数量必须大于等于0', trigger: 'change' }]
 };
 
 const openAddDialog = () => {
-    bookForm.value = { title: '', author: '', publisher: '' };
+    bookForm.value = { title: '', author: '', publisher: '', quantity: 0 };
     if (formRef.value) {
         formRef.value.resetFields();
     }
@@ -95,9 +101,9 @@ const openAddDialog = () => {
 };
 
 const openEditDialog = (row) => {
-    // console.log(row);
+    console.log(row);
     dialogTitle.value = '编辑图书';
-    bookForm.value = { title: row.title, author: row.author, publisher: row.publisher };
+    bookForm.value = { title: row.title, author: row.author, publisher: row.publisher, quantity: row.quantity };
     editingId = row.id;
     dialogVisible.value = true;
 };

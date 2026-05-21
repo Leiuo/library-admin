@@ -8,13 +8,13 @@ const STORAGE_KEYS = {
 function initMockData() {
     // 图书
     if (!localStorage.getItem(STORAGE_KEYS.BOOKS)) {
-        const books = [
-            { id: 1, title: 'Javascript高级程序设计', author: 'Nicholas C. Zakas', publisher: '人民邮电出版社', status: 0 },  // status: 0 可借, 1 借出
-            { id: 2, title: 'Vue.js设计与实现', author: '尤雨溪', publisher: '人民邮电出版社', status: 0 },
-            { id: 3, title: 'CSS揭秘', author: 'Lea Verou', publisher: '人民邮电出版社', status: 0 },
-            { id: 4, title: '深入理解ES6', author: 'Nicholas C. Zakas', publisher: '电子工业出版社', status: 0 },
-            { id: 5, title: '时间简史', author: 'Stephen Hawking', publisher: '北京联合出版公司', status: 0 },
-            { id: 6, title: '人类简史', author: 'Yuval Noah Harari', publisher: '中信出版社', status: 0 }
+        const books = [  // quantity 表示图书数量
+            { id: 1, title: 'Javascript高级程序设计', author: 'Nicholas C. Zakas', publisher: '人民邮电出版社', quantity: 6 },
+            { id: 2, title: 'Vue.js设计与实现', author: '尤雨溪', publisher: '人民邮电出版社', quantity: 6 },
+            { id: 3, title: 'CSS揭秘', author: 'Lea Verou', publisher: '人民邮电出版社', quantity: 6 },
+            { id: 4, title: '深入理解ES6', author: 'Nicholas C. Zakas', publisher: '电子工业出版社', quantity: 6 },
+            { id: 5, title: '时间简史', author: 'Stephen Hawking', publisher: '北京联合出版公司', quantity: 6 },
+            { id: 6, title: '人类简史', author: 'Yuval Noah Harari', publisher: '中信出版社', quantity: 6 }
         ];
         localStorage.setItem(STORAGE_KEYS.BOOKS, JSON.stringify(books));
     }
@@ -24,7 +24,7 @@ function initMockData() {
         const borrows = [
             { id: 1, bookId: 3, readerId: 1, borrowDate: '2025-04-01', dueDate: '2025-04-15', status: 1 },
             { id: 2, bookId: 1, readerId: 2, borrowDate: '2025-04-10', dueDate: '2025-04-24', status: 1 },
-            { id: 3, bookId: 4, readerId: 3, borrowDate: '2026-05-12', dueDate: '2026-05-19', status: 0 }
+            { id: 3, bookId: 4, readerId: 3, borrowDate: '2026-05-12', dueDate: '2026-05-19', status: 1 }
         ];
         localStorage.setItem(STORAGE_KEYS.BORROWS, JSON.stringify(borrows));
     }
@@ -52,24 +52,16 @@ const setData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 // -------------------- 图书模块 --------------------
 // export const getBooks = () => Promise.resolve(getData(STORAGE_KEYS.BOOKS))
 
-// 根据借阅状态动态获取图书数据
+// 获取图书列表 
 export const getBooks = () => {
     let books = getData(STORAGE_KEYS.BOOKS);
-    const borrows = getData(STORAGE_KEYS.BORROWS);
-    books.forEach(book => {
-        const hasBorrow = borrows.some(borrow => borrow.bookId === book.id && !borrow.status);
-        if (hasBorrow) {
-            book.status = 1;
-        }
-    });
-
     return Promise.resolve(books);
 }
 
 export const addBook = (book) => {
     const books = getData(STORAGE_KEYS.BOOKS);
     const newId = books.length ? Math.max(...books.map(b => b.id)) + 1 : 1;
-    const newBook = { ...book, id: newId, status: 0 };
+    const newBook = { ...book, id: newId, quantity: book.quantity };  // 新增图书的剩余数量初始为其总数量
     books.push(newBook);
     setData(STORAGE_KEYS.BOOKS, books);
     return Promise.resolve(newBook);
@@ -89,11 +81,11 @@ export const updateBook = (id, updatedData) => {
 export const deleteBook = (id) => {
     // 检查是否存在未归还的借阅记录关联此书
     const borrows = getData(STORAGE_KEYS.BORROWS);
+    let books = getData(STORAGE_KEYS.BOOKS);
     const hasActiveBorrow = borrows.some(b => b.bookId === id && b.status === 0);
     if (hasActiveBorrow) {
         return Promise.reject(new Error('该书尚有未归还的借阅，不能删除'));
     }
-    let books = getData(STORAGE_KEYS.BOOKS);
     books = books.filter(b => b.id !== id);
     setData(STORAGE_KEYS.BOOKS, books);
     return Promise.resolve();
@@ -137,7 +129,7 @@ export const returnBook = (borrowId) => {
     const books = getData(STORAGE_KEYS.BOOKS);
     const book = books.find(book => book.id === borrows[borrowIdx].bookId);
     if (book) {
-        book.status = 0;
+        book.quantity += 1;  // 归还后图书剩余数量加 1
         setData(STORAGE_KEYS.BOOKS, books);
     }
 
@@ -149,7 +141,7 @@ export const addBorrow = (bookId, readerId, borrowDate, dueDate) => {
     const books = getData(STORAGE_KEYS.BOOKS);
     const book = books.find(book => book.id === bookId);
     if (!book) return Promise.reject(new Error('图书不存在'));
-    if (book.status) return Promise.reject(new Error('图书已被借出'));
+    if (book.quantity === 0) return Promise.reject(new Error('图书已被借完，无法借出'));
 
     const readers = getData(STORAGE_KEYS.READERS);
     const reader = readers.find(reader => reader.id === readerId);
@@ -168,8 +160,8 @@ export const addBorrow = (bookId, readerId, borrowDate, dueDate) => {
     borrows.push(newBorrow);
     setData(STORAGE_KEYS.BORROWS, borrows);
 
-    // 修改图书状态为借出
-    book.status = 1;
+    // 借出后图书剩余数量减 1
+    book.quantity -= 1;
     setData(STORAGE_KEYS.BOOKS, books);
     return Promise.resolve(newBorrow);
 }
@@ -191,26 +183,26 @@ export const updateBorrow = (id, bookId, readerId, borrowDate, dueDate, status) 
 
         // 只有当前借阅未归还时，才需要处理图书状态流转
         if (oldBorrow.status === 0) {
-            if (newBook.status === 1 && newBook.id !== oldBorrow.bookId) {
-                return Promise.reject(new Error('该图书已被借出'));
+            if (newBook.quantity === 0 && newBook.id !== oldBorrow.bookId) {
+                return Promise.reject(new Error('该图书已被借完，无法借出'));
             }
-            if (oldBook) oldBook.status = 0;   // 旧书恢复可借
-            newBook.status = 1;                  // 新书标记借出
+            if (oldBook) oldBook.quantity += 1;   // 旧书剩余数量加 1
+            newBook.quantity -= 1;                  // 新书数量减 1
         }
     }
 
     // 如果归还状态发生变化，同步图书状态
     const oldStatus = oldBorrow.status;
     const newStatus = status !== undefined ? status : oldStatus;
-    if (oldStatus === 0 && newStatus === 1) {
+    if (oldStatus === 0 && newStatus === 1) {  // 从借出改为归还
         const book = books.find(b => b.id === bookId);
-        if (book) book.status = 0;  // 归还后图书恢复可借
-    } else if (oldStatus === 1 && newStatus === 0) {
+        if (book) book.quantity += 1;  // 归还后图书剩余数量加 1
+    } else if (oldStatus === 1 && newStatus === 0) {  // 从归还改为借出
         const book = books.find(b => b.id === bookId);
-        if (book && book.status === 1) {
-            return Promise.reject(new Error('该图书已被借出，无法重新借出'));
+        if (book && book.quantity === 0) {
+            return Promise.reject(new Error('该图书已被借完，无法重新借出'));
         }
-        if (book) book.status = 1;  // 重新借出
+        if (book) book.quantity -= 1;  // 重新借出
     }
 
     setData(STORAGE_KEYS.BOOKS, books);
