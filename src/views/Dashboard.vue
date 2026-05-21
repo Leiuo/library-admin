@@ -566,6 +566,7 @@ onUnmounted(() => {
                 height: 320px;
                 min-width: 0;
                 flex: 1;
+                overflow: hidden;
             }
         }
     }
