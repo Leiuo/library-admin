@@ -436,12 +436,12 @@ const fetchAllData = async () => {
         books.value = await getBooks();
         borrows.value = await getBorrows();
         readers.value = await getReaders();
-        refreshAllCharts();
     } catch (error) {
         console.error('获取数据失败：', error);
     } finally {
         loading.value = false;
     }
+    refreshAllCharts();
 };
 
 // 刷新所有图表

@@ -65,6 +65,7 @@ const setData = (key, data) => localStorage.setItem(key, JSON.stringify(data));
 
 // 获取图书列表 
 export const getBooks = () => {
+    initMockData();
     let books = getData(STORAGE_KEYS.BOOKS);
     return Promise.resolve(books);
 }
@@ -105,6 +106,7 @@ export const deleteBook = (id) => {
 
 // -------------------- 借阅模块 --------------------
 export const getBorrows = () => {
+    initMockData();
     const borrows = getData(STORAGE_KEYS.BORROWS);
     const books = getData(STORAGE_KEYS.BOOKS);
     const readers = getData(STORAGE_KEYS.READERS);
@@ -224,7 +226,10 @@ export const updateBorrow = (id, bookId, readerId, borrowDate, dueDate, status) 
 
 
 // -------------------- 读者模块 --------------------
-export const getReaders = () => Promise.resolve(getData(STORAGE_KEYS.READERS))
+export const getReaders = () => {
+    initMockData();
+    return Promise.resolve(getData(STORAGE_KEYS.READERS));
+}
 
 export const addReader = (reader) => {
     const readers = getData(STORAGE_KEYS.READERS);
