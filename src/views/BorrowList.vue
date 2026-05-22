@@ -5,16 +5,16 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="borrows" border stripe>
+            <el-table :data="borrows" border stripe :row-class-name="rowClassName">
                 <el-table-column prop="id" label="记录ID" width="70" />
                 <el-table-column prop="bookTitle" label="图书名称" />
                 <el-table-column prop="readerName" label="借阅人" width="240" />
                 <el-table-column prop="borrowDate" label="借书日期" width="120" />
                 <el-table-column prop="dueDate" label="应还日期" width="120" />
-                <el-table-column prop="status" label="状态" width="100">
+                <el-table-column prop="status" label="状态" width="110">
                     <template #default="{ row }">
-                        <el-tag :type="row.status === 0 ? 'warning' : 'info'">
-                            {{ row.status === 0 ? '借出中' : '已归还' }}
+                        <el-tag :type="statusTagType(row)">
+                            {{ statusText(row) }}
                         </el-tag>
                     </template>
                 </el-table-column>
@@ -77,6 +77,21 @@ const dialogTitle = ref('');
 const editingId = ref(null);
 
 const loading = ref(false);  // 加载状态
+
+// 判断借阅是否逾期（未归还 且 当前日期已过应还日期）
+const today = new Date().toISOString().split('T')[0];
+const isOverdue = (row) => row.status === 0 && row.dueDate < today;
+const statusText = (row) => {
+    if (row.status === 1) return '已归还';
+    return isOverdue(row) ? '逾期中' : '借出中';
+};
+const statusTagType = (row) => {
+    if (row.status === 1) return 'info';
+    return isOverdue(row) ? 'danger' : 'warning';
+};
+const rowClassName = ({ row }) => {
+    return isOverdue(row) ? 'overdue-row' : '';
+};
 
 const fetchBorrows = async () => {
     loading.value = true;
@@ -213,6 +228,10 @@ onMounted(() => {
 
     .table-wrapper {
         overflow-x: auto;
+    }
+
+    :deep(.overdue-row) {
+        background-color: rgba(161, 11, 11, 0.08) !important;
     }
 }
 
