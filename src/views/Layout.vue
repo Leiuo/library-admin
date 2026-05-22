@@ -3,19 +3,16 @@
         <!-- 移动端遮罩层 -->
         <div v-if="isMobile && !isCollapse" class="aside-overlay" @click="isCollapse = true"></div>
 
-        <el-aside
-            class="layout-aside"
-            :class="{ 'aside-mobile-open': isMobile && !isCollapse }"
-            :width="isMobile || !isCollapse ? '220px' : '66px'"
-        >
+        <el-aside class="layout-aside" :class="{ 'aside-mobile-open': isMobile && !isCollapse }"
+            :width="isMobile || !isCollapse ? '220px' : '66px'">
             <div class="aside-title">
                 <el-icon size="24">
                     <Reading />
                 </el-icon>
                 <h3 v-if="isMobile || !isCollapse">图书馆管理系统</h3>
             </div>
-            <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false" router
-                background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff" class="aside-menu"
+            <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false"
+                router background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff" class="aside-menu"
                 @select="onMenuSelect">
                 <el-menu-item index="/dashboard">
                     <el-icon>
@@ -88,6 +85,7 @@ import { useUserStore } from '../stores/user';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { DataLine } from '@element-plus/icons-vue';
+import { ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();
 const route = useRoute();
@@ -115,8 +113,12 @@ onUnmounted(() => {
 });
 
 const logout = () => {
-    userStore.logout();
-    router.push('/login');
+    ElMessageBox.confirm('确定要退出登录吗？', '提示', { type: 'warning' }).then(() => {
+        userStore.logout();
+        router.push('/login');
+    }).catch(() => {
+        // 取消操作，不执行任何动作
+    });
 };
 
 const toggleCollapse = () => {
