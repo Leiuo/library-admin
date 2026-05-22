@@ -68,7 +68,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow } from '../api/mock';
 
@@ -109,8 +109,33 @@ const borrowRules = {
     bookId: [{ required: true, message: '请选择图书', trigger: 'change' }],
     readerId: [{ required: true, message: '请选择读者', trigger: 'change' }],
     borrowDate: [{ required: true, message: '请选择借书日期', trigger: 'change' }],
-    dueDate: [{ required: true, message: '请选择应还日期', trigger: 'change' }]
+    dueDate: [
+        { required: true, message: '请选择应还日期', trigger: 'change' },
+        // 自定义验证规则，确保应还日期不早于借书日期
+        {
+            validator: (rule, value, callback) => {
+                if (!value) {
+                    callback(new Error('请选择应还日期'));
+                } else if (borrowForm.value.borrowDate && value < borrowForm.value.borrowDate) {
+                    callback(new Error('应还日期不能早于借书日期'));
+                } else {
+                    callback();
+                }
+            },
+            trigger: 'change'
+        }
+    ]
 };
+
+// 借书日期变化时，重新校验应还日期
+watch(() => borrowForm.value.borrowDate, () => {
+    if (borrowForm.value.dueDate && borrowFormRef.value) {
+        // console.log('借书日期变化，重新校验应还日期');
+        // console.log('borrowFormRef.value:', borrowFormRef.value);
+        borrowFormRef.value.validateField('dueDate');
+    }
+});
+
 const availableBooks = ref([]);
 const readers = ref([]);
 
