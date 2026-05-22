@@ -60,10 +60,18 @@ import { getBooks, deleteBook, updateBook, addBook } from '../api/mock';
 
 const searchKeyword = ref('');
 const books = ref([]);
+const loading = ref(false);  // 加载状态，防止重复请求
 
 const fetchBooks = async () => {
-    // console.log(await getBooks());
-    books.value = await getBooks();
+    loading.value = true;
+    try {
+        // console.log(await getBooks());
+        books.value = await getBooks();
+    } catch (error) {
+        ElMessage.error('获取图书列表失败');
+    } finally {
+        loading.value = false;
+    }
 };
 
 const filteredBooks = computed(() => {
@@ -122,7 +130,7 @@ const handleDelete = (id) => {
         } catch (error) {
             ElMessage.error(error.message);
         }
-    }).catch(() => {});
+    }).catch(() => { });
 
 };
 

@@ -56,6 +56,8 @@ const readerForm = ref({
 });
 let editingId = null;
 
+const loading = ref(false);  // 加载状态
+
 const readerRules = {
     cardNo: [{ required: true, message: '借书证号不能为空', trigger: 'blur' }],
     name: [{ required: true, message: '姓名不能为空', trigger: 'blur' }],
@@ -63,8 +65,15 @@ const readerRules = {
 };
 
 const fetchReaders = async () => {
-    // console.log(await getReaders());
-    readers.value = await getReaders();
+    loading.value = true;
+    try {
+        // console.log(await getReaders());
+        readers.value = await getReaders();
+    } catch (error) {
+        ElMessage.error('获取读者列表失败');
+    } finally {
+        loading.value = false;
+    }
 }
 
 const openReaderDialog = () => {
@@ -100,7 +109,7 @@ const handleDelete = (id) => {
             } catch (error) {
                 ElMessage.error(error.message);
             }
-        }).catch(() => {});
+        }).catch(() => { });
 }
 
 const submitReader = async () => {

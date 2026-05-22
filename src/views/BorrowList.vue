@@ -20,8 +20,10 @@
                 </el-table-column>
                 <el-table-column label="操作" width="120">
                     <template #default="{ row }">
-                        <el-button link type="primary" @click="openEditDialog(row)" :disabled="row.status === 1">编辑</el-button>
-                        <el-button v-if="row.status === 0" link type="danger" @click="handleReturn(row.id)">归还</el-button>
+                        <el-button link type="primary" @click="openEditDialog(row)"
+                            :disabled="row.status === 1">编辑</el-button>
+                        <el-button v-if="row.status === 0" link type="danger"
+                            @click="handleReturn(row.id)">归还</el-button>
                     </template>
                 </el-table-column>
             </el-table>
@@ -74,8 +76,17 @@ const borrows = ref([]);
 const dialogTitle = ref('');
 const editingId = ref(null);
 
+const loading = ref(false);  // 加载状态
+
 const fetchBorrows = async () => {
-    borrows.value = await getBorrows();
+    loading.value = true;
+    try {
+        borrows.value = await getBorrows();
+    } catch (error) {
+        ElMessage.error('获取借阅列表失败');
+    } finally {
+        loading.value = false;
+    }
 }
 
 const handleReturn = (borrowId) => {
@@ -107,7 +118,7 @@ const readers = ref([]);
 const fetchSeletData = async (currentBookId = null) => {
     const allBooks = await getBooks();
     availableBooks.value = allBooks.filter(book => book.quantity > 0 || book.id === currentBookId);  // 可借图书为剩余数量大于 0 的图书，或者当前正在编辑的借阅记录的图书（如果有的话）
-    
+
     if (currentBookId) {  // 编辑时需要将当前借阅的图书也加入可选列表（如果它当前不可借）
         const currentBook = allBooks.find(b => b.id === currentBookId);
         if (currentBook && !availableBooks.value.find(b => b.id === currentBookId)) {
