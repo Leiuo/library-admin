@@ -43,6 +43,12 @@ const routes = [
                 meta: { title: '数据统计', KeepAlive: false }
             }
         ]
+    },
+    {
+        path: '/:pathMatch(.*)*',  // 匹配所有未定义的路径
+        name: '404',
+        component: () => import('../views/404.vue'),
+        meta: { requiresAuth: false }
     }
 ]
 
