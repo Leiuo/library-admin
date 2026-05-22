@@ -33,7 +33,7 @@
                 <el-form-item label="图书" prop="bookId">
                     <el-select v-model="borrowForm.bookId" placeholder="请选择图书" filterable>
                         <el-option v-for="book in availableBooks" :key="book.id"
-                            :label="`${book.title} (${book.author})${book.status === 1 ? ' [已借出，剩余' + book.quantity + '本]' : ''}`" :value="book.id" />
+                            :label="`${book.title} (${book.author}) [剩余${book.quantity}本]`" :value="book.id" />
                     </el-select>
                 </el-form-item>
                 <el-form-item label="读者" prop="readerId">

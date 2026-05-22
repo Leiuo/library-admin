@@ -29,9 +29,9 @@ function initMockData() {
             { id: 5, bookId: 5, readerId: 5, borrowDate: '2026-04-05', dueDate: '2026-04-19', status: 1 },
             { id: 6, bookId: 6, readerId: 6, borrowDate: '2026-04-10', dueDate: '2026-04-24', status: 1 },
             { id: 7, bookId: 1, readerId: 7, borrowDate: '2026-05-15', dueDate: '2026-05-20', status: 1 },
-            { id: 8, bookId: 2, readerId: 8, borrowDate: '2026-06-20', dueDate: '2026-07-04', status: 0 },
-            { id: 9, bookId: 3, readerId: 9, borrowDate: '2026-06-25', dueDate: '2026-07-09', status: 0 },
-            { id: 10, bookId: 4, readerId: 10, borrowDate: '2026-06-30', dueDate: '2026-07-14', status: 0 }
+            { id: 8, bookId: 2, readerId: 8, borrowDate: '2026-05-20', dueDate: '2026-05-22', status: 1 },
+            { id: 9, bookId: 3, readerId: 9, borrowDate: '2026-05-25', dueDate: '2026-06-09', status: 1 },
+            { id: 10, bookId: 4, readerId: 10, borrowDate: '2026-05-30', dueDate: '2026-06-14', status: 1 }
         ];
         localStorage.setItem(STORAGE_KEYS.BORROWS, JSON.stringify(borrows));
     }

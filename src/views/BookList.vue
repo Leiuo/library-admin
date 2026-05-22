@@ -62,7 +62,7 @@ const searchKeyword = ref('');
 const books = ref([]);
 
 const fetchBooks = async () => {
-    console.log(await getBooks());
+    // console.log(await getBooks());
     books.value = await getBooks();
 };
 
@@ -94,6 +94,7 @@ const rules = {
 };
 
 const openAddDialog = () => {
+    editingId = null;
     bookForm.value = { title: '', author: '', publisher: '', quantity: 0 };
     if (formRef.value) {
         formRef.value.resetFields();
@@ -132,12 +133,16 @@ const submitForm = async () => {
     // console.log(formRef);
     await formRef.value.validate();  // 等待表单校验通过
 
-    if (editingId) {  // 如果是编辑图书，更新当前图书
-        await updateBook(editingId, bookForm.value);
-        ElMessage.success('更新成功');
-    } else {  // 如果是新增图书，将图书加到列表中
-        await addBook(bookForm.value);
-        ElMessage.success('添加成功');
+    try {
+        if (editingId) {  // 如果是编辑图书，更新当前图书
+            await updateBook(editingId, bookForm.value);
+            ElMessage.success('更新成功');
+        } else {  // 如果是新增图书，将图书加到列表中
+            await addBook(bookForm.value);
+            ElMessage.success('添加成功');
+        }
+    } catch (error) {
+        ElMessage.error(error.message);
     }
 
     dialogVisible.value = false;  // 关闭对话框
