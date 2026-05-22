@@ -100,7 +100,7 @@ const handleDelete = (id) => {
             } catch (error) {
                 ElMessage.error(error.message);
             }
-        });
+        }).catch(() => {});
 }
 
 const submitReader = async () => {

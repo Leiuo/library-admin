@@ -245,9 +245,6 @@ export const updateReader = (id, updatedData) => {
     const idx = readers.findIndex(reader => reader.id === id);
 
     if (idx !== -1) {
-        console.log('readers[idx]:', readers[idx]);
-        console.log('updatedData:', updatedData);
-        // readers[idx] = [...readers[idx], ...updatedData];
         readers[idx] = { ...readers[idx], ...updatedData };
         setData(STORAGE_KEYS.READERS, readers);
         return Promise.resolve(readers[idx]);

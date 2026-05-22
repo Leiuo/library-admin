@@ -1,6 +1,5 @@
 import { createRouter, createWebHashHistory } from "vue-router"
 import { useUserStore } from "../stores/user"
-import { KeepAlive } from "vue"
 
 
 const routes = [

@@ -133,7 +133,6 @@ const openBorrowDialog = async () => {
 }
 
 const openEditDialog = async (row) => {
-    console.log(row);
     dialogTitle.value = '编辑借阅';
     await fetchSeletData(row.bookId);
     editingId.value = row.id;

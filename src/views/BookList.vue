@@ -55,7 +55,7 @@
 
 <script setup>
 import { ref, computed, onMounted } from 'vue';
-import { ElFormItem, ElMessage, ElMessageBox } from 'element-plus';
+import { ElMessage, ElMessageBox } from 'element-plus';
 import { getBooks, deleteBook, updateBook, addBook } from '../api/mock';
 
 const searchKeyword = ref('');
@@ -104,7 +104,6 @@ const openAddDialog = () => {
 };
 
 const openEditDialog = (row) => {
-    console.log(row);
     dialogTitle.value = '编辑图书';
     bookForm.value = { title: row.title, author: row.author, publisher: row.publisher, quantity: row.quantity };
     editingId = row.id;
@@ -115,17 +114,15 @@ const handleDelete = (id) => {
     // ElMessageBox.confirm('提示', '确定要删除该图书吗？');
     ElMessageBox.confirm('你确定要删除该图书吗？', '提示', {
         type: 'warning',
-        // confirmButtonText: '确定',
-        // cancelButtonText: '取消'
     }).then(async () => {
         try {
             await deleteBook(id);
             ElMessage.success('删除成功');
-            fetchBooks();  // 刷新book列表
+            fetchBooks();
         } catch (error) {
             ElMessage.error(error.message);
         }
-    });
+    }).catch(() => {});
 
 };
 

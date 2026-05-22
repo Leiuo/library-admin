@@ -138,8 +138,6 @@ const computeStats = () => {
     stats.borrowedBooks = borrows.value.length;  // 总借阅数量为所有借阅记录的数量
     stats.totalReaders = readers.value.length;
     stats.activeBorrows = borrows.value.filter(borrow => borrow.status === 0).length;
-
-    console.log('统计数据已更新:', stats);
 };
 
 // 准备图书状态扇形图数据
@@ -156,10 +154,8 @@ const getStatusChartData = () => {
 
 // 绘制图书状态扇形图
 const renderStatusChart = () => {
-    if (!statusChartRef.value) return;  // 如果图表 DOM 不存在，直接返回
-    if (statusChart) statusChart.dispose();  // 释放 ECharts 实例占用的 DOM 和内存资源，防止组件卸载后发生内存泄漏
-
-    console.log('图书状态扇形图 DOM：', statusChartRef.value);
+    if (!statusChartRef.value) return;
+    if (statusChart) statusChart.dispose();
     statusChart = echarts.init(statusChartRef.value);
     const data = getStatusChartData();
     statusChart.setOption({
