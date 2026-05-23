@@ -1,25 +1,47 @@
 <template>
     <div class="login-container">
-        <el-card class="login-card">
-            <div class="card-header">
-                <h2>图书馆后台管理系统</h2>
-                <p>欢迎登录</p>
+        <div class="brand-panel">
+            <div class="brand-content">
+                <div class="brand-marker" />
+                <h2 class="brand-name">Library Admin</h2>
+                <p class="brand-slogan">
+                    图书馆后台管理系统<br>
+                    为您的图书馆提供高效便捷的管理工具
+                </p>
             </div>
-            <el-form :model="loginForm" :rules="rules" ref="loginFormRef">
+        </div>
+
+        <div class="form-container">
+            <div class="form-header">
+                <h2 class="form-title">欢迎登录</h2>
+                <p class="form-subtitle">使用您的账户以访问控制面板</p>
+            </div>
+
+            <el-form ref="loginFormRef" :model="loginForm" :rules="rules" size="large" class="login-form"
+                @keyup.enter="handleLogin">
                 <el-form-item prop="username">
-                    <el-input v-model="loginForm.username" placeholder="用户名" prefix-icon="User" />
+                    <label class="field-label">用户名</label>
+                    <el-input v-model="loginForm.username" placeholder="输入您的用户名" prefix-icon="User" />
                 </el-form-item>
+
                 <el-form-item prop="password">
-                    <el-input v-model="loginForm.password" placeholder="密码" prefix-icon="Lock" show-password />
+                    <label class="field-label">密码</label>
+                    <el-input v-model="loginForm.password" type="password" placeholder="输入您的密码" show-password prefix-icon="Lock" />
                 </el-form-item>
+
                 <el-form-item>
-                    <el-button type="primary" @click="handleLogin" :loading="loading" style="width: 100%">登录</el-button>
+                    <el-button type="primary" :loading="loading" class="submit-btn" @click="handleLogin"
+                        style="width: 100%;">
+                        登录
+                    </el-button>
                 </el-form-item>
             </el-form>
+
             <div class="tip">
+                <span class="tip-dot" />
                 用户名：任意用户名 / 密码：123456
             </div>
-        </el-card>
+        </div>
     </div>
 </template>
 
@@ -73,56 +95,134 @@ const handleLogin = async () => {
 <style lang="less" scoped>
 .login-container {
     height: 100%;
-    background: linear-gradient(135deg, #1a1a2e 0%, #16213e 30%, #0f3460 60%, #533483 100%);
     display: flex;
-    align-items: center;
-    justify-content: center;
-    position: relative;
-    overflow: hidden;
 
-    &::before {
-        content: '';
-        position: absolute;
-        top: -50%;
-        left: -50%;
-        width: 200%;
-        height: 200%;
-        background: radial-gradient(circle at 30% 20%, rgba(255, 255, 255, 0.03) 0%, transparent 50%),
-                    radial-gradient(circle at 70% 80%, rgba(255, 255, 255, 0.04) 0%, transparent 50%),
-                    radial-gradient(circle at 50% 50%, rgba(255, 255, 255, 0.02) 0%, transparent 60%);
-        pointer-events: none;
-    }
+    .brand-panel {
+        flex: 1;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        justify-content: center;
+        background: #0f172a;
+        position: relative;
 
-    .login-card {
-        width: 450px;
-        max-width: 90vw;
-        border-radius: 10px;
-        transition: transform 0.3s ease;
-
-        &:hover {
-            transform: translateY(-5px);
-        }
-
-        .card-header {
-            display: flex;
-            flex-direction: column;
-            gap: 5px;
-            text-align: center;
-            margin-bottom: 20px;
-
-            h2 {
-                font-size: 22px;
+        .brand-content {
+            .brand-marker {
+                width: 32px;
+                height: 3px;
+                background: #0d9488;
+                border-radius: 2px;
+                margin-bottom: 15px;
             }
 
-            p {
+            .brand-name {
+                color: #fff;
+                font-size: 40px;
+                margin-bottom: 32px;
+                font-weight: 700;
+                letter-spacing: -1.5px;
+                line-height: 1.2;
+            }
+
+            .brand-slogan {
+                color: #94a3b8;
+                font-size: 15px;
+                line-height: 1.7;
+            }
+        }
+    }
+
+    // .login-card {
+    //     width: 450px;
+    //     max-width: 90vw;
+    //     border-radius: 10px;
+    //     transition: transform 0.3s ease;
+
+    //     &:hover {
+    //         transform: translateY(-5px);
+    //     }
+
+    //     .card-header {
+    //         display: flex;
+    //         flex-direction: column;
+    //         gap: 5px;
+    //         text-align: center;
+    //         margin-bottom: 20px;
+
+    //         h2 {
+    //             font-size: 22px;
+    //         }
+
+    //         p {
+    //             font-size: 14px;
+    //         }
+    //     }
+
+    //     .tip {
+    //         text-align: center;
+    //         font-size: 12px;
+    //         color: #909399;
+    //     }
+    // }
+
+    .form-container {
+        width: 480px;
+        padding: 60px;
+        display: flex;
+        flex-direction: column;
+        justify-content: space-evenly;
+
+        .form-header {
+            .form-title {
+                font-size: 28px;
+                font-weight: bold;
+                margin-bottom: 8px;
+            }
+
+            .form-subtitle {
+                color: #64748b;
                 font-size: 14px;
             }
         }
 
+        .login-form {
+            width: 100%;
+
+            .field-label {
+                font-size: 13px;
+                color: #334155;
+            }
+
+            .submit-btn {
+                width: 100%;
+                height: 44px;
+                font-size: 16px;
+                border-radius: 8px;
+                background: #0d9488;
+
+                &:hover {
+                    background: #0f766e;
+                }
+            }
+        }
+
         .tip {
-            text-align: center;
             font-size: 12px;
-            color: #909399;
+            background: #f8fafc;
+            color: #64748b;
+            border: 1px solid #e2e8f0;
+            padding: 10px 15px;
+            border-radius: 8px;
+            display: flex;
+            gap: 8px;
+            align-items: center;
+
+            .tip-dot {
+                width: 5px;
+                height: 5px;
+                border-radius: 50%;
+                background-color: #0d9488;
+            }
         }
     }
 }
