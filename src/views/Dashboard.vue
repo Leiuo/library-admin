@@ -147,8 +147,8 @@ const getStatusChartData = () => {
     const borrowedValue = borrows.value.filter(borrow => borrow.status === 0).length;  // 借出数量为状态为 0 的借阅记录数
 
     return [
-        { name: '可借', value: availableValue, itemStyle: { color: '#67C23A' } },
-        { name: '借出', value: borrowedValue, itemStyle: { color: '#F56C6C' } }
+        { name: '可借', value: availableValue, itemStyle: { color: '#22c55e' } },
+        { name: '借出', value: borrowedValue, itemStyle: { color: '#f59e0b' } }
     ];
 };
 
@@ -235,16 +235,16 @@ const renderTrendChart = () => {
             data: monthlyData,
             smooth: true,
             lineStyle: {
-                color: '#409EFF',
+                color: '#0d9488',
                 width: 3
             },
             areaStyle: {
                 opacity: 0.1,
-                color: '#409EFF'
+                color: '#0d9488'
             },
             symbol: 'circle',
             symbolSize: 8,
-            itemStyle: { color: '#409EFF' }
+            itemStyle: { color: '#0d9488' }
         }]
     });
 };
@@ -323,7 +323,7 @@ const renderHotBooksChart = () => {
             type: 'bar',
             data: counts,
             itemStyle: {
-                color: '#E6A23C',
+                color: '#f59e0b',
                 borderRadius: [0, 4, 4, 0]
             },
             label: {
@@ -396,7 +396,7 @@ const renderTopReadersChart = () => {
             type: 'bar',
             data: counts,
             itemStyle: {
-                color: '#909399',
+                color: '#0d9488',
                 borderRadius: [0, 4, 4, 0]
             },
             label: {
@@ -507,19 +507,19 @@ onUnmounted(() => {
             }
 
             .blue {
-                background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+                background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
             }
 
             .green {
-                background: linear-gradient(135deg, #43e97b 0%, #38f9d7 100%);
+                background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
             }
 
             .orange {
-                background: linear-gradient(135deg, #fa709a 0%, #fee140 100%);
+                background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
             }
 
             .purple {
-                background: linear-gradient(135deg, #a18cd1 0%, #fbc2eb 100%);
+                background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
             }
 
             .stat-info {

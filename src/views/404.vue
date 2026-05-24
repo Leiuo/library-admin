@@ -21,26 +21,26 @@
 
 .not-found h1 {
     font-size: 48px;
-    color: #ccc;
+    color: #cbd5e1;
     margin-bottom: 10px;
 }
 
 .not-found p {
     font-size: 18px;
-    color: #666;
+    color: #64748b;
 }
 
 .back-to-home {
     display: inline-block;
     margin-top: 20px;
     padding: 10px 20px;
-    background-color: #409EFF;
+    background-color: #0d9488;
     color: #fff;
     text-decoration: none;
     border-radius: 6px;
 }
 
 .back-to-home:hover {
-    background-color: #66b1ff;
+    background-color: #0f766e;
 }
 </style>

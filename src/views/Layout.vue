@@ -12,7 +12,7 @@
                 <h3 v-if="isMobile || !isCollapse">图书馆管理系统</h3>
             </div>
             <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false"
-                router background-color="#304156" text-color="#bfcbd9" active-text-color="#409eff" class="aside-menu"
+                router background-color="#0f172a" text-color="#94a3b8" active-text-color="#2dd4bf" class="aside-menu"
                 @select="onMenuSelect">
                 <el-menu-item index="/dashboard">
                     <el-icon>
@@ -151,7 +151,7 @@ const breadcrumbs = computed(() => {
 
 <style lang="less" scoped>
 .layout-aside {
-    background-color: #304156;
+    background-color: #0f172a;
     transition: width 0.3s ease;
     white-space: nowrap;
     overflow: hidden;
@@ -182,7 +182,7 @@ const breadcrumbs = computed(() => {
         left: 40%;
 
         .version {
-            color: #ded3d3;
+            color: #64748b;
             font-size: 12px;
         }
     }
@@ -198,13 +198,17 @@ const breadcrumbs = computed(() => {
 .layout-right {
     min-width: 0;
     overflow: hidden;
+
+    :deep(.el-main) {
+        background-color: #f1f5f9;
+    }
 }
 
 .layout-header {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #ddd;
+    border-bottom: 1px solid #e2e8f0;
 
     .header-left {
         display: flex;
@@ -248,7 +252,7 @@ const breadcrumbs = computed(() => {
                 font-size: 12px;
 
                 &:hover {
-                    color: #409eff;
+                    color: #0d9488;
                     cursor: pointer;
                 }
             }
