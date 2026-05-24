@@ -2,10 +2,14 @@
     <div class="borrowlist-container">
         <div class="top-button">
             <el-button type="primary" @click="openBorrowDialog">+ 借书</el-button>
+            <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">
+                批量删除 {{ selectedIds.length ? `(${selectedIds.length})` : '' }}
+            </el-button>
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="paginatedBorrows" border stripe :row-class-name="rowClassName" v-loading="loading">
+            <el-table :data="paginatedBorrows" border stripe :row-class-name="rowClassName" v-loading="loading" @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="记录ID" width="70" />
                 <el-table-column prop="bookTitle" label="图书名称" />
                 <el-table-column prop="readerName" label="借阅人" width="240" />
@@ -79,8 +83,8 @@
 
 <script setup>
 import { ref, onMounted, computed, watch } from 'vue';
-import { ElMessage } from 'element-plus';
-import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow } from '../api/mock';
+import { ElMessage, ElMessageBox } from 'element-plus';
+import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows } from '../api/mock';
 
 const borrows = ref([]);
 const dialogTitle = ref('');
@@ -230,6 +234,30 @@ const submitBorrow = async () => {
     } catch (error) {
         ElMessage.error(error.message);
     }
+};
+
+// 批量选择
+const selectedIds = ref([]);
+const handleSelectionChange = (rows) => {
+    selectedIds.value = rows.map(r => r.id);
+};
+
+// 批量删除
+const handleBatchDelete = () => {
+    if (!selectedIds.value.length) return;
+    ElMessageBox.confirm(
+        `确定要删除选中的 ${selectedIds.value.length} 条借阅记录吗？`,
+        '批量删除',
+        { type: 'warning' }
+    ).then(async () => {
+        try {
+            const count = await deleteBorrows(selectedIds.value);
+            ElMessage.success(`成功删除 ${count} 条记录`);
+            fetchBorrows();
+        } catch (error) {
+            ElMessage.error(error.message);
+        }
+    }).catch(() => {});
 };
 
 onMounted(() => {

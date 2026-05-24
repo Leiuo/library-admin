@@ -4,10 +4,15 @@
             <el-input v-model="searchKeyword" placeholder="按书名/作者搜索" clearable />
             <el-button type="primary" @click="fetchBooks" class="search-btn">搜索</el-button>
             <el-button type="success" @click="openAddDialog">+ 新增图书</el-button>
+            <el-button type="warning" @click="openImportDialog">批量导入</el-button>
+            <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">
+                批量删除 {{ selectedIds.length ? `(${selectedIds.length})` : '' }}
+            </el-button>
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="paginatedBooks" border stripe v-loading="loading">
+            <el-table :data="paginatedBooks" border stripe v-loading="loading" @selection-change="handleSelectionChange">
+                <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="title" label="书名" />
                 <el-table-column prop="author" label="作者" />
@@ -60,13 +65,49 @@
                 <el-button type="primary" @click="submitForm">确定</el-button>
             </template>
         </el-dialog>
+
+        <!-- 批量导入对话框 -->
+        <el-dialog v-model="importDialogVisible" title="批量导入图书" width="40%">
+            <div class="import-tips">
+                <p>支持 CSV 或 JSON 文件格式，每行一条记录。</p>
+                <p>CSV 列顺序：书名, 作者, 出版社, 数量</p>
+                <el-button link type="primary" @click="downloadBookTemplate">下载 CSV 模板</el-button>
+            </div>
+            <el-upload
+                ref="uploadRef"
+                :auto-upload="false"
+                :limit="1"
+                accept=".csv,.json"
+                :on-change="handleFileChange"
+                :on-remove="() => { importFile = null; }"
+                drag
+            >
+                <el-icon class="el-icon--upload"><upload-filled /></el-icon>
+                <div class="el-upload__text">拖拽文件到此处 或 <em>点击上传</em></div>
+            </el-upload>
+            <div v-if="previewData.length" class="preview-table">
+                <p>预览（共 {{ previewData.length }} 条）</p>
+                <el-table :data="previewData.slice(0, 5)" border size="small" max-height="200">
+                    <el-table-column prop="title" label="书名" />
+                    <el-table-column prop="author" label="作者" />
+                    <el-table-column prop="publisher" label="出版社" />
+                    <el-table-column prop="quantity" label="数量" width="80" />
+                </el-table>
+                <p v-if="previewData.length > 5" class="preview-more">...还有 {{ previewData.length - 5 }} 条</p>
+            </div>
+            <template #footer>
+                <el-button @click="importDialogVisible = false">取消</el-button>
+                <el-button type="primary" @click="submitImport" :disabled="!importFile">确认导入</el-button>
+            </template>
+        </el-dialog>
     </div>
 </template>
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { getBooks, deleteBook, updateBook, addBook } from '../api/mock';
+import { UploadFilled } from '@element-plus/icons-vue';
+import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks } from '../api/mock';
 
 const searchKeyword = ref('');
 const books = ref([]);
@@ -172,6 +213,110 @@ const submitForm = async () => {
     fetchBooks();
 }
 
+// 批量选择
+const selectedIds = ref([]);
+const handleSelectionChange = (rows) => {
+    selectedIds.value = rows.map(r => r.id);
+};
+
+// 批量删除
+const handleBatchDelete = () => {
+    if (!selectedIds.value.length) return;
+    ElMessageBox.confirm(
+        `确定要删除选中的 ${selectedIds.value.length} 本图书吗？`,
+        '批量删除',
+        { type: 'warning' }
+    ).then(async () => {
+        try {
+            const count = await deleteBooks(selectedIds.value);
+            ElMessage.success(`成功删除 ${count} 本图书`);
+            fetchBooks();
+        } catch (error) {
+            ElMessage.error(error.message);
+        }
+    }).catch(() => {});
+};
+
+// 批量导入
+const importDialogVisible = ref(false);
+const importFile = ref(null);
+const previewData = ref([]);
+const uploadRef = ref(null);
+
+const parseCSV = (text) => {
+    const lines = text.trim().split(/\r?\n/);
+    if (lines.length < 2) return [];
+    const headers = lines[0].split(',').map(h => h.trim());
+    return lines.slice(1).filter(line => line.trim()).map(line => {
+        const values = line.split(',').map(v => v.trim().replace(/^"|"$/g, ''));
+        const row = {};
+        headers.forEach((h, i) => { row[h] = values[i] || ''; });
+        return row;
+    });
+};
+
+const parseJSON = (text) => {
+    const data = JSON.parse(text);
+    return Array.isArray(data) ? data : [];
+};
+
+const handleFileChange = (file) => {
+    const reader = new FileReader();
+    reader.onload = (e) => {
+        try {
+            const text = e.target.result;
+            const isCSV = file.name.endsWith('.csv');
+            const parsed = isCSV ? parseCSV(text) : parseJSON(text);
+            if (!parsed.length) {
+                ElMessage.warning('文件中没有有效数据');
+                previewData.value = [];
+                importFile.value = null;
+                return;
+            }
+            previewData.value = parsed.map(item => ({
+                title: item.title || item['书名'] || '',
+                author: item.author || item['作者'] || '',
+                publisher: item.publisher || item['出版社'] || '',
+                quantity: Number(item.quantity ?? item['数量']) || 0
+            }));
+            importFile.value = file;
+        } catch {
+            ElMessage.error('文件格式错误，请检查文件内容');
+            previewData.value = [];
+            importFile.value = null;
+        }
+    };
+    reader.readAsText(file.raw);
+};
+
+const openImportDialog = () => {
+    importFile.value = null;
+    previewData.value = [];
+    importDialogVisible.value = true;
+};
+
+const submitImport = async () => {
+    if (!previewData.value.length) return;
+    try {
+        const count = await importBooks(previewData.value);
+        ElMessage.success(`成功导入 ${count} 本图书`);
+        importDialogVisible.value = false;
+        fetchBooks();
+    } catch (error) {
+        ElMessage.error(error.message);
+    }
+};
+
+const downloadBookTemplate = () => {
+    const csvContent = 'title,author,publisher,quantity\n示例书名,示例作者,示例出版社,10';
+    const blob = new Blob(['﻿' + csvContent], { type: 'text/csv;charset=utf-8;' });
+    const link = document.createElement('a');
+    link.href = URL.createObjectURL(blob);
+    link.download = '图书导入模板.csv';
+    link.click();
+    URL.revokeObjectURL(link.href);
+};
+
 onMounted(() => {
     fetchBooks();
 });
@@ -198,6 +343,27 @@ onMounted(() => {
         margin-top: 16px;
         display: flex;
         justify-content: flex-end;
+    }
+
+    .import-tips {
+        margin-bottom: 16px;
+        p {
+            margin: 4px 0;
+            font-size: 14px;
+            color: #666;
+        }
+    }
+
+    .preview-table {
+        margin-top: 16px;
+        p {
+            margin: 4px 0;
+            font-size: 14px;
+        }
+        .preview-more {
+            color: #999;
+            text-align: center;
+        }
     }
 }
 

@@ -103,6 +103,38 @@ export const deleteBook = (id) => {
     return Promise.resolve();
 }
 
+export const deleteBooks = (ids) => {
+    const borrows = getData(STORAGE_KEYS.BORROWS);
+    let books = getData(STORAGE_KEYS.BOOKS);
+    const failedIds = [];
+    ids.forEach(id => {
+        const hasActiveBorrow = borrows.some(b => b.bookId === id && b.status === 0);
+        if (hasActiveBorrow) {
+            failedIds.push(id);
+        }
+    });
+    if (failedIds.length) {
+        const titles = books.filter(b => failedIds.includes(b.id)).map(b => b.title).join('、');
+        return Promise.reject(new Error(`《${titles}》尚有未归还的借阅，不能删除`));
+    }
+    books = books.filter(b => !ids.includes(b.id));
+    setData(STORAGE_KEYS.BOOKS, books);
+    return Promise.resolve(ids.length);
+}
+
+export const importBooks = (bookList) => {
+    const books = getData(STORAGE_KEYS.BOOKS);
+    let maxId = books.length ? Math.max(...books.map(b => b.id)) : 0;
+    const newBooks = bookList.map((book, i) => ({
+        ...book,
+        id: maxId + i + 1,
+        quantity: Number(book.quantity) || 0
+    }));
+    books.push(...newBooks);
+    setData(STORAGE_KEYS.BOOKS, books);
+    return Promise.resolve(newBooks.length);
+}
+
 
 // -------------------- 借阅模块 --------------------
 export const getBorrows = () => {
@@ -224,6 +256,22 @@ export const updateBorrow = (id, bookId, readerId, borrowDate, dueDate, status) 
     return Promise.resolve(borrows[borrowIdx]);
 }
 
+export const deleteBorrows = (ids) => {
+    let borrows = getData(STORAGE_KEYS.BORROWS);
+    const books = getData(STORAGE_KEYS.BOOKS);
+    ids.forEach(id => {
+        const borrow = borrows.find(b => b.id === id);
+        if (borrow && borrow.status === 0) {
+            const book = books.find(b => b.id === borrow.bookId);
+            if (book) book.quantity += 1;
+        }
+    });
+    setData(STORAGE_KEYS.BOOKS, books);
+    borrows = borrows.filter(b => !ids.includes(b.id));
+    setData(STORAGE_KEYS.BORROWS, borrows);
+    return Promise.resolve(ids.length);
+}
+
 
 // -------------------- 读者模块 --------------------
 export const getReaders = () => {
@@ -262,4 +310,34 @@ export const deleteReader = (id) => {
     readers = readers.filter(reader => reader.id !== id);
     setData(STORAGE_KEYS.READERS, readers);
     return Promise.resolve();
+}
+
+export const deleteReaders = (ids) => {
+    const borrows = getData(STORAGE_KEYS.BORROWS);
+    let readers = getData(STORAGE_KEYS.READERS);
+    const failedIds = [];
+    ids.forEach(id => {
+        if (borrows.some(b => b.readerId === id && !b.status)) {
+            failedIds.push(id);
+        }
+    });
+    if (failedIds.length) {
+        const names = readers.filter(r => failedIds.includes(r.id)).map(r => r.name).join('、');
+        return Promise.reject(new Error(`${names} 有尚未归还的图书，不能删除`));
+    }
+    readers = readers.filter(r => !ids.includes(r.id));
+    setData(STORAGE_KEYS.READERS, readers);
+    return Promise.resolve(ids.length);
+}
+
+export const importReaders = (readerList) => {
+    const readers = getData(STORAGE_KEYS.READERS);
+    let maxId = readers.length ? Math.max(...readers.map(r => r.id)) : 0;
+    const newReaders = readerList.map((reader, i) => ({
+        ...reader,
+        id: maxId + i + 1
+    }));
+    readers.push(...newReaders);
+    setData(STORAGE_KEYS.READERS, readers);
+    return Promise.resolve(newReaders.length);
 }
