@@ -39,6 +39,9 @@
                     <span>读者管理</span>
                 </el-menu-item>
             </el-menu>
+            <div class="aside-footer">
+                <span class="version">v 1.1.0</span>
+            </div>
         </el-aside>
 
         <el-container class="layout-right">
@@ -153,6 +156,7 @@ const breadcrumbs = computed(() => {
     white-space: nowrap;
     overflow: hidden;
     z-index: 1000;
+    position: relative;
 
     .aside-title {
         color: #fff;
@@ -170,6 +174,17 @@ const breadcrumbs = computed(() => {
 
     .aside-menu {
         border-right: none;
+    }
+
+    .aside-footer {
+        position: absolute;
+        bottom: 10px;
+        left: 40%;
+
+        .version {
+            color: #ded3d3;
+            font-size: 12px;
+        }
     }
 }
 
@@ -221,9 +236,10 @@ const breadcrumbs = computed(() => {
             .el-avatar {
                 transition: all 0.3s ease;
                 flex-shrink: 0;
+                cursor: pointer;
 
                 &:hover {
-                    transform: scale(1.05);
+                    transform: scale(1.02);
                 }
             }
 
