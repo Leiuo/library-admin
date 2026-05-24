@@ -5,7 +5,7 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="readers" border stripe>
+            <el-table :data="paginatedReaders" border stripe v-loading="loading">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="cardNo" label="借书证号" />
                 <el-table-column prop="name" label="姓名" />
@@ -17,6 +17,16 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <div class="pagination-wrapper">
+                <el-pagination
+                    v-model:current-page="currentPage"
+                    v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 50]"
+                    :total="readers.length"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    background
+                />
+            </div>
         </div>
 
         <!-- 读者对话框 -->
@@ -41,7 +51,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted } from 'vue';
+import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { getReaders, addReader, updateReader, deleteReader } from '../api/mock';
 
@@ -57,6 +67,13 @@ const readerForm = ref({
 let editingId = null;
 
 const loading = ref(false);  // 加载状态
+
+const currentPage = ref(1);
+const pageSize = ref(10);
+const paginatedReaders = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    return readers.value.slice(start, start + pageSize.value);
+});
 
 const readerRules = {
     cardNo: [{ required: true, message: '借书证号不能为空', trigger: 'blur' }],
@@ -140,6 +157,12 @@ onMounted(() => {
 
     .table-wrapper {
         overflow-x: auto;
+    }
+
+    .pagination-wrapper {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
     }
 }
 

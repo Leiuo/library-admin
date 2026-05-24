@@ -5,7 +5,7 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="borrows" border stripe :row-class-name="rowClassName">
+            <el-table :data="paginatedBorrows" border stripe :row-class-name="rowClassName" v-loading="loading">
                 <el-table-column prop="id" label="记录ID" width="70" />
                 <el-table-column prop="bookTitle" label="图书名称" />
                 <el-table-column prop="readerName" label="借阅人" width="240" />
@@ -27,6 +27,16 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <div class="pagination-wrapper">
+                <el-pagination
+                    v-model:current-page="currentPage"
+                    v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 50]"
+                    :total="borrows.length"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    background
+                />
+            </div>
         </div>
 
         <!-- 借阅对话框 -->
@@ -68,7 +78,7 @@
 </template>
 
 <script setup>
-import { ref, onMounted, watch } from 'vue';
+import { ref, onMounted, computed, watch } from 'vue';
 import { ElMessage } from 'element-plus';
 import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow } from '../api/mock';
 
@@ -77,6 +87,13 @@ const dialogTitle = ref('');
 const editingId = ref(null);
 
 const loading = ref(false);  // 加载状态
+
+const currentPage = ref(1);
+const pageSize = ref(10);
+const paginatedBorrows = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    return borrows.value.slice(start, start + pageSize.value);
+});
 
 // 判断借阅是否逾期（未归还 且 当前日期已过应还日期）
 const today = new Date().toISOString().split('T')[0];
@@ -228,6 +245,12 @@ onMounted(() => {
 
     .table-wrapper {
         overflow-x: auto;
+    }
+
+    .pagination-wrapper {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
     }
 
     :deep(.overdue-row) {

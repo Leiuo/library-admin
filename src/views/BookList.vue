@@ -7,7 +7,7 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="filteredBooks" border stripe>
+            <el-table :data="paginatedBooks" border stripe v-loading="loading">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="title" label="书名" />
                 <el-table-column prop="author" label="作者" />
@@ -27,6 +27,16 @@
                     </template>
                 </el-table-column>
             </el-table>
+            <div class="pagination-wrapper">
+                <el-pagination
+                    v-model:current-page="currentPage"
+                    v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 50]"
+                    :total="filteredBooks.length"
+                    layout="total, sizes, prev, pager, next, jumper"
+                    background
+                />
+            </div>
         </div>
 
         <!-- 新增/编辑对话框 -->
@@ -54,7 +64,7 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted } from 'vue';
+import { ref, computed, onMounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { getBooks, deleteBook, updateBook, addBook } from '../api/mock';
 
@@ -82,6 +92,14 @@ const filteredBooks = computed(() => {
         book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword)
     )
 });
+
+const currentPage = ref(1);
+const pageSize = ref(10);
+const paginatedBooks = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    return filteredBooks.value.slice(start, start + pageSize.value);
+});
+watch(searchKeyword, () => { currentPage.value = 1; });
 
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
@@ -174,6 +192,12 @@ onMounted(() => {
 
     .table-wrapper {
         overflow-x: auto;
+    }
+
+    .pagination-wrapper {
+        margin-top: 16px;
+        display: flex;
+        justify-content: flex-end;
     }
 }
 
