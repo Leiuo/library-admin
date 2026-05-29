@@ -139,12 +139,15 @@ const fetchReaders = async () => {
 
 const openReaderDialog = () => {
     dialogTitle.value = '新增读者';
+    editingId = null;
     readerForm.value = {
         cardNo: '',
         name: '',
         phone: ''
     };
-    editingId = null;
+    if (readerFormRef.value) {
+        readerFormRef.value.resetFields();
+    }
     dialogVisible.value = true;
 }
 
