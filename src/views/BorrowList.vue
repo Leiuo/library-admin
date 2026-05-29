@@ -7,6 +7,14 @@
             </el-button>
         </div>
 
+        <transition name="undo-fade">
+            <div v-if="undoState" class="undo-bar">
+                <span>{{ undoState.message }}</span>
+                <el-button link type="primary" @click="handleUndo">撤销</el-button>
+                <el-icon class="undo-close" @click="clearUndo"><Close /></el-icon>
+            </div>
+        </transition>
+
         <div class="table-wrapper">
             <el-table :data="paginatedBorrows" border stripe :row-class-name="rowClassName" v-loading="loading" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
@@ -81,8 +89,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed, watch } from 'vue';
+import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { Close } from '@element-plus/icons-vue';
 import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows } from '../api/mock';
 
 const borrows = ref([]);
@@ -250,8 +259,10 @@ const handleBatchDelete = () => {
         { type: 'warning' }
     ).then(async () => {
         try {
+            const rawBorrows = JSON.parse(localStorage.getItem('library_borrows')) || [];
+            const deletedItems = rawBorrows.filter(b => selectedIds.value.includes(b.id));
             const count = await deleteBorrows(selectedIds.value);
-            ElMessage.success(`成功删除 ${count} 条记录`);
+            showUndo(`已删除 ${count} 条记录`, deletedItems);
             fetchBorrows();
         } catch (error) {
             ElMessage.error(error.message);
@@ -259,12 +270,81 @@ const handleBatchDelete = () => {
     }).catch(() => {});
 };
 
+// 撤销删除
+const undoState = ref(null);
+let undoTimer = null;
+
+const showUndo = (message, deletedItems) => {
+    clearUndo();
+    undoState.value = { message, items: deletedItems };
+    undoTimer = setTimeout(() => { undoState.value = null; }, 10000);
+};
+
+const clearUndo = () => {
+    if (undoTimer) clearTimeout(undoTimer);
+    undoState.value = null;
+};
+
+const handleUndo = () => {
+    if (!undoState.value) return;
+    const borrows = JSON.parse(localStorage.getItem('library_borrows')) || [];
+    const books = JSON.parse(localStorage.getItem('library_books')) || [];
+
+    for (const item of undoState.value.items) {
+        borrows.push(item);
+        if (item.status === 0) {
+            const book = books.find(b => b.id === item.bookId);
+            if (book) book.quantity -= 1;
+        }
+    }
+
+    localStorage.setItem('library_borrows', JSON.stringify(borrows));
+    localStorage.setItem('library_books', JSON.stringify(books));
+    clearUndo();
+    fetchBorrows();
+    ElMessage.success('已撤销删除');
+};
+
 onMounted(() => {
     fetchBorrows();
+});
+
+onUnmounted(() => {
+    clearUndo();
 });
 </script>
 
 <style lang="less" scoped>
+.undo-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #065f46;
+
+    .undo-close {
+        margin-left: auto;
+        cursor: pointer;
+        color: #6b7280;
+        &:hover { color: #374151; }
+    }
+}
+
+.undo-fade-enter-active,
+.undo-fade-leave-active {
+    transition: all 0.3s ease;
+}
+.undo-fade-enter-from,
+.undo-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
 .borrowlist-container {
     .top-button {
         margin-bottom: 16px;

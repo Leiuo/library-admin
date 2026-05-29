@@ -8,8 +8,19 @@
             </el-button>
         </div>
 
+        <transition name="undo-fade">
+            <div v-if="undoState" class="undo-bar">
+                <span>{{ undoState.message }}</span>
+                <el-button link type="primary" @click="handleUndo">撤销</el-button>
+                <el-icon class="undo-close" @click="clearUndo">
+                    <Close />
+                </el-icon>
+            </div>
+        </transition>
+
         <div class="table-wrapper">
-            <el-table :data="paginatedReaders" border stripe v-loading="loading" @selection-change="handleSelectionChange">
+            <el-table :data="paginatedReaders" border stripe v-loading="loading"
+                @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="cardNo" label="借书证号" />
@@ -24,14 +35,9 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-wrapper">
-                <el-pagination
-                    v-model:current-page="currentPage"
-                    v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :total="readers.length"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    background
-                />
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 50]" :total="readers.length" layout="total, sizes, prev, pager, next, jumper"
+                    background />
             </div>
         </div>
 
@@ -61,15 +67,8 @@
                 <p>CSV 列顺序：借书证号, 姓名, 电话</p>
                 <el-button link type="primary" @click="downloadReaderTemplate">下载 CSV 模板</el-button>
             </div>
-            <el-upload
-                ref="uploadRef"
-                :auto-upload="false"
-                :limit="1"
-                accept=".csv,.json"
-                :on-change="handleFileChange"
-                :on-remove="() => { importFile = null; }"
-                drag
-            >
+            <el-upload ref="uploadRef" :auto-upload="false" :limit="1" accept=".csv,.json" :on-change="handleFileChange"
+                :on-remove="() => { importFile = null; }" drag>
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text">拖拽文件到此处 或 <em>点击上传</em></div>
             </el-upload>
@@ -91,9 +90,9 @@
 </template>
 
 <script setup>
-import { ref, onMounted, computed } from 'vue';
+import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { UploadFilled } from '@element-plus/icons-vue';
+import { UploadFilled, Close } from '@element-plus/icons-vue';
 import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders } from '../api/mock';
 import { useRouter } from 'vue-router';
 
@@ -154,7 +153,7 @@ const openReaderDialog = () => {
 const goBorrowHistory = (row) => {
     console.log(`去到${row.name}的借阅历史`);
     router.push(`/reader/${row.id}/history`);
-    
+
 }
 
 const openEditDialog = (row) => {
@@ -173,8 +172,9 @@ const handleDelete = (id) => {
     ElMessageBox.confirm('你确定要删除该读者吗？', '提示', { type: 'warning' })
         .then(async () => {
             try {
+                const reader = readers.value.find(r => r.id === id);
                 await deleteReader(id);
-                ElMessage.success('删除成功');
+                if (reader) showUndo(`已删除读者 ${reader.name}`, [reader]);
                 fetchReaders();
             } catch (error) {
                 ElMessage.error(error.message);
@@ -212,13 +212,39 @@ const handleBatchDelete = () => {
         { type: 'warning' }
     ).then(async () => {
         try {
+            const deletedReaders = readers.value.filter(r => selectedIds.value.includes(r.id));
             const count = await deleteReaders(selectedIds.value);
-            ElMessage.success(`成功删除 ${count} 位读者`);
+            showUndo(`已删除 ${count} 位读者`, deletedReaders);
             fetchReaders();
         } catch (error) {
             ElMessage.error(error.message);
         }
-    }).catch(() => {});
+    }).catch(() => { });
+};
+
+// 撤销删除
+const undoState = ref(null);
+let undoTimer = null;
+
+const showUndo = (message, deletedItems) => {
+    clearUndo();
+    undoState.value = { message, items: deletedItems };
+    undoTimer = setTimeout(() => { undoState.value = null; }, 10000);
+};
+
+const clearUndo = () => {
+    if (undoTimer) clearTimeout(undoTimer);
+    undoState.value = null;
+};
+
+const handleUndo = () => {
+    if (!undoState.value) return;
+    const readers = JSON.parse(localStorage.getItem('library_readers')) || [];
+    readers.push(...undoState.value.items);
+    localStorage.setItem('library_readers', JSON.stringify(readers));
+    clearUndo();
+    fetchReaders();
+    ElMessage.success('已撤销删除');
 };
 
 // 批量导入
@@ -306,9 +332,47 @@ const downloadReaderTemplate = () => {
 onMounted(() => {
     fetchReaders();
 });
+
+onUnmounted(() => {
+    clearUndo();
+});
 </script>
 
 <style lang="less" scoped>
+.undo-bar {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 10px 16px;
+    margin-bottom: 12px;
+    background: #ecfdf5;
+    border: 1px solid #a7f3d0;
+    border-radius: 8px;
+    font-size: 14px;
+    color: #065f46;
+
+    .undo-close {
+        margin-left: auto;
+        cursor: pointer;
+        color: #6b7280;
+
+        &:hover {
+            color: #374151;
+        }
+    }
+}
+
+.undo-fade-enter-active,
+.undo-fade-leave-active {
+    transition: all 0.3s ease;
+}
+
+.undo-fade-enter-from,
+.undo-fade-leave-to {
+    opacity: 0;
+    transform: translateY(-8px);
+}
+
 .readerlist-container {
     .top-button {
         margin-bottom: 16px;
@@ -326,6 +390,7 @@ onMounted(() => {
 
     .import-tips {
         margin-bottom: 16px;
+
         p {
             margin: 4px 0;
             font-size: 14px;
@@ -335,10 +400,12 @@ onMounted(() => {
 
     .preview-table {
         margin-top: 16px;
+
         p {
             margin: 4px 0;
             font-size: 14px;
         }
+
         .preview-more {
             color: #999;
             text-align: center;

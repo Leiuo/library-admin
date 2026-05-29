@@ -13,8 +13,19 @@
             </el-button>
         </div>
 
+        <transition name="undo-fade">
+            <div v-if="undoState" class="undo-bar">
+                <span>{{ undoState.message }}</span>
+                <el-button link type="primary" @click="handleUndo">撤销</el-button>
+                <el-icon class="undo-close" @click="clearUndo">
+                    <Close />
+                </el-icon>
+            </div>
+        </transition>
+
         <div class="table-wrapper">
-            <el-table :data="paginatedBooks" border stripe v-loading="loading" @selection-change="handleSelectionChange">
+            <el-table :data="paginatedBooks" border stripe v-loading="loading"
+                @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="title" label="书名" />
@@ -41,14 +52,9 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-wrapper">
-                <el-pagination
-                    v-model:current-page="currentPage"
-                    v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :total="filteredBooks.length"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    background
-                />
+                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :page-sizes="[10, 20, 50]" :total="filteredBooks.length"
+                    layout="total, sizes, prev, pager, next, jumper" background />
             </div>
         </div>
 
@@ -65,7 +71,8 @@
                     <el-input v-model="bookForm.publisher" />
                 </el-form-item>
                 <el-form-item label="分类" prop="category">
-                    <el-select v-model="bookForm.category" placeholder="请选择分类" filterable allow-create style="width: 100%;">
+                    <el-select v-model="bookForm.category" placeholder="请选择分类" filterable allow-create
+                        style="width: 100%;">
                         <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
                     </el-select>
                 </el-form-item>
@@ -86,15 +93,8 @@
                 <p>CSV 列顺序：书名, 作者, 出版社, 分类, 数量</p>
                 <el-button link type="primary" @click="downloadBookTemplate">下载 CSV 模板</el-button>
             </div>
-            <el-upload
-                ref="uploadRef"
-                :auto-upload="false"
-                :limit="1"
-                accept=".csv,.json"
-                :on-change="handleFileChange"
-                :on-remove="() => { importFile = null; }"
-                drag
-            >
+            <el-upload ref="uploadRef" :auto-upload="false" :limit="1" accept=".csv,.json" :on-change="handleFileChange"
+                :on-remove="() => { importFile = null; }" drag>
                 <el-icon class="el-icon--upload"><upload-filled /></el-icon>
                 <div class="el-upload__text">拖拽文件到此处 或 <em>点击上传</em></div>
             </el-upload>
@@ -118,9 +118,9 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { UploadFilled } from '@element-plus/icons-vue';
+import { UploadFilled, Close } from '@element-plus/icons-vue';
 import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks } from '../api/mock';
 
 const categories = ['文学小说', '科技编程', '历史哲学', '科学科普', '经济管理', '艺术设计', '教育学习', '生活百科'];
@@ -204,19 +204,18 @@ const openEditDialog = (row) => {
 };
 
 const handleDelete = (id) => {
-    // ElMessageBox.confirm('提示', '确定要删除该图书吗？');
     ElMessageBox.confirm('你确定要删除该图书吗？', '提示', {
         type: 'warning',
     }).then(async () => {
         try {
+            const book = books.value.find(b => b.id === id);
             await deleteBook(id);
-            ElMessage.success('删除成功');
+            if (book) showUndo(`已删除《${book.title}》`, [book]);
             fetchBooks();
         } catch (error) {
             ElMessage.error(error.message);
         }
     }).catch(() => { });
-
 };
 
 const submitForm = async () => {
@@ -260,7 +259,32 @@ const handleBatchDelete = () => {
         } catch (error) {
             ElMessage.error(error.message);
         }
-    }).catch(() => {});
+    }).catch(() => { });
+};
+
+// 撤销删除
+const undoState = ref(null);
+let undoTimer = null;
+
+const showUndo = (message, deletedItems) => {
+    clearUndo();
+    undoState.value = { message, items: deletedItems };
+    undoTimer = setTimeout(() => { undoState.value = null; }, 10000);
+};
+
+const clearUndo = () => {
+    if (undoTimer) clearTimeout(undoTimer);
+    undoState.value = null;
+};
+
+const handleUndo = () => {
+    if (!undoState.value) return;
+    const books = JSON.parse(localStorage.getItem('library_books')) || [];
+    books.unshift(...undoState.value.items);
+    localStorage.setItem('library_books', JSON.stringify(books));
+    clearUndo();
+    fetchBooks();
+    ElMessage.success('已撤销删除');
 };
 
 // 批量导入
@@ -365,6 +389,40 @@ onMounted(() => {
         }
     }
 
+    .undo-bar {
+        display: flex;
+        align-items: center;
+        gap: 8px;
+        margin-bottom: 12px;
+        padding: 10px 16px;
+        background: #ecfdf5;
+        border: 1px solid #a7f3d0;
+        border-radius: 8px;
+        font-size: 14px;
+        color: #065f46;
+
+        .undo-close {
+            margin-left: auto;
+            cursor: pointer;
+            color: #6b7280;
+
+            &:hover {
+                color: #374151;
+            }
+        }
+    }
+
+    .undo-fade-enter-active,
+    .undo-fade-leave-active {
+        transition: all 0.3s ease;
+    }
+
+    .undo-fade-enter-from,
+    .undo-fade-leave-to {
+        opacity: 0;
+        transform: translateY(-8px);
+    }
+
     .table-wrapper {
         overflow-x: auto;
     }
@@ -377,6 +435,7 @@ onMounted(() => {
 
     .import-tips {
         margin-bottom: 16px;
+
         p {
             margin: 4px 0;
             font-size: 14px;
@@ -386,10 +445,12 @@ onMounted(() => {
 
     .preview-table {
         margin-top: 16px;
+
         p {
             margin: 4px 0;
             font-size: 14px;
         }
+
         .preview-more {
             color: #999;
             text-align: center;
