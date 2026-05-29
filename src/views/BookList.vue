@@ -154,9 +154,9 @@ const formRef = ref(null);
 let editingId = null;  // 当前正在编辑的图书编号
 
 const rules = {
-    title: [{ required: true, message: '书名不能为空', tigger: 'blur' }],
-    author: [{ required: true, message: '作者不能为空', tigger: 'blur' }],
-    publisher: [{ required: true, message: '出版社不能为空', tigger: 'blur' }],
+    title: [{ required: true, message: '书名不能为空', trigger: 'blur' }],
+    author: [{ required: true, message: '作者不能为空', trigger: 'blur' }],
+    publisher: [{ required: true, message: '出版社不能为空', trigger: 'blur' }],
     quantity: [{ type: 'number', min: 0, message: '数量必须大于等于0', trigger: 'change' }]
 };
 
