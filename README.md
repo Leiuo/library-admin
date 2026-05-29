@@ -16,14 +16,16 @@ A modern library management system built with **Vue 3 + Element Plus**, featurin
 
 ### Borrowing Management
 
-- Borrowing record list
+- Borrowing record list with pagination
 - Book checkout and return operations
-- Automatic borrowing date calculation
+- Borrowing date validation (return date ≥ borrow date)
+- Overdue borrowing highlight
 
 ### Reader Management
 
-- Reader information management
-- Reader borrowing history tracking
+- Reader information management (add, edit, delete)
+- Batch import (CSV/JSON) and batch delete
+- Reader borrowing history with statistics
 
 ### Data Statistics
 
@@ -61,11 +63,13 @@ library-admin/
 │   │   └── user.js          # User state management
 │   ├── views/               # Page view components
 │   │   ├── Login.vue        # Login page
+│   │   ├── 404.vue           # 404 Not Found page
 │   │   ├── Layout.vue       # Layout component
 │   │   ├── Dashboard.vue    # Data statistics dashboard
 │   │   ├── BookList.vue     # Book management page
 │   │   ├── BorrowList.vue   # Borrowing management page
-│   │   └── ReaderList.vue   # Reader management page
+│   │   ├── ReaderList.vue   # Reader management page
+│   │   └── ReaderBorrowHistory.vue  # Reader borrowing history
 │   ├── App.vue              # Root component
 │   ├── main.js              # Application entry
 │   └── style.css            # Global styles
@@ -140,11 +144,19 @@ npm run preview
 ## Feature Checklist
 
 - [x] User login/logout
+- [x] Login page redesign
 - [x] Book CRUD operations
-- [x] Borrowing management (checkout / return)
+- [x] Borrowing management (checkout / return / date validation)
+- [x] Overdue borrowing highlight
 - [x] Reader CRUD operations
+- [x] Reader batch delete & batch import (CSV/JSON)
+- [x] Reader borrowing history page
+- [x] Table pagination
 - [x] Data statistics dashboard
 - [x] ECharts visualization
 - [x] Local storage mock data
 - [x] Element Plus component library
+- [x] 404 Not Found page
 - [x] Responsive layout
+- [x] Custom theme colors
+- [x] Sidebar version number
