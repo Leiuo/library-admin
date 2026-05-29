@@ -9,7 +9,7 @@
             <el-card class="stat-card" shadow="hover">
                 <div class="stat-icon blue">
                     <el-icon>
-                        <Notebook />
+                        <Collection />
                     </el-icon>
                 </div>
                 <div class="stat-info">
@@ -20,7 +20,7 @@
             <el-card class="stat-card" shadow="hover">
                 <div class="stat-icon orange">
                     <el-icon>
-                        <User />
+                        <Reading />
                     </el-icon>
                 </div>
                 <div class="stat-info">
@@ -31,7 +31,7 @@
             <el-card class="stat-card returned-card" shadow="hover">
                 <div class="stat-icon green">
                     <el-icon>
-                        <FolderChecked />
+                        <CircleCheckFilled />
                     </el-icon>
                 </div>
                 <div class="stat-info">
@@ -42,7 +42,7 @@
             <el-card class="stat-card overdue-card" shadow="hover">
                 <div class="stat-icon red">
                     <el-icon>
-                        <Timer />
+                        <WarningFilled />
                     </el-icon>
                 </div>
                 <div class="stat-info">
@@ -68,7 +68,7 @@
             </el-table>
             <div class="pagination-wrapper">
                 <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]" :total="paginatedBorrowsRecords.length"
+                    :page-sizes="[10, 20, 50]" :total="filteredBorrows.length"
                     layout="total, sizes, prev, pager, next, jumper" background />
             </div>
         </div>
@@ -80,7 +80,6 @@ import { computed, reactive, ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getReaders, getBorrows } from '../api/mock';
 import { ElMessage } from 'element-plus';
-import { Timer } from '@element-plus/icons-vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -100,7 +99,7 @@ const computeStats = () => {
     stats.totalBorrows = filteredBorrows.value.length;
     stats.activeBorrows = filteredBorrows.value.filter(borrow => borrow.status === 0 && borrow.dueDate >= today).length;
     stats.returnedBorrows = filteredBorrows.value.filter(borrow => borrow.status === 1).length;
-    stats.overdue = filteredBorrows.value.filter(borrow => borrow.status === 0 && borrow.dueDate < today).length;;
+    stats.overdue = filteredBorrows.value.filter(borrow => borrow.status === 0 && borrow.dueDate < today).length;
 }
 
 const fetchReader = async () => {
@@ -114,7 +113,7 @@ const returnReader = () => {
     router.push('/readers');
 };
 
-const fetchFilteresBorrows = async () => {
+const fetchFilteredBorrows = async () => {
     loading.value = true;
     try {
         const allBorrows = await getBorrows();
@@ -154,8 +153,7 @@ const rowClassName = ({ row }) => {
 
 onMounted(() => {
     fetchReader();
-    fetchFilteresBorrows();
-    computeStats();
+    fetchFilteredBorrows();
 });
 </script>
 
@@ -176,11 +174,16 @@ onMounted(() => {
         .stat-card {
             flex: 1;
             cursor: pointer;
-            display: flex;
-            align-items: center;
 
             &:hover {
                 transform: translateY(-3px);
+            }
+
+            :deep(.el-card__body) {
+                display: flex;
+                flex-direction: column;
+                justify-content: center;
+                align-items: center;
             }
 
             .stat-icon {
@@ -269,7 +272,7 @@ onMounted(() => {
     }
 
     :deep(.overdue-row) {
-        background-color: rgba(161, 11, 11, 0.488) !important;
+        background-color: rgba(239, 68, 68, 0.08) !important;
     }
 }
 </style>
