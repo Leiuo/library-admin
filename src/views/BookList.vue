@@ -292,6 +292,9 @@ const handleFileChange = (file) => {
 const openImportDialog = () => {
     importFile.value = null;
     previewData.value = [];
+    if (uploadRef.value) {
+        uploadRef.value.clearFiles();
+    }
     importDialogVisible.value = true;
 };
 
