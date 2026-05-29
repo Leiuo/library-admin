@@ -6,7 +6,7 @@
         </div>
 
         <div class="history-stat">
-            <el-card class="stat-card" shadow="hover">
+            <el-card class="stat-card total-borrow-card" shadow="hover">
                 <div class="stat-icon blue">
                     <el-icon>
                         <Collection />
@@ -17,7 +17,7 @@
                     <div class="stat-label">累计借阅</div>
                 </div>
             </el-card>
-            <el-card class="stat-card" shadow="hover">
+            <el-card class="stat-card borrowing-card" shadow="hover">
                 <div class="stat-icon orange">
                     <el-icon>
                         <Reading />
@@ -166,6 +166,11 @@ onMounted(() => {
         margin-bottom: 16px;
     }
 
+    .total-borrow-card:hover,
+    .borrowing-card:hover {
+        border-color: #90939975;
+    }
+
     .history-stat {
         display: flex;
         gap: 10px;
@@ -243,21 +248,12 @@ onMounted(() => {
             }
         }
 
-        .returned-card {
+        .returned-card:hover {
             border-color: #22c55e62;
-
-            &:hover {
-                border-color: #22c55e;
-            }
-
         }
 
-        .overdue-card {
+        .overdue-card:hover {
             border-color: rgba(239, 68, 68, 0.3);
-
-            &:hover {
-                border-color: #ef4444;
-            }
         }
     }
 

@@ -481,6 +481,7 @@ onUnmounted(() => {
 
             &:hover {
                 transform: translateY(-3px);
+                border-color: #90939975;
             }
 
             :deep(.el-card__body) {
