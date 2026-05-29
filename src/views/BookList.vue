@@ -2,6 +2,9 @@
     <div class="booklist-container">
         <div class="search-area">
             <el-input v-model="searchKeyword" placeholder="按书名/作者搜索" clearable />
+            <el-select v-model="categoryFilter" placeholder="全部分类" clearable style="width: 140px;">
+                <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
+            </el-select>
             <el-button type="primary" @click="fetchBooks" class="search-btn">搜索</el-button>
             <el-button type="success" @click="openAddDialog">+ 新增图书</el-button>
             <el-button type="warning" @click="openImportDialog">批量导入</el-button>
@@ -17,6 +20,11 @@
                 <el-table-column prop="title" label="书名" />
                 <el-table-column prop="author" label="作者" />
                 <el-table-column prop="publisher" label="出版社" />
+                <el-table-column prop="category" label="分类" width="100">
+                    <template #default="{ row }">
+                        <el-tag size="small" type="info">{{ row.category || '未分类' }}</el-tag>
+                    </template>
+                </el-table-column>
                 <el-table-column prop="quantity" label="数量" width="80" />
                 <el-table-column prop="status" label="状态" width="100">
                     <template #default="{ row }">
@@ -56,6 +64,11 @@
                 <el-form-item label="出版社" prop="publisher">
                     <el-input v-model="bookForm.publisher" />
                 </el-form-item>
+                <el-form-item label="分类" prop="category">
+                    <el-select v-model="bookForm.category" placeholder="请选择分类" filterable allow-create style="width: 100%;">
+                        <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
+                    </el-select>
+                </el-form-item>
                 <el-form-item label="数量" prop="quantity">
                     <el-input v-model.number="bookForm.quantity" type="number" min="0" />
                 </el-form-item>
@@ -70,7 +83,7 @@
         <el-dialog v-model="importDialogVisible" title="批量导入图书" width="40%">
             <div class="import-tips">
                 <p>支持 CSV 或 JSON 文件格式，每行一条记录。</p>
-                <p>CSV 列顺序：书名, 作者, 出版社, 数量</p>
+                <p>CSV 列顺序：书名, 作者, 出版社, 分类, 数量</p>
                 <el-button link type="primary" @click="downloadBookTemplate">下载 CSV 模板</el-button>
             </div>
             <el-upload
@@ -91,6 +104,7 @@
                     <el-table-column prop="title" label="书名" />
                     <el-table-column prop="author" label="作者" />
                     <el-table-column prop="publisher" label="出版社" />
+                    <el-table-column prop="category" label="分类" width="90" />
                     <el-table-column prop="quantity" label="数量" width="80" />
                 </el-table>
                 <p v-if="previewData.length > 5" class="preview-more">...还有 {{ previewData.length - 5 }} 条</p>
@@ -109,7 +123,10 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue';
 import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks } from '../api/mock';
 
+const categories = ['文学小说', '科技编程', '历史哲学', '科学科普', '经济管理', '艺术设计', '教育学习', '生活百科'];
+
 const searchKeyword = ref('');
+const categoryFilter = ref('');
 const books = ref([]);
 const loading = ref(false);  // 加载状态，防止重复请求
 
@@ -126,12 +143,20 @@ const fetchBooks = async () => {
 };
 
 const filteredBooks = computed(() => {
-    if (!searchKeyword.value) return books.value;
+    let result = books.value;
 
-    const keyword = searchKeyword.value.toLowerCase();
-    return books.value.filter(book =>
-        book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword)
-    )
+    if (searchKeyword.value) {
+        const keyword = searchKeyword.value.toLowerCase();
+        result = result.filter(book =>
+            book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword)
+        );
+    }
+
+    if (categoryFilter.value) {
+        result = result.filter(book => book.category === categoryFilter.value);
+    }
+
+    return result;
 });
 
 const currentPage = ref(1);
@@ -140,7 +165,7 @@ const paginatedBooks = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value;
     return filteredBooks.value.slice(start, start + pageSize.value);
 });
-watch(searchKeyword, () => { currentPage.value = 1; });
+watch([searchKeyword, categoryFilter], () => { currentPage.value = 1; });
 
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
@@ -148,6 +173,7 @@ const bookForm = ref({
     title: '',
     author: '',
     publisher: '',
+    category: '',
     quantity: 0
 });
 const formRef = ref(null);
@@ -162,7 +188,7 @@ const rules = {
 
 const openAddDialog = () => {
     editingId = null;
-    bookForm.value = { title: '', author: '', publisher: '', quantity: 0 };
+    bookForm.value = { title: '', author: '', publisher: '', category: '', quantity: 0 };
     if (formRef.value) {
         formRef.value.resetFields();
     }
@@ -172,7 +198,7 @@ const openAddDialog = () => {
 
 const openEditDialog = (row) => {
     dialogTitle.value = '编辑图书';
-    bookForm.value = { title: row.title, author: row.author, publisher: row.publisher, quantity: row.quantity };
+    bookForm.value = { title: row.title, author: row.author, publisher: row.publisher, category: row.category || '', quantity: row.quantity };
     editingId = row.id;
     dialogVisible.value = true;
 };
@@ -277,6 +303,7 @@ const handleFileChange = (file) => {
                 title: item.title || item['书名'] || '',
                 author: item.author || item['作者'] || '',
                 publisher: item.publisher || item['出版社'] || '',
+                category: item.category || item['分类'] || '',
                 quantity: Number(item.quantity ?? item['数量']) || 0
             }));
             importFile.value = file;
@@ -311,7 +338,7 @@ const submitImport = async () => {
 };
 
 const downloadBookTemplate = () => {
-    const csvContent = 'title,author,publisher,quantity\n示例书名,示例作者,示例出版社,10';
+    const csvContent = 'title,author,publisher,category,quantity\n示例书名,示例作者,示例出版社,科技编程,10';
     const blob = new Blob(['﻿' + csvContent], { type: 'text/csv;charset=utf-8;' });
     const link = document.createElement('a');
     link.href = URL.createObjectURL(blob);

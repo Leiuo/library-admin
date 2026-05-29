@@ -95,6 +95,17 @@
                 <div ref="topReadersChartRef" class="chart-container"></div>
             </el-card>
         </div>
+
+        <div class="charts-row" v-if="!loading">
+            <el-card class="chart-card" shadow="hover">
+                <template #header>
+                    <div class="card-header">
+                        <span>📚 图书分类分布</span>
+                    </div>
+                </template>
+                <div ref="categoryChartRef" class="chart-container"></div>
+            </el-card>
+        </div>
     </div>
 </template>
 
@@ -123,12 +134,14 @@ const statusChartRef = ref(null);
 const trendChartRef = ref(null);
 const hotBooksChartRef = ref(null);
 const topReadersChartRef = ref(null);
+const categoryChartRef = ref(null);
 
 // 图表实例
 let statusChart = null;
 let trendChart = null;
 let hotBooksChart = null;
 let topReadersChart = null;
+let categoryChart = null;
 
 const trendYear = ref(2026);  // 趋势图年份
 
@@ -407,13 +420,75 @@ const renderTopReadersChart = () => {
     });
 };
 
+// 准备图书分类分布数据
+const getCategoryData = () => {
+    const categoryCount = {};
+    books.value.forEach(book => {
+        const cat = book.category || '未分类';
+        categoryCount[cat] = (categoryCount[cat] || 0) + book.quantity;
+    });
+    const data = Object.entries(categoryCount).map(([name, value]) => ({ name, value }));
+    data.sort((a, b) => b.value - a.value);
+    return data;
+};
+
+// 绘制图书分类分布图
+const renderCategoryChart = () => {
+    if (!categoryChartRef.value) return;
+    if (categoryChart) categoryChart.dispose();
+    categoryChart = echarts.init(categoryChartRef.value);
+
+    const data = getCategoryData();
+    const names = data.map(d => d.name);
+    const values = data.map(d => d.value);
+
+    const colors = ['#0d9488', '#f59e0b', '#6366f1', '#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316'];
+    categoryChart.setOption({
+        tooltip: {
+            trigger: 'axis',
+            axisPointer: { type: 'shadow' },
+            formatter: '{b}: {c} 册'
+        },
+        grid: {
+            left: '12%',
+            right: '8%',
+            containLabel: true
+        },
+        yAxis: {
+            type: 'category',
+            data: names,
+            axisLabel: { fontSize: 12 }
+        },
+        xAxis: {
+            type: 'value',
+            name: '馆藏册数',
+            nameLocation: 'middle',
+            nameGap: 30
+        },
+        series: [{
+            type: 'bar',
+            data: values.map((v, i) => ({
+                value: v,
+                itemStyle: {
+                    color: colors[i % colors.length],
+                    borderRadius: [0, 4, 4, 0]
+                }
+            })),
+            label: {
+                show: true,
+                position: 'right'
+            }
+        }]
+    });
+};
+
 // 防抖 resize
 let resizeTimer = null;
 const handleResize = () => {
     // console.log('窗口 resize 事件触发');
     if (resizeTimer) clearTimeout(resizeTimer);
     resizeTimer = setTimeout(() => {
-        const charts = [statusChart, trendChart, hotBooksChart, topReadersChart];
+        const charts = [statusChart, trendChart, hotBooksChart, topReadersChart, categoryChart];
         // console.log('图表实例状态:', charts.map(c => c ? (c.isDisposed?.() ? '已销毁' : '正常') : 'null'));
         charts.forEach(chart => {
             if (chart && !chart.isDisposed()) {
@@ -448,6 +523,7 @@ const refreshAllCharts = () => {
         renderTrendChart();
         renderHotBooksChart();
         renderTopReadersChart();
+        renderCategoryChart();
     });
 };
 
@@ -460,7 +536,7 @@ onMounted(() => {
 onUnmounted(() => {
     clearTimeout(resizeTimer);
     window.removeEventListener('resize', handleResize);
-    [statusChart, trendChart, hotBooksChart, topReadersChart].forEach(chart => {
+    [statusChart, trendChart, hotBooksChart, topReadersChart, categoryChart].forEach(chart => {
         chart && chart.dispose();
     })
 })

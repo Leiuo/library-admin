@@ -9,12 +9,12 @@ function initMockData() {
     // 图书
     if (!localStorage.getItem(STORAGE_KEYS.BOOKS)) {
         const books = [  // quantity 表示图书数量
-            { id: 1, title: 'Javascript高级程序设计', author: 'Nicholas C. Zakas', publisher: '人民邮电出版社', quantity: 6 },
-            { id: 2, title: 'Vue.js设计与实现', author: '尤雨溪', publisher: '人民邮电出版社', quantity: 6 },
-            { id: 3, title: 'CSS揭秘', author: 'Lea Verou', publisher: '人民邮电出版社', quantity: 6 },
-            { id: 4, title: '深入理解ES6', author: 'Nicholas C. Zakas', publisher: '电子工业出版社', quantity: 6 },
-            { id: 5, title: '时间简史', author: 'Stephen Hawking', publisher: '北京联合出版公司', quantity: 6 },
-            { id: 6, title: '人类简史', author: 'Yuval Noah Harari', publisher: '中信出版社', quantity: 6 }
+            { id: 1, title: 'Javascript高级程序设计', author: 'Nicholas C. Zakas', publisher: '人民邮电出版社', category: '科技编程', quantity: 6 },
+            { id: 2, title: 'Vue.js设计与实现', author: '尤雨溪', publisher: '人民邮电出版社', category: '科技编程', quantity: 6 },
+            { id: 3, title: 'CSS揭秘', author: 'Lea Verou', publisher: '人民邮电出版社', category: '科技编程', quantity: 6 },
+            { id: 4, title: '深入理解ES6', author: 'Nicholas C. Zakas', publisher: '电子工业出版社', category: '科技编程', quantity: 6 },
+            { id: 5, title: '时间简史', author: 'Stephen Hawking', publisher: '北京联合出版公司', category: '科学科普', quantity: 6 },
+            { id: 6, title: '人类简史', author: 'Yuval Noah Harari', publisher: '中信出版社', category: '历史哲学', quantity: 6 }
         ];
         localStorage.setItem(STORAGE_KEYS.BOOKS, JSON.stringify(books));
     }
