@@ -24,8 +24,7 @@
                 </el-table-column>
                 <el-table-column label="操作" width="120">
                     <template #default="{ row }">
-                        <el-button link type="primary" @click="openEditDialog(row)"
-                            :disabled="row.status === 1">编辑</el-button>
+                        <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
                         <el-button v-if="row.status === 0" link type="danger"
                             @click="handleReturn(row.id)">归还</el-button>
                     </template>
@@ -282,7 +281,7 @@ onMounted(() => {
     }
 
     :deep(.overdue-row) {
-        background-color: rgba(161, 11, 11, 0.488) !important;
+        background-color: rgba(161, 11, 11, 0.159) !important;
     }
 }
 

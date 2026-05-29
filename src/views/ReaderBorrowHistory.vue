@@ -268,7 +268,7 @@ onMounted(() => {
     }
 
     :deep(.overdue-row) {
-        background-color: rgba(239, 68, 68, 0.08) !important;
+        background-color: rgba(161, 11, 11, 0.159) !important;
     }
 }
 </style>
