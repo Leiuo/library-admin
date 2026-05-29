@@ -41,6 +41,12 @@ const routes = [
                 name: 'Dashboard',
                 component: () => import('../views/Dashboard.vue'),
                 meta: { title: '数据统计', KeepAlive: false }
+            },
+            {
+                path: 'reader/:id/history',
+                name: 'ReaderBorrowHistory',
+                component: () => import('../views/ReaderBorrowHistory.vue'),
+                meta: { title: '借阅历史', KeepAlive: false }
             }
         ]
     },

@@ -17,6 +17,7 @@
                 <el-table-column prop="phone" label="电话" />
                 <el-table-column label="操作" width="180">
                     <template #default="{ row }">
+                        <el-button link type="success" @click="goBorrowHistory(row)">借阅历史</el-button>
                         <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
                         <el-button link type="danger" @click="handleDelete(row.id)">删除</el-button>
                     </template>
@@ -94,6 +95,9 @@ import { ref, onMounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue';
 import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders } from '../api/mock';
+import { useRouter } from 'vue-router';
+
+const router = useRouter();
 
 const readers = ref([]);
 const dialogVisible = ref(false);
@@ -142,6 +146,12 @@ const openReaderDialog = () => {
     };
     editingId = null;
     dialogVisible.value = true;
+}
+
+const goBorrowHistory = (row) => {
+    console.log(`去到${row.name}的借阅历史`);
+    router.push(`/reader/${row.id}/history`);
+    
 }
 
 const openEditDialog = (row) => {
