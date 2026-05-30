@@ -242,6 +242,7 @@ const submitForm = async () => {
 const selectedIds = ref([]);
 const handleSelectionChange = (rows) => {
     selectedIds.value = rows.map(r => r.id);
+    // console.log(selectedIds.value);
 };
 
 // 批量删除
@@ -253,8 +254,9 @@ const handleBatchDelete = () => {
         { type: 'warning' }
     ).then(async () => {
         try {
+            const deletedBooks = books.value.filter(b => selectedIds.value.includes(b.id));
             const count = await deleteBooks(selectedIds.value);
-            ElMessage.success(`成功删除 ${count} 本图书`);
+            showUndo(`已删除 ${count} 本图书`, deletedBooks);
             fetchBooks();
         } catch (error) {
             ElMessage.error(error.message);
