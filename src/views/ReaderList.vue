@@ -1,8 +1,8 @@
 <template>
     <div class="readerlist-container">
         <div class="top-button">
-            <el-input v-model="searchKeyword" placeholder="按借书证号/姓名搜索" clearable />
-            <el-button type="primary" @click="fetchReaders">搜索</el-button>
+            <el-input v-model="searchKeyword" placeholder="按借书证号/姓名搜索" clearable @keyup.enter="handleSearch" />
+            <el-button type="primary" @click="handleSearch">搜索</el-button>
             <el-button type="success" @click="openReaderDialog">+ 新增读者</el-button>
             <el-button type="warning" @click="openImportDialog">批量导入</el-button>
             <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">
@@ -101,7 +101,12 @@ import { useRouter } from 'vue-router';
 const router = useRouter();
 
 const searchKeyword = ref('');
+const searchQuery = ref('');
 const readers = ref([]);
+
+const handleSearch = () => {
+    searchQuery.value = searchKeyword.value;
+};
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
 const readerFormRef = ref(null);
@@ -143,8 +148,8 @@ const fetchReaders = async () => {
 const filteredReaders = computed(() => {
     let res = readers.value;
 
-    if (searchKeyword.value) {
-        const keyword = searchKeyword.value.toLowerCase();
+    if (searchQuery.value) {
+        const keyword = searchQuery.value.toLowerCase();
         res = res.filter((reader) => {
             return reader.cardNo.toLowerCase().includes(keyword) || reader.name.toLowerCase().includes(keyword);
         });

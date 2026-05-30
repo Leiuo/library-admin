@@ -1,11 +1,11 @@
 <template>
     <div class="booklist-container">
         <div class="search-area">
-            <el-input v-model="searchKeyword" placeholder="按书名/作者搜索" clearable />
+            <el-input v-model="searchKeyword" placeholder="按书名/作者搜索" clearable @keyup.enter="handleSearch" />
             <el-select v-model="categoryFilter" placeholder="全部分类" clearable style="width: 140px;">
                 <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
             </el-select>
-            <el-button type="primary" @click="fetchBooks" class="search-btn">搜索</el-button>
+            <el-button type="primary" @click="handleSearch" class="search-btn">搜索</el-button>
             <el-button type="success" @click="openAddDialog">+ 新增图书</el-button>
             <el-button type="warning" @click="openImportDialog">批量导入</el-button>
             <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">
@@ -127,13 +127,19 @@ const categories = ['文学小说', '科技编程', '历史哲学', '科学科�
 
 const searchKeyword = ref('');
 const categoryFilter = ref('');
+const searchQuery = ref('');
+const categoryQuery = ref('');
 const books = ref([]);
 const loading = ref(false);  // 加载状态，防止重复请求
+
+const handleSearch = () => {
+    searchQuery.value = searchKeyword.value;
+    categoryQuery.value = categoryFilter.value;
+};
 
 const fetchBooks = async () => {
     loading.value = true;
     try {
-        // console.log(await getBooks());
         books.value = await getBooks();
     } catch (error) {
         ElMessage.error('获取图书列表失败');
@@ -145,15 +151,15 @@ const fetchBooks = async () => {
 const filteredBooks = computed(() => {
     let result = books.value;
 
-    if (searchKeyword.value) {
-        const keyword = searchKeyword.value.toLowerCase();
+    if (searchQuery.value) {
+        const keyword = searchQuery.value.toLowerCase();
         result = result.filter(book =>
             book.title.toLowerCase().includes(keyword) || book.author.toLowerCase().includes(keyword)
         );
     }
 
-    if (categoryFilter.value) {
-        result = result.filter(book => book.category === categoryFilter.value);
+    if (categoryQuery.value) {
+        result = result.filter(book => book.category === categoryQuery.value);
     }
 
     return result;
@@ -165,7 +171,7 @@ const paginatedBooks = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value;
     return filteredBooks.value.slice(start, start + pageSize.value);
 });
-watch([searchKeyword, categoryFilter], () => { currentPage.value = 1; });
+watch([searchQuery, categoryQuery], () => { currentPage.value = 1; });
 
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
