@@ -1,7 +1,9 @@
 <template>
     <div class="readerlist-container">
         <div class="top-button">
-            <el-button type="primary" @click="openReaderDialog">+ 新增读者</el-button>
+            <el-input v-model="searchKeyword" placeholder="按借书证号/姓名搜索" clearable />
+            <el-button type="primary" @click="fetchReaders">搜索</el-button>
+            <el-button type="success" @click="openReaderDialog">+ 新增读者</el-button>
             <el-button type="warning" @click="openImportDialog">批量导入</el-button>
             <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">
                 批量删除 {{ selectedIds.length ? `(${selectedIds.length})` : '' }}
@@ -98,6 +100,7 @@ import { useRouter } from 'vue-router';
 
 const router = useRouter();
 
+const searchKeyword = ref('');
 const readers = ref([]);
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
@@ -113,9 +116,9 @@ const loading = ref(false);  // 加载状态
 
 const currentPage = ref(1);
 const pageSize = ref(10);
-const paginatedReaders = computed(() => {
+let paginatedReaders = computed(() => {
     const start = (currentPage.value - 1) * pageSize.value;
-    return readers.value.slice(start, start + pageSize.value);
+    return filteredReaders.value.slice(start, start + pageSize.value);
 });
 
 const readerRules = {
@@ -135,6 +138,20 @@ const fetchReaders = async () => {
         loading.value = false;
     }
 }
+
+// 根据关键词筛选读者
+const filteredReaders = computed(() => {
+    let res = readers.value;
+
+    if (searchKeyword.value) {
+        const keyword = searchKeyword.value.toLowerCase();
+        res = res.filter((reader) => {
+            return reader.cardNo.toLowerCase().includes(keyword) || reader.name.toLowerCase().includes(keyword);
+        });
+    }
+
+    return res;
+});
 
 const openReaderDialog = () => {
     dialogTitle.value = '新增读者';
@@ -383,6 +400,13 @@ onUnmounted(() => {
 .readerlist-container {
     .top-button {
         margin-bottom: 16px;
+        display: flex;
+        gap: 8px;
+        flex-wrap: wrap;
+
+        .el-input {
+            width: 250px;
+        }
     }
 
     .table-wrapper {
