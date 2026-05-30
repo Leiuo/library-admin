@@ -208,9 +208,10 @@ const handleDelete = (id) => {
         type: 'warning',
     }).then(async () => {
         try {
-            const book = books.value.find(b => b.id === id);
+            const index = books.value.findIndex(b => b.id === id);
+            const book = books.value[index];
             await deleteBook(id);
-            if (book) showUndo(`已删除《${book.title}》`, [book]);
+            if (book) showUndo(`已删除《${book.title}》`, [{ item: book, index }]);
             fetchBooks();
         } catch (error) {
             ElMessage.error(error.message);
@@ -254,7 +255,11 @@ const handleBatchDelete = () => {
         { type: 'warning' }
     ).then(async () => {
         try {
-            const deletedBooks = books.value.filter(b => selectedIds.value.includes(b.id));
+            const deletedBooks = books.value.reduce((acc, b, i) => {
+                if (selectedIds.value.includes(b.id)) acc.push({ item: b, index: i });
+                return acc;
+            }, []);
+            console.log("删掉的图书", deletedBooks);
             const count = await deleteBooks(selectedIds.value);
             showUndo(`已删除 ${count} 本图书`, deletedBooks);
             fetchBooks();
@@ -282,7 +287,10 @@ const clearUndo = () => {
 const handleUndo = () => {
     if (!undoState.value) return;
     const books = JSON.parse(localStorage.getItem('library_books')) || [];
-    books.unshift(...undoState.value.items);
+    const sorted = [...undoState.value.items].sort((a, b) => a.index - b.index);
+    for (const { item, index } of sorted) {
+        books.splice(index, 0, item);
+    }
     localStorage.setItem('library_books', JSON.stringify(books));
     clearUndo();
     fetchBooks();

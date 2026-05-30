@@ -172,9 +172,10 @@ const handleDelete = (id) => {
     ElMessageBox.confirm('你确定要删除该读者吗？', '提示', { type: 'warning' })
         .then(async () => {
             try {
-                const reader = readers.value.find(r => r.id === id);
+                const index = readers.value.findIndex(r => r.id === id);
+                const reader = readers.value[index];
                 await deleteReader(id);
-                if (reader) showUndo(`已删除读者 ${reader.name}`, [reader]);
+                if (reader) showUndo(`已删除读者 ${reader.name}`, [{ item: reader, index }]);
                 fetchReaders();
             } catch (error) {
                 ElMessage.error(error.message);
@@ -212,7 +213,10 @@ const handleBatchDelete = () => {
         { type: 'warning' }
     ).then(async () => {
         try {
-            const deletedReaders = readers.value.filter(r => selectedIds.value.includes(r.id));
+            const deletedReaders = readers.value.reduce((acc, r, i) => {
+                if (selectedIds.value.includes(r.id)) acc.push({ item: r, index: i });
+                return acc;
+            }, []);
             const count = await deleteReaders(selectedIds.value);
             showUndo(`已删除 ${count} 位读者`, deletedReaders);
             fetchReaders();
@@ -240,7 +244,10 @@ const clearUndo = () => {
 const handleUndo = () => {
     if (!undoState.value) return;
     const readers = JSON.parse(localStorage.getItem('library_readers')) || [];
-    readers.push(...undoState.value.items);
+    const sorted = [...undoState.value.items].sort((a, b) => a.index - b.index);
+    for (const { item, index } of sorted) {
+        readers.splice(index, 0, item);
+    }
     localStorage.setItem('library_readers', JSON.stringify(readers));
     clearUndo();
     fetchReaders();

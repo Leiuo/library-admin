@@ -260,7 +260,10 @@ const handleBatchDelete = () => {
     ).then(async () => {
         try {
             const rawBorrows = JSON.parse(localStorage.getItem('library_borrows')) || [];
-            const deletedItems = rawBorrows.filter(b => selectedIds.value.includes(b.id));
+            const deletedItems = rawBorrows.reduce((acc, b, i) => {
+                if (selectedIds.value.includes(b.id)) acc.push({ item: b, index: i });
+                return acc;
+            }, []);
             const count = await deleteBorrows(selectedIds.value);
             showUndo(`已删除 ${count} 条记录`, deletedItems);
             fetchBorrows();
@@ -290,8 +293,9 @@ const handleUndo = () => {
     const borrows = JSON.parse(localStorage.getItem('library_borrows')) || [];
     const books = JSON.parse(localStorage.getItem('library_books')) || [];
 
-    for (const item of undoState.value.items) {
-        borrows.push(item);
+    const sorted = [...undoState.value.items].sort((a, b) => a.index - b.index);
+    for (const { item, index } of sorted) {
+        borrows.splice(index, 0, item);
         if (item.status === 0) {
             const book = books.find(b => b.id === item.bookId);
             if (book) book.quantity -= 1;
