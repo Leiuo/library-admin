@@ -494,3 +494,16 @@ onMounted(() => {
     }
 }
 </style>
+
+<style lang="less">
+html.dark {
+    .undo-bar {
+        background: #064e3b;
+        border-color: #065f46;
+        color: #a7f3d0;
+    }
+    .import-tips p {
+        color: #94a3b8;
+    }
+}
+</style>

@@ -272,3 +272,11 @@ onMounted(() => {
     }
 }
 </style>
+
+<style lang="less">
+html.dark {
+    .history-stat .stat-card {
+        .stat-label { color: #94a3b8; }
+    }
+}
+</style>

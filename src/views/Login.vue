@@ -1,5 +1,12 @@
 <template>
     <div class="login-container">
+        <div class="theme-switch" @click="themeStore.toggle()">
+            <el-icon size="20">
+                <Sunny v-if="themeStore.isDark" />
+                <Moon v-else />
+            </el-icon>
+        </div>
+
         <div class="brand-panel">
             <div class="brand-content">
                 <div class="brand-marker" />
@@ -49,10 +56,13 @@
 import { reactive, ref } from 'vue';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';
+import { useThemeStore } from '../stores/theme';
 import { ElMessage } from 'element-plus';
+import { Sunny, Moon } from '@element-plus/icons-vue';
 
 const router = useRouter();
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 
 const loginForm = reactive({
     username: 'admin',
@@ -93,6 +103,17 @@ const handleLogin = async () => {
 </script>
 
 <style lang="less" scoped>
+.theme-switch {
+    position: absolute;
+    top: 20px;
+    right: 20px;
+    z-index: 10;
+    cursor: pointer;
+    color: #94a3b8;
+    transition: color 0.3s;
+    &:hover { color: #f59e0b; }
+}
+
 .login-container {
     height: 100%;
     display: flex;
@@ -224,6 +245,38 @@ const handleLogin = async () => {
                 background-color: #0d9488;
             }
         }
+    }
+}
+</style>
+
+<style lang="less">
+html.dark {
+    .login-container .form-container {
+        background: #1e293b;
+    }
+
+    .login-container .form-header {
+        .form-title { color: #f1f5f9; }
+        .form-subtitle { color: #94a3b8; }
+    }
+
+    .login-container .field-label {
+        color: #e2e8f0 !important;
+    }
+
+    .login-container .form-container .tip {
+        background: #0f172a !important;
+        border-color: #334155 !important;
+        color: #cbd5e1 !important;
+    }
+
+    .login-container .brand-panel {
+        background: #020617;
+    }
+
+    .theme-switch {
+        color: #cbd5e1;
+        &:hover { color: #f59e0b; }
     }
 }
 </style>

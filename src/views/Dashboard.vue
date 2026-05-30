@@ -110,9 +110,12 @@
 </template>
 
 <script setup>
-import { reactive, ref, onMounted, onUnmounted, nextTick } from 'vue';
+import { reactive, ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import * as echarts from 'echarts';
 import { getBooks, getBorrows, getReaders } from '../api/mock';
+import { useThemeStore } from '../stores/theme';
+
+const themeStore = useThemeStore();
 
 // 统计数据
 const stats = reactive({
@@ -169,7 +172,7 @@ const getStatusChartData = () => {
 const renderStatusChart = () => {
     if (!statusChartRef.value) return;
     if (statusChart) statusChart.dispose();
-    statusChart = echarts.init(statusChartRef.value);
+    statusChart = echarts.init(statusChartRef.value, themeStore.isDark ? 'dark' : undefined);
     const data = getStatusChartData();
     statusChart.setOption({
         // title: {
@@ -227,7 +230,7 @@ const getMonthlyTrendData = (year) => {
 const renderTrendChart = () => {
     if (!trendChartRef.value) return;
     if (trendChart) trendChart.dispose();
-    trendChart = echarts.init(trendChartRef.value);
+    trendChart = echarts.init(trendChartRef.value, themeStore.isDark ? 'dark' : undefined);
 
     const monthlyData = getMonthlyTrendData(trendYear.value);
     trendChart.setOption({
@@ -299,7 +302,7 @@ const getHotBooksData = () => {
 const renderHotBooksChart = () => {
     if (!hotBooksChartRef.value) return;
     if (hotBooksChart) hotBooksChart.dispose();
-    hotBooksChart = echarts.init(hotBooksChartRef.value);
+    hotBooksChart = echarts.init(hotBooksChartRef.value, themeStore.isDark ? 'dark' : undefined);
 
     const data = getHotBooksData();
     const names = data.map(d => d.name.length > 12 ? d.name.slice(0, 10) + '…' : d.name);
@@ -375,7 +378,7 @@ const getTopReadersData = () => {
 const renderTopReadersChart = () => {
     if (!topReadersChartRef.value) return;
     if (topReadersChart) topReadersChart.dispose();
-    topReadersChart = echarts.init(topReadersChartRef.value);
+    topReadersChart = echarts.init(topReadersChartRef.value, themeStore.isDark ? 'dark' : undefined);
 
     const data = getTopReadersData();
     const names = data.map(d => `${d.name} (${d.cardNo})`);
@@ -436,7 +439,7 @@ const getCategoryData = () => {
 const renderCategoryChart = () => {
     if (!categoryChartRef.value) return;
     if (categoryChart) categoryChart.dispose();
-    categoryChart = echarts.init(categoryChartRef.value);
+    categoryChart = echarts.init(categoryChartRef.value, themeStore.isDark ? 'dark' : undefined);
 
     const data = getCategoryData();
     const names = data.map(d => d.name);
@@ -530,6 +533,10 @@ const refreshAllCharts = () => {
 onMounted(() => {
     fetchAllData();
     window.addEventListener('resize', handleResize);  // 窗口尺寸变化时，重塑图表尺寸
+});
+
+watch(() => themeStore.isDark, () => {
+    refreshAllCharts();
 });
 
 // 组件卸载时销毁图表
@@ -733,6 +740,14 @@ onUnmounted(() => {
                 }
             }
         }
+    }
+}
+</style>
+
+<style lang="less">
+html.dark {
+    .dashboard-container .stat-card .stat-label {
+        color: #94a3b8;
     }
 }
 </style>

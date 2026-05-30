@@ -59,6 +59,10 @@
                     </el-breadcrumb>
                 </div>
                 <div class="header-right">
+                    <el-icon size="20" class="theme-toggle" @click="themeStore.toggle()">
+                        <Sunny v-if="themeStore.isDark" />
+                        <Moon v-else />
+                    </el-icon>
                     <div class="userInfo">
                         <el-avatar :src="userStore.user_avatar" :size="30" />
                         <span class="user-name">{{ userStore.user_name }}</span>
@@ -85,12 +89,14 @@
 
 <script setup>
 import { useUserStore } from '../stores/user';
+import { useThemeStore } from '../stores/theme';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { DataLine } from '@element-plus/icons-vue';
+import { DataLine, Sunny, Moon } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();
+const themeStore = useThemeStore();
 const route = useRoute();
 const router = useRouter();
 
@@ -232,6 +238,13 @@ const breadcrumbs = computed(() => {
         gap: 10px;
         flex-shrink: 0;
 
+        .theme-toggle {
+            cursor: pointer;
+            color: #64748b;
+            transition: color 0.3s;
+            &:hover { color: #f59e0b; }
+        }
+
         .userInfo {
             display: flex;
             align-items: center;
@@ -301,6 +314,32 @@ const breadcrumbs = computed(() => {
 @media (min-width: 768px) and (max-width: 1023px) {
     .layout-header {
         padding: 0 16px;
+    }
+}
+</style>
+
+<style lang="less">
+html.dark {
+    .layout-aside {
+        .aside-title { color: #e2e8f0; }
+        .version { color: #94a3b8; }
+    }
+
+    .layout-header {
+        background-color: #1e293b;
+        border-bottom-color: #334155;
+    }
+
+    .layout-right .el-main {
+        background-color: #0f172a;
+    }
+
+    .layout-header .header-right .user-name {
+        color: #cbd5e1 !important;
+    }
+
+    .header-breadcrumb .el-breadcrumb__inner {
+        color: #94a3b8;
     }
 }
 </style>
