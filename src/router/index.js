@@ -47,6 +47,12 @@ const routes = [
                 name: 'ReaderBorrowHistory',
                 component: () => import('../views/ReaderBorrowHistory.vue'),
                 meta: { title: '借阅历史', KeepAlive: false }
+            },
+            {
+                path: 'settings',
+                name: 'Settings',
+                component: () => import('../views/Settings.vue'),
+                meta: { title: '系统设置', KeepAlive: false }
             }
         ]
     },

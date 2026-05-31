@@ -38,6 +38,12 @@
                     </el-icon>
                     <span>读者管理</span>
                 </el-menu-item>
+                <el-menu-item index="/settings">
+                    <el-icon>
+                        <Setting />
+                    </el-icon>
+                    <span>系统设置</span>
+                </el-menu-item>
             </el-menu>
             <div class="aside-footer">
                 <span class="version">v 1.1.0</span>
@@ -92,7 +98,7 @@ import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { DataLine, Sunny, Moon } from '@element-plus/icons-vue';
+import { DataLine, Setting, Sunny, Moon } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();

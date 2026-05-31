@@ -2,7 +2,8 @@
 const STORAGE_KEYS = {
     BOOKS: 'library_books',
     READERS: 'library_readers',
-    BORROWS: 'library_borrows'
+    BORROWS: 'library_borrows',
+    SETTINGS: 'library_settings'
 };
 
 function initMockData() {
@@ -341,3 +342,33 @@ export const importReaders = (readerList) => {
     setData(STORAGE_KEYS.READERS, readers);
     return Promise.resolve(newReaders.length);
 }
+
+
+// -------------------- 系统设置模块 --------------------
+const DEFAULT_SETTINGS = {
+    libraryName: '图书馆管理系统',
+    libraryAddress: '',
+    libraryPhone: '',
+    openingHours: '',
+    maxBorrowBooks: 5,
+    borrowDuration: 30,
+    renewalLimit: 2,
+    overdueFinePerDay: 0.5
+};
+
+function initSettings() {
+    if (!localStorage.getItem(STORAGE_KEYS.SETTINGS)) {
+        localStorage.setItem(STORAGE_KEYS.SETTINGS, JSON.stringify(DEFAULT_SETTINGS));
+    }
+}
+initSettings();
+
+export const getSettings = () => {
+    initSettings();
+    return Promise.resolve(getData(STORAGE_KEYS.SETTINGS));
+};
+
+export const saveSettings = (settings) => {
+    setData(STORAGE_KEYS.SETTINGS, settings);
+    return Promise.resolve(settings);
+};
