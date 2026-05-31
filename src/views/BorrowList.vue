@@ -38,6 +38,14 @@
                         </el-tag>
                     </template>
                 </el-table-column>
+                <el-table-column label="逾期罚款" width="120">
+                    <template #default="{ row }">
+                        <span v-if="isOverdue(row)" class="fine-text">
+                            {{ calcFine(row) }}
+                        </span>
+                        <span v-else>-</span>
+                    </template>
+                </el-table-column>
                 <el-table-column label="操作" width="120">
                     <template #default="{ row }">
                         <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
@@ -100,9 +108,22 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Close } from '@element-plus/icons-vue';
-import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows } from '../api/mock';
+import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows, getSettings } from '../api/mock';
 
 const borrows = ref([]);
+
+const settings = ref({
+    maxBorrowBooks: 5,
+    borrowDuration: 30,
+    overdueFinePerDay: 0.5
+});
+
+const loadSettings = async () => {
+    try {
+        const s = await getSettings();
+        settings.value = s;
+    } catch { /* use defaults */ }
+};
 
 // 搜索/筛选状态
 const searchKeyword = ref('');
@@ -128,6 +149,13 @@ const pageSize = ref(10);
 // 判断借阅是否逾期（未归还 且 当前日期已过应还日期）
 const today = new Date().toISOString().split('T')[0];
 const isOverdue = (row) => row.status === 0 && row.dueDate < today;
+
+const calcFine = (row) => {
+    if (!isOverdue(row)) return '0 元';
+    const days = Math.floor((new Date(today) - new Date(row.dueDate)) / (1000 * 60 * 60 * 24));
+    const fine = (days * settings.value.overdueFinePerDay).toFixed(1);
+    return `${days}天 / ${fine} 元`;
+};
 
 const filteredBorrows = computed(() => {
     let result = borrows.value;
@@ -224,9 +252,31 @@ const borrowRules = {
 // 借书日期变化时，重新校验应还日期
 watch(() => borrowForm.value.borrowDate, () => {
     if (borrowForm.value.dueDate && borrowFormRef.value) {
-        // console.log('借书日期变化，重新校验应还日期');
-        // console.log('borrowFormRef.value:', borrowFormRef.value);
         borrowFormRef.value.validateField('dueDate');
+    }
+});
+
+// 借书日期变化时，自动计算应还日期（仅新增模式）
+watch(() => borrowForm.value.borrowDate, (val) => {
+    if (!editingId.value && val) {
+        const d = new Date(val);
+        d.setDate(d.getDate() + settings.value.borrowDuration);
+        borrowForm.value.dueDate = d.toISOString().split('T')[0];
+        if (borrowFormRef.value) {
+            borrowFormRef.value.validateField('dueDate');
+        }
+    }
+});
+
+// 选择读者时，检查是否已达最大借阅数量（新增模式下，或编辑时更换了读者）
+watch(() => borrowForm.value.readerId, (val, oldVal) => {
+    if (!val) return;
+    const activeCount = borrows.value.filter(
+        b => b.readerId === val && b.status === 0 && b.id !== editingId.value
+    ).length;
+    if (activeCount >= settings.value.maxBorrowBooks) {
+        ElMessage.warning(`该读者当前已借 ${activeCount} 本，已达最大借阅上限（${settings.value.maxBorrowBooks}本）`);
+        borrowForm.value.readerId = '';
     }
 });
 
@@ -250,7 +300,7 @@ const fetchSeletData = async (currentBookId = null) => {
 const openBorrowDialog = async () => {
     dialogTitle.value = '新增借阅';
     editingId.value = null;
-    await fetchSeletData();
+    await Promise.all([fetchSeletData(), loadSettings()]);
     borrowForm.value = {
         bookId: '',
         readerId: '',
@@ -361,6 +411,7 @@ const handleUndo = () => {
 
 onMounted(() => {
     fetchBorrows();
+    loadSettings();
 });
 
 onUnmounted(() => {
@@ -419,6 +470,12 @@ onUnmounted(() => {
         margin-top: 16px;
         display: flex;
         justify-content: flex-end;
+    }
+
+    .fine-text {
+        color: #ef4444;
+        font-weight: 500;
+        font-size: 13px;
     }
 
     :deep(.overdue-row) {
