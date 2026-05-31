@@ -1,7 +1,15 @@
 <template>
     <div class="borrowlist-container">
-        <div class="top-button">
-            <el-button type="primary" @click="openBorrowDialog">+ 借书</el-button>
+        <div class="search-area">
+            <el-input v-model="searchKeyword" placeholder="按书名搜索" clearable @keyup.enter="handleSearch" />
+            <el-input v-model="readerKeyword" placeholder="按读者名搜索" clearable @keyup.enter="handleSearch" />
+            <el-select v-model="statusFilter" placeholder="全部状态" clearable style="width: 130px;">
+                <el-option label="借出中" value="borrowing" />
+                <el-option label="逾期中" value="overdue" />
+                <el-option label="已归还" value="returned" />
+            </el-select>
+            <el-button type="primary" @click="handleSearch" class="search-btn">搜索</el-button>
+            <el-button type="success" @click="openBorrowDialog">+ 借书</el-button>
             <el-button type="danger" @click="handleBatchDelete" :disabled="selectedIds.length === 0">
                 批量删除 {{ selectedIds.length ? `(${selectedIds.length})` : '' }}
             </el-button>
@@ -43,7 +51,7 @@
                     v-model:current-page="currentPage"
                     v-model:page-size="pageSize"
                     :page-sizes="[10, 20, 50]"
-                    :total="borrows.length"
+                    :total="filteredBorrows.length"
                     layout="total, sizes, prev, pager, next, jumper"
                     background
                 />
@@ -95,6 +103,21 @@ import { Close } from '@element-plus/icons-vue';
 import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows } from '../api/mock';
 
 const borrows = ref([]);
+
+// 搜索/筛选状态
+const searchKeyword = ref('');
+const readerKeyword = ref('');
+const statusFilter = ref('');
+const searchQuery = ref('');
+const readerQuery = ref('');
+const statusQuery = ref('');
+
+const handleSearch = () => {
+    searchQuery.value = searchKeyword.value;
+    readerQuery.value = readerKeyword.value;
+    statusQuery.value = statusFilter.value;
+};
+
 const dialogTitle = ref('');
 const editingId = ref(null);
 
@@ -102,14 +125,41 @@ const loading = ref(false);  // 加载状态
 
 const currentPage = ref(1);
 const pageSize = ref(10);
-const paginatedBorrows = computed(() => {
-    const start = (currentPage.value - 1) * pageSize.value;
-    return borrows.value.slice(start, start + pageSize.value);
-});
-
 // 判断借阅是否逾期（未归还 且 当前日期已过应还日期）
 const today = new Date().toISOString().split('T')[0];
 const isOverdue = (row) => row.status === 0 && row.dueDate < today;
+
+const filteredBorrows = computed(() => {
+    let result = borrows.value;
+
+    if (searchQuery.value) {
+        const keyword = searchQuery.value.toLowerCase();
+        result = result.filter(b => b.bookTitle && b.bookTitle.toLowerCase().includes(keyword));
+    }
+
+    if (readerQuery.value) {
+        const keyword = readerQuery.value.toLowerCase();
+        result = result.filter(b => b.readerName && b.readerName.toLowerCase().includes(keyword));
+    }
+
+    if (statusQuery.value) {
+        if (statusQuery.value === 'borrowing') {
+            result = result.filter(b => b.status === 0 && !isOverdue(b));
+        } else if (statusQuery.value === 'overdue') {
+            result = result.filter(b => isOverdue(b));
+        } else if (statusQuery.value === 'returned') {
+            result = result.filter(b => b.status === 1);
+        }
+    }
+
+    return result;
+});
+
+const paginatedBorrows = computed(() => {
+    const start = (currentPage.value - 1) * pageSize.value;
+    return filteredBorrows.value.slice(start, start + pageSize.value);
+});
+watch([searchQuery, readerQuery, statusQuery], () => { currentPage.value = 1; });
 const statusText = (row) => {
     if (row.status === 1) return '已归还';
     return isOverdue(row) ? '逾期中' : '借出中';
@@ -350,8 +400,15 @@ onUnmounted(() => {
 }
 
 .borrowlist-container {
-    .top-button {
+    .search-area {
         margin-bottom: 16px;
+        display: flex;
+        flex-wrap: wrap;
+        gap: 8px;
+
+        .el-input {
+            width: 200px;
+        }
     }
 
     .table-wrapper {
@@ -370,6 +427,14 @@ onUnmounted(() => {
 }
 
 @media (max-width: 767px) {
+    .borrowlist-container {
+        .search-area {
+            .el-input {
+                width: 100%;
+            }
+        }
+    }
+
     :deep(.el-dialog) {
         width: 90% !important;
     }
