@@ -242,7 +242,10 @@ const breadcrumbs = computed(() => {
             cursor: pointer;
             color: #94a3b8;
             transition: color 0.3s;
-            &:hover { color: #f59e0b; }
+
+            &:hover {
+                color: #f59e0b;
+            }
         }
 
         .userInfo {
@@ -321,8 +324,13 @@ const breadcrumbs = computed(() => {
 <style lang="less">
 html.dark {
     .layout-aside {
-        .aside-title { color: #e2e8f0; }
-        .version { color: #94a3b8; }
+        .aside-title {
+            color: #e2e8f0;
+        }
+
+        .version {
+            color: #94a3b8;
+        }
     }
 
     .layout-header {
@@ -332,6 +340,14 @@ html.dark {
 
     .layout-right .el-main {
         background-color: #0f172a;
+    }
+
+    .layout-header .header-right .theme-toggle {
+        color: #cbd5e1;
+
+        &:hover {
+            color: #f59e0b;
+        }
     }
 
     .layout-header .header-right .user-name {
