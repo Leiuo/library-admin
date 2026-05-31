@@ -123,7 +123,12 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { UploadFilled, Close } from '@element-plus/icons-vue';
 import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks } from '../api/mock';
 
-const categories = ['文学小说', '科技编程', '历史哲学', '科学科普', '经济管理', '艺术设计', '教育学习', '生活百科'];
+// 分类从图书数据中动态提取，合并预设分类作为兜底
+const categories = computed(() => {
+    const set = new Set(['文学小说', '科技编程', '历史哲学', '科学科普', '经济管理', '艺术设计', '教育学习', '生活百科']);
+    books.value.forEach(b => { if (b.category) set.add(b.category); });
+    return [...set].sort();
+});
 
 const searchKeyword = ref('');
 const categoryFilter = ref('');
