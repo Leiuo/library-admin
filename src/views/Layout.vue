@@ -240,7 +240,7 @@ const breadcrumbs = computed(() => {
 
         .theme-toggle {
             cursor: pointer;
-            color: #64748b;
+            color: #94a3b8;
             transition: color 0.3s;
             &:hover { color: #f59e0b; }
         }
