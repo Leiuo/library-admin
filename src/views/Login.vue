@@ -59,14 +59,15 @@ import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { ElMessage } from 'element-plus';
 import { Sunny, Moon } from '@element-plus/icons-vue';
+import { getAdmins } from '../api/mock';
 
 const router = useRouter();
 const userStore = useUserStore();
 const themeStore = useThemeStore();
 
 const loginForm = reactive({
-    username: 'admin',
-    password: '123456'
+    username: 'LEI',
+    password: 'qiuyue@080701'
 });
 
 const loginFormRef = ref(null);
@@ -152,39 +153,6 @@ const handleLogin = async () => {
             }
         }
     }
-
-    // .login-card {
-    //     width: 450px;
-    //     max-width: 90vw;
-    //     border-radius: 10px;
-    //     transition: transform 0.3s ease;
-
-    //     &:hover {
-    //         transform: translateY(-5px);
-    //     }
-
-    //     .card-header {
-    //         display: flex;
-    //         flex-direction: column;
-    //         gap: 5px;
-    //         text-align: center;
-    //         margin-bottom: 20px;
-
-    //         h2 {
-    //             font-size: 22px;
-    //         }
-
-    //         p {
-    //             font-size: 14px;
-    //         }
-    //     }
-
-    //     .tip {
-    //         text-align: center;
-    //         font-size: 12px;
-    //         color: #909399;
-    //     }
-    // }
 
     .form-container {
         width: 480px;
