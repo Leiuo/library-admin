@@ -53,7 +53,7 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getAdmins, addAdmin, updateAdmin, deleteAdmin } from '../api/mock';
+import { getAdmins, addAdmin, updateAdmin, deleteAdmin, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
 import { Plus } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
@@ -119,9 +119,11 @@ const handleSubmit = async () => {
 
         if (editingId.value) {
             await updateAdmin(editingId.value, data);
+            addLog(userStore.user_name, 'edit_admin', form.value.username);
             ElMessage.success('编辑成功');
         } else {
             await addAdmin(data);
+            addLog(userStore.user_name, 'add_admin', form.value.username);
             ElMessage.success('添加成功');
         }
         dialogVisible.value = false;
@@ -141,6 +143,7 @@ const handleDelete = (row) => {
     ).then(async () => {
         try {
             await deleteAdmin(row.id, userStore.user_name);
+            addLog(userStore.user_name, 'delete_admin', row.username);
             ElMessage.success('删除成功');
             await fetchAdmins();
         } catch (error) {

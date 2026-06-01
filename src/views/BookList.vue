@@ -121,7 +121,10 @@
 import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { UploadFilled, Close } from '@element-plus/icons-vue';
-import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks } from '../api/mock';
+import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks, addLog } from '../api/mock';
+import { useUserStore } from '../stores/user';
+
+const userStore = useUserStore();
 
 // 分类从图书数据中动态提取，合并预设分类作为兜底
 const categories = computed(() => {
@@ -222,7 +225,10 @@ const handleDelete = (id) => {
             const index = books.value.findIndex(b => b.id === id);
             const book = books.value[index];
             await deleteBook(id);
-            if (book) showUndo(`已删除《${book.title}》`, [{ item: book, index }]);
+            if (book) {
+                addLog(userStore.user_name, 'delete_book', `《${book.title}》`);
+                showUndo(`已删除《${book.title}》`, [{ item: book, index }]);
+            }
             fetchBooks();
         } catch (error) {
             ElMessage.error(error.message);
@@ -237,9 +243,11 @@ const submitForm = async () => {
     try {
         if (editingId) {  // 如果是编辑图书，更新当前图书
             await updateBook(editingId, bookForm.value);
+            addLog(userStore.user_name, 'edit_book', `《${bookForm.value.title}》`);
             ElMessage.success('更新成功');
         } else {  // 如果是新增图书，将图书加到列表中
             await addBook(bookForm.value);
+            addLog(userStore.user_name, 'add_book', `《${bookForm.value.title}》`);
             ElMessage.success('添加成功');
         }
     } catch (error) {
@@ -272,6 +280,8 @@ const handleBatchDelete = () => {
             }, []);
             console.log("删掉的图书", deletedBooks);
             const count = await deleteBooks(selectedIds.value);
+            addLog(userStore.user_name, 'delete_book', `${count} 本图书`,
+                deletedBooks.map(d => `《${d.item.title}》`).join('、'));
             showUndo(`已删除 ${count} 本图书`, deletedBooks);
             fetchBooks();
         } catch (error) {
@@ -374,6 +384,7 @@ const submitImport = async () => {
     if (!previewData.value.length) return;
     try {
         const count = await importBooks(previewData.value);
+        addLog(userStore.user_name, 'import_books', `${count} 本图书`);
         ElMessage.success(`成功导入 ${count} 本图书`);
         importDialogVisible.value = false;
         fetchBooks();

@@ -108,7 +108,10 @@
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { Close } from '@element-plus/icons-vue';
-import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows, getSettings } from '../api/mock';
+import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows, getSettings, addLog } from '../api/mock';
+import { useUserStore } from '../stores/user';
+
+const userStore = useUserStore();
 
 const borrows = ref([]);
 
@@ -212,7 +215,9 @@ const fetchBorrows = async () => {
 }
 
 const handleReturn = (borrowId) => {
+    const borrow = borrows.value.find(b => b.id === borrowId);
     returnBook(borrowId).then(() => {
+        if (borrow) addLog(userStore.user_name, 'return', `《${borrow.bookTitle}》`, `借阅人: ${borrow.readerName}`);
         ElMessage.success('归还成功');
         fetchBorrows();
     }).catch(error => ElMessage.error(error.message));
@@ -332,9 +337,13 @@ const submitBorrow = async () => {
     try {
         if (editingId.value) {  // 如果正在编辑，则调用更新接口
             await updateBorrow(editingId.value, borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate, borrowForm.value.status);
+            addLog(userStore.user_name, 'edit_borrow', `记录#${editingId.value}`);
             ElMessage.success('更新成功');
         } else {  // 否则调用新增接口
             await addBorrow(borrowForm.value.bookId, borrowForm.value.readerId, borrowForm.value.borrowDate, borrowForm.value.dueDate);
+            const book = availableBooks.value.find(b => b.id === borrowForm.value.bookId);
+            const reader = readers.value.find(r => r.id === borrowForm.value.readerId);
+            if (book && reader) addLog(userStore.user_name, 'borrow', `《${book.title}》`, `借阅人: ${reader.name}`);
             ElMessage.success('借书成功');
         }
         dialogVisible.value = false;
@@ -365,6 +374,7 @@ const handleBatchDelete = () => {
                 return acc;
             }, []);
             const count = await deleteBorrows(selectedIds.value);
+            addLog(userStore.user_name, 'delete_borrow', `${count} 条记录`);
             showUndo(`已删除 ${count} 条记录`, deletedItems);
             fetchBorrows();
         } catch (error) {

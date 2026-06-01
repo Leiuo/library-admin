@@ -63,9 +63,15 @@ const routes = [
                         path: 'admins',
                         name: 'AdminManagement',
                         component: () => import('../views/AdminManagement.vue'),
-                        meta: { title: '管理员管理', KeepAlive: false }
-                    }
+                        meta: { title: '管理员设置', KeepAlive: false }
+                    },
                 ]
+            },
+            {
+                path: 'logs',
+                name: 'OperationLog',
+                component: () => import('../views/OperationLog.vue'),
+                meta: { title: '操作日志', KeepAlive: false }
             }
         ]
     },

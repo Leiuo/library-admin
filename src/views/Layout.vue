@@ -52,6 +52,12 @@
                         <span>管理员设置</span>
                     </el-menu-item>
                 </el-sub-menu>
+                <el-menu-item index="/logs">
+                    <el-icon>
+                        <DocumentChecked />
+                    </el-icon>
+                    <span>操作日志</span>
+                </el-menu-item>
             </el-menu>
             <div class="aside-footer">
                 <span class="version">v 1.1.0</span>
@@ -106,7 +112,7 @@ import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { DataLine, Setting, Sunny, Moon } from '@element-plus/icons-vue';
+import { DataLine, Setting, DocumentChecked, Sunny, Moon } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();

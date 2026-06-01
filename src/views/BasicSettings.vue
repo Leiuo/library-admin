@@ -61,7 +61,10 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
-import { getSettings, saveSettings } from '../api/mock';
+import { getSettings, saveSettings, addLog } from '../api/mock';
+import { useUserStore } from '../stores/user';
+
+const userStore = useUserStore();
 import { Check } from '@element-plus/icons-vue';
 import { ElMessage } from 'element-plus';
 
@@ -108,6 +111,7 @@ const handleSave = async () => {
         const all = await getSettings();
         const updated = { ...all, ...form };
         await saveSettings(updated);
+        addLog(userStore.user_name, 'save_settings', '系统设置');
         ElMessage.success('保存成功');
     } catch {
         ElMessage.error('保存失败，请重试');

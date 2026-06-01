@@ -95,10 +95,12 @@
 import { ref, onMounted, onUnmounted, computed } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import { UploadFilled, Close } from '@element-plus/icons-vue';
-import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders } from '../api/mock';
+import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders, addLog } from '../api/mock';
 import { useRouter } from 'vue-router';
+import { useUserStore } from '../stores/user';
 
 const router = useRouter();
+const userStore = useUserStore();
 
 const searchKeyword = ref('');
 const searchQuery = ref('');
@@ -197,7 +199,10 @@ const handleDelete = (id) => {
                 const index = readers.value.findIndex(r => r.id === id);
                 const reader = readers.value[index];
                 await deleteReader(id);
-                if (reader) showUndo(`已删除读者 ${reader.name}`, [{ item: reader, index }]);
+                if (reader) {
+                    addLog(userStore.user_name, 'delete_reader', reader.name);
+                    showUndo(`已删除读者 ${reader.name}`, [{ item: reader, index }]);
+                }
                 fetchReaders();
             } catch (error) {
                 ElMessage.error(error.message);
@@ -210,9 +215,11 @@ const submitReader = async () => {
 
     if (editingId) {  // 如果是编辑读者
         await updateReader(editingId, readerForm.value);
+        addLog(userStore.user_name, 'edit_reader', readerForm.value.name);
         ElMessage.success('更新成功');
     } else {  // 如果是新增读者
         await addReader(readerForm.value);
+        addLog(userStore.user_name, 'add_reader', readerForm.value.name);
         ElMessage.success('新增成功');
     }
 
@@ -240,6 +247,8 @@ const handleBatchDelete = () => {
                 return acc;
             }, []);
             const count = await deleteReaders(selectedIds.value);
+            addLog(userStore.user_name, 'delete_reader', `${count} 位读者`,
+                deletedReaders.map(d => d.item.name).join('、'));
             showUndo(`已删除 ${count} 位读者`, deletedReaders);
             fetchReaders();
         } catch (error) {
@@ -340,6 +349,7 @@ const submitImport = async () => {
     if (!previewData.value.length) return;
     try {
         const count = await importReaders(previewData.value);
+        addLog(userStore.user_name, 'import_readers', `${count} 位读者`);
         ElMessage.success(`成功导入 ${count} 位读者`);
         importDialogVisible.value = false;
         fetchReaders();

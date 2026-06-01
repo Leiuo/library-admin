@@ -436,3 +436,29 @@ export const verifyLogin = (username, password) => {
     if (!admin) return Promise.reject(new Error('用户名或密码错误'));
     return Promise.resolve({ id: admin.id, username: admin.username, role: admin.role });
 };
+
+
+// -------------------- 操作日志模块 --------------------
+const STORAGE_LOG_KEY = 'library_logs';
+
+export const addLog = (operator, action, target, detail = '') => {
+    const logs = getData(STORAGE_LOG_KEY);
+    const newLog = {
+        id: logs.length ? Math.max(...logs.map(l => l.id)) + 1 : 1,
+        operator,
+        action,
+        target,
+        detail,
+        time: new Date().toLocaleString('zh-CN', { hour12: false })
+    };
+    logs.push(newLog);
+    setData(STORAGE_LOG_KEY, logs);
+    return Promise.resolve(newLog);
+};
+
+export const getLogs = () => Promise.resolve(getData(STORAGE_LOG_KEY));
+
+export const clearLogs = () => {
+    setData(STORAGE_LOG_KEY, []);
+    return Promise.resolve();
+};
