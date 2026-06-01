@@ -38,7 +38,7 @@
                         </el-tag>
                     </template>
                 </el-table-column>
-                <el-table-column label="逾期罚款" width="120">
+                <el-table-column label="逾期罚款" width="140">
                     <template #default="{ row }">
                         <span v-if="isOverdue(row)" class="fine-text">
                             {{ calcFine(row) }}
@@ -478,7 +478,8 @@ onUnmounted(() => {
         font-size: 13px;
     }
 
-    :deep(.overdue-row) {
+    :deep(.overdue-row),
+    :deep(.overdue-row > td) {
         background-color: rgba(161, 11, 11, 0.159) !important;
     }
 }

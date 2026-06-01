@@ -38,12 +38,20 @@
                     </el-icon>
                     <span>读者管理</span>
                 </el-menu-item>
-                <el-menu-item index="/settings">
-                    <el-icon>
-                        <Setting />
-                    </el-icon>
-                    <span>系统设置</span>
-                </el-menu-item>
+                <el-sub-menu index="/settings">
+                    <template #title>
+                        <el-icon>
+                            <Setting />
+                        </el-icon>
+                        <span>系统设置</span>
+                    </template>
+                    <el-menu-item index="/settings/basic">
+                        <span>基本设置</span>
+                    </el-menu-item>
+                    <el-menu-item index="/settings/admins">
+                        <span>管理员设置</span>
+                    </el-menu-item>
+                </el-sub-menu>
             </el-menu>
             <div class="aside-footer">
                 <span class="version">v 1.1.0</span>

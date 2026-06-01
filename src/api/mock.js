@@ -3,7 +3,8 @@ const STORAGE_KEYS = {
     BOOKS: 'library_books',
     READERS: 'library_readers',
     BORROWS: 'library_borrows',
-    SETTINGS: 'library_settings'
+    SETTINGS: 'library_settings',
+    ADMINS: 'library_admins'
 };
 
 function initMockData() {
@@ -371,4 +372,67 @@ export const getSettings = () => {
 export const saveSettings = (settings) => {
     setData(STORAGE_KEYS.SETTINGS, settings);
     return Promise.resolve(settings);
+};
+
+
+// -------------------- 管理员模块 --------------------
+function initAdmins() {
+    if (!localStorage.getItem(STORAGE_KEYS.ADMINS)) {
+        const admins = [
+            { id: 1, username: 'admin', password: '123456', role: 'super', createdAt: '2026-05-01' }
+        ];
+        localStorage.setItem(STORAGE_KEYS.ADMINS, JSON.stringify(admins));
+    }
+}
+initAdmins();
+
+export const getAdmins = () => {
+    initAdmins();
+    return Promise.resolve(getData(STORAGE_KEYS.ADMINS).map(a => ({ ...a, password: '********' })));
+};
+
+export const addAdmin = (admin) => {
+    const admins = getData(STORAGE_KEYS.ADMINS);
+    if (admins.some(a => a.username === admin.username)) {
+        return Promise.reject(new Error('该用户名已存在'));
+    }
+    const newId = admins.length ? Math.max(...admins.map(a => a.id)) + 1 : 1;
+    const newAdmin = { ...admin, id: newId, createdAt: new Date().toISOString().split('T')[0] };
+    admins.push(newAdmin);
+    setData(STORAGE_KEYS.ADMINS, admins);
+    return Promise.resolve({ ...newAdmin, password: '********' });
+};
+
+export const updateAdmin = (id, data) => {
+    const admins = getData(STORAGE_KEYS.ADMINS);
+    const idx = admins.findIndex(a => a.id === id);
+    if (idx === -1) return Promise.reject(new Error('管理员不存在'));
+    if (data.username && data.username !== admins[idx].username && admins.some(a => a.username === data.username)) {
+        return Promise.reject(new Error('该用户名已存在'));
+    }
+    admins[idx] = { ...admins[idx], ...data };
+    setData(STORAGE_KEYS.ADMINS, admins);
+    return Promise.resolve({ ...admins[idx], password: '********' });
+};
+
+export const deleteAdmin = (id, currentUsername) => {
+    const admins = getData(STORAGE_KEYS.ADMINS);
+    if (admins.length <= 1) {
+        return Promise.reject(new Error('至少保留一个管理员账号'));
+    }
+    const target = admins.find(a => a.id === id);
+    if (!target) return Promise.reject(new Error('管理员不存在'));
+    if (target.username === currentUsername) {
+        return Promise.reject(new Error('不能删除自己'));
+    }
+    setData(STORAGE_KEYS.ADMINS, admins.filter(a => a.id !== id));
+    return Promise.resolve();
+};
+
+export const verifyLogin = (username, password) => {
+    initAdmins();
+    const admins = getData(STORAGE_KEYS.ADMINS);
+    const admin = admins.find(a => a.username === username && a.password === password);
+    if (!admin) return Promise.reject(new Error('用户名或密码错误'));
+    return Promise.resolve({ id: admin.id, username: admin.username, role: admin.role });
 };

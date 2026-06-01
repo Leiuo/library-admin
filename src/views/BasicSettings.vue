@@ -28,7 +28,7 @@
                     <span>借阅规则</span>
                 </div>
             </template>
-            <el-form :model="form" :rules="rules" ref="formRef2" label-width="120px" class="settings-form">
+            <el-form :model="form" :rules="rules" ref="formRef" label-width="120px" class="settings-form">
                 <el-form-item label="最大借阅数量" prop="maxBorrowBooks">
                     <el-input-number v-model="form.maxBorrowBooks" :min="1" :max="20" :step="1" />
                     <span class="unit">本</span>
@@ -50,7 +50,9 @@
 
         <div class="save-row">
             <el-button type="primary" size="large" @click="handleSave" :loading="saving">
-                <el-icon><Check /></el-icon>
+                <el-icon>
+                    <Check />
+                </el-icon>
                 保存设置
             </el-button>
         </div>
@@ -79,14 +81,22 @@ const form = reactive({
 
 const rules = {
     libraryName: [{ required: true, message: '请输入图书馆名称', trigger: 'blur' }],
-    libraryAddress: [{ required: true, message: '请输入图书馆地址', trigger: 'blur' }],
     maxBorrowBooks: [{ required: true, message: '请设置最大借阅数量', trigger: 'blur' }],
     borrowDuration: [{ required: true, message: '请设置借阅天数', trigger: 'blur' }]
 };
 
 onMounted(async () => {
     const settings = await getSettings();
-    Object.assign(form, settings);
+    Object.assign(form, {
+        libraryName: settings.libraryName || '',
+        libraryAddress: settings.libraryAddress || '',
+        libraryPhone: settings.libraryPhone || '',
+        openingHours: settings.openingHours || '',
+        maxBorrowBooks: settings.maxBorrowBooks ?? 5,
+        borrowDuration: settings.borrowDuration ?? 30,
+        renewalLimit: settings.renewalLimit ?? 2,
+        overdueFinePerDay: settings.overdueFinePerDay ?? 0.5
+    });
 });
 
 const handleSave = async () => {
@@ -95,8 +105,10 @@ const handleSave = async () => {
 
     saving.value = true;
     try {
-        await saveSettings({ ...form });
-        ElMessage.success('设置保存成功');
+        const all = await getSettings();
+        const updated = { ...all, ...form };
+        await saveSettings(updated);
+        ElMessage.success('保存成功');
     } catch {
         ElMessage.error('保存失败，请重试');
     } finally {
@@ -110,29 +122,19 @@ const handleSave = async () => {
     max-width: 720px;
 
     .settings-card {
-        margin-bottom: 20px;
+        margin-bottom: 16px;
 
         .card-header {
             font-weight: 600;
             font-size: 15px;
-        }
-
-        .settings-form {
-            .unit {
-                margin-left: 8px;
-                color: #909399;
-                font-size: 13px;
-            }
         }
     }
 
     .save-row {
         margin-top: 24px;
 
-        .el-button {
-            .el-icon {
-                margin-right: 4px;
-            }
+        .el-icon {
+            margin-right: 8px;
         }
     }
 }
@@ -146,14 +148,6 @@ const handleSave = async () => {
                 width: 90px !important;
             }
         }
-    }
-}
-</style>
-
-<style lang="less">
-html.dark {
-    .settings-form .unit {
-        color: #94a3b8;
     }
 }
 </style>

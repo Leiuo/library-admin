@@ -50,9 +50,22 @@ const routes = [
             },
             {
                 path: 'settings',
-                name: 'Settings',
-                component: () => import('../views/Settings.vue'),
-                meta: { title: '系统设置', KeepAlive: false }
+                redirect: '/settings/basic',
+                meta: { title: '系统设置' },
+                children: [
+                    {
+                        path: 'basic',
+                        name: 'BasicSettings',
+                        component: () => import('../views/BasicSettings.vue'),
+                        meta: { title: '基本设置', KeepAlive: false }
+                    },
+                    {
+                        path: 'admins',
+                        name: 'AdminManagement',
+                        component: () => import('../views/AdminManagement.vue'),
+                        meta: { title: '管理员管理', KeepAlive: false }
+                    }
+                ]
             }
         ]
     },
