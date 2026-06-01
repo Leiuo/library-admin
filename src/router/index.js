@@ -72,6 +72,12 @@ const routes = [
                 name: 'OperationLog',
                 component: () => import('../views/OperationLog.vue'),
                 meta: { title: '操作日志', KeepAlive: false }
+            },
+            {
+                path: 'fines',
+                name: 'FineManagement',
+                component: () => import('../views/FineManagement.vue'),
+                meta: { title: '罚款管理', KeepAlive: false }
             }
         ]
     },

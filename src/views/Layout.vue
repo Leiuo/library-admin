@@ -32,6 +32,12 @@
                     </el-icon>
                     <span>借阅管理</span>
                 </el-menu-item>
+                <el-menu-item index="/fines">
+                    <el-icon>
+                        <Money />
+                    </el-icon>
+                    <span>罚款管理</span>
+                </el-menu-item>
                 <el-menu-item index="/readers">
                     <el-icon>
                         <User />
@@ -112,7 +118,7 @@ import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, onMounted, onUnmounted } from 'vue';
-import { DataLine, Setting, DocumentChecked, Sunny, Moon } from '@element-plus/icons-vue';
+import { DataLine, Setting, DocumentChecked, Money, Sunny, Moon } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();

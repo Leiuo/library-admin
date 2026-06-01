@@ -83,7 +83,8 @@ const actionOptions = [
     { label: '新增管理员', value: 'add_admin' },
     { label: '编辑管理员', value: 'edit_admin' },
     { label: '删除管理员', value: 'delete_admin' },
-    { label: '保存设置', value: 'save_settings' }
+    { label: '保存设置', value: 'save_settings' },
+    { label: '缴纳罚款', value: 'pay_fine' }
 ];
 
 const actionLabel = (action) => {
@@ -95,6 +96,7 @@ const actionTagType = (action) => {
     if (action.includes('delete')) return 'danger';
     if (action.includes('add') || action.includes('import') || action === 'borrow') return 'success';
     if (action.includes('edit') || action === 'return') return 'warning';
+    if (action === 'pay_fine') return 'success';
     return 'info';
 };
 

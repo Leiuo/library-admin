@@ -462,3 +462,25 @@ export const clearLogs = () => {
     setData(STORAGE_LOG_KEY, []);
     return Promise.resolve();
 };
+
+
+// -------------------- 罚款管理模块 --------------------
+const STORAGE_FINE_PAID_KEY = 'library_fine_paid';
+
+export const getPaidFines = () => Promise.resolve(getData(STORAGE_FINE_PAID_KEY));
+
+export const payFines = (borrowIds) => {
+    const paid = getData(STORAGE_FINE_PAID_KEY);
+    borrowIds.forEach(id => {
+        if (!paid.includes(id)) paid.push(id);
+    });
+    setData(STORAGE_FINE_PAID_KEY, paid);
+    return Promise.resolve();
+};
+
+export const undoPayFines = (borrowIds) => {
+    let paid = getData(STORAGE_FINE_PAID_KEY);
+    paid = paid.filter(id => !borrowIds.includes(id));
+    setData(STORAGE_FINE_PAID_KEY, paid);
+    return Promise.resolve();
+};
