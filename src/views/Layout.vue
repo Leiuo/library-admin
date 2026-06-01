@@ -206,6 +206,21 @@ const breadcrumbs = computed(() => {
 
     .aside-menu {
         border-right: none;
+
+        > .el-menu-item,
+        .el-sub-menu .el-menu-item {
+            border-left: 5px solid transparent;
+
+            &:hover {
+                background-color: rgba(45, 212, 191, 0.1);
+            }
+
+            &:focus,
+            &.is-active {
+                border-left: 5px solid #2dd4bf;
+                background-color: rgba(45, 212, 191, 0.1);
+            }
+        }
     }
 
     .aside-footer {
