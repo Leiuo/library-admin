@@ -97,6 +97,15 @@
                 </div>
             </el-header>
             <el-main>
+                <div class="main-header">
+                    <el-tag v-for="tag in dynamicTags" :key="tag.path" closable :disable-transitions="false"
+                        :effect="route.path === tag.path ? 'dark' : 'plain'"
+                        :type="route.path === tag.path ? 'primary' : 'info'" @close="handleClose(tag)"
+                        @click="handleClick(tag)" size="large">
+                        {{ tag.title }}
+                    </el-tag>
+                </div>
+
                 <!-- <router-view /> -->
 
                 <!-- <transition name="fade" mode="out-in">
@@ -117,7 +126,7 @@
 import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { useRoute, useRouter } from 'vue-router';
-import { ref, computed, onMounted, onUnmounted } from 'vue';
+import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
 import { DataLine, Setting, DocumentChecked, Money, Sunny, Moon } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
@@ -128,6 +137,39 @@ const router = useRouter();
 
 const isCollapse = ref(false);
 const isMobile = ref(window.innerWidth < 768);
+
+const dynamicTags = ref([]);
+
+watch(
+    () => route.path,
+    (newPath) => {
+        const title = route.meta?.title;
+        if (title && !dynamicTags.value.some(tag => tag.path === newPath)) {
+            dynamicTags.value.push({ title, path: newPath });
+        }
+    },
+    { immediate: true }
+);
+
+const handleClose = (tag) => {
+    const tags = dynamicTags.value;
+    const index = tags.indexOf(tag);
+    tags.splice(index, 1);
+
+    if (tag.path === route.path) {
+        if (tags.length > 0) {
+            const nextTab = tags[Math.min(index, tags.length - 1)];
+            router.push(nextTab.path);
+        } else {
+            router.push('/dashboard');
+        }
+    }
+};
+
+const handleClick = (tag) => {
+    router.push(tag.path);
+};
+
 
 const handleWindowResize = () => {
     isMobile.value = window.innerWidth < 768;
@@ -207,7 +249,7 @@ const breadcrumbs = computed(() => {
     .aside-menu {
         border-right: none;
 
-        > .el-menu-item,
+        >.el-menu-item,
         .el-sub-menu .el-menu-item {
             border-left: 5px solid transparent;
 
@@ -318,6 +360,24 @@ const breadcrumbs = computed(() => {
         .el-button {
             border-radius: 4px;
         }
+    }
+}
+
+.main-header {
+    margin-bottom: 16px;
+    display: flex;
+    gap: 8px;
+
+    .el-tag {
+        font-size: 13px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.3s ease;
+
+        // &:hover {
+        //     background-color: #5eead4;
+        //     color: #fff;
+        // }
     }
 }
 

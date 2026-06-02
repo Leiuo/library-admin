@@ -2,8 +2,7 @@
     <div class="admin-container">
         <div class="toolbar">
             <el-button type="primary" @click="openAddDialog">
-                <el-icon><Plus /></el-icon>
-                添加管理员
+                + 添加管理员
             </el-button>
         </div>
 
@@ -55,7 +54,6 @@
 import { ref, onMounted } from 'vue';
 import { getAdmins, addAdmin, updateAdmin, deleteAdmin, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
-import { Plus } from '@element-plus/icons-vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();
