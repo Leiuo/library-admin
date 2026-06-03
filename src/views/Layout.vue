@@ -11,16 +11,16 @@
                         <rect x="2" y="8" width="40" height="30" rx="4" fill="url(#logo-grad)" />
                         <rect x="6" y="12" width="14" height="22" rx="2" fill="#fff" opacity="0.95" />
                         <rect x="22" y="12" width="16" height="22" rx="2" fill="#fff" opacity="0.8" />
-                        <line x1="13" y1="17" x2="17" y2="17" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                        <line x1="13" y1="21" x2="17" y2="21" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                        <line x1="13" y1="25" x2="16" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                        <line x1="27" y1="17" x2="32" y2="17" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                        <line x1="27" y1="21" x2="33" y2="21" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
-                        <line x1="27" y1="25" x2="31" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="17" x2="17" y2="17" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="21" x2="17" y2="21" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="25" x2="16" y2="25" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="17" x2="32" y2="17" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="21" x2="33" y2="21" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="25" x2="31" y2="25" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
                         <defs>
                             <linearGradient id="logo-grad" x1="0" y1="0" x2="44" y2="44">
-                                <stop offset="0%" stop-color="#0d9488" />
-                                <stop offset="100%" stop-color="#14b8a6" />
+                                <stop offset="0%" stop-color="var(--sidebar-logo-start)" />
+                                <stop offset="100%" stop-color="var(--sidebar-logo-end)" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -31,7 +31,7 @@
                 </div>
             </div>
             <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false"
-                router background-color="#0f172a" text-color="#94a3b8" active-text-color="#2dd4bf" class="aside-menu"
+                router class="aside-menu"
                 @select="onMenuSelect">
                 <el-menu-item index="/dashboard">
                     <el-icon>
@@ -250,7 +250,7 @@ const breadcrumbs = computed(() => {
 
 <style lang="less" scoped>
 .layout-aside {
-    background-color: #0f172a;
+    background-color: var(--sidebar-bg);
     transition: width 0.3s ease;
     white-space: nowrap;
     overflow: hidden;
@@ -263,7 +263,7 @@ const breadcrumbs = computed(() => {
         justify-content: center;
         gap: 10px;
         padding: 22px 12px 18px;
-        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
+        border-bottom: 1px solid var(--sidebar-border);
 
         .logo-mark {
             flex-shrink: 0;
@@ -280,14 +280,14 @@ const breadcrumbs = computed(() => {
             .title-main {
                 font-size: 16px;
                 font-weight: 700;
-                color: #fff;
+                color: var(--sidebar-text-main);
                 letter-spacing: -.3px;
                 white-space: nowrap;
             }
 
             .title-sub {
                 font-size: 11px;
-                color: #94a3b8;
+                color: var(--sidebar-text);
                 margin-top: 1px;
                 white-space: nowrap;
             }
@@ -296,6 +296,11 @@ const breadcrumbs = computed(() => {
 
     .aside-menu {
         border-right: none;
+        --el-menu-bg-color: var(--sidebar-bg);
+        --el-menu-text-color: var(--sidebar-text);
+        --el-menu-active-color: var(--sidebar-text-active);
+        --el-menu-hover-bg-color: var(--sidebar-hover-bg);
+        background-color: var(--sidebar-bg);
 
         >.el-menu-item,
         .el-sub-menu .el-menu-item {
@@ -306,15 +311,15 @@ const breadcrumbs = computed(() => {
             }
 
             &:hover {
-                background-color: rgba(45, 212, 191, 0.1);
+                background-color: var(--sidebar-hover-bg);
 
                 .el-icon { transform: scale(1.15); }
             }
 
             &:focus,
             &.is-active {
-                border-left: 5px solid #2dd4bf;
-                background-color: rgba(45, 212, 191, 0.1);
+                border-left: 5px solid var(--sidebar-active-border);
+                background-color: var(--sidebar-hover-bg);
             }
         }
     }
@@ -380,7 +385,7 @@ const breadcrumbs = computed(() => {
 
             .el-breadcrumb__inner {
                 transition: color 0.2s;
-                &:hover { color: #0d9488; }
+                &:hover { color: var(--el-color-primary); }
             }
         }
     }
@@ -424,7 +429,7 @@ const breadcrumbs = computed(() => {
                 font-size: 12px;
 
                 &:hover {
-                    color: #0d9488;
+                    color: var(--el-color-primary);
                     cursor: pointer;
                 }
             }

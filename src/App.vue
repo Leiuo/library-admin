@@ -51,6 +51,17 @@ body,
     --el-border-radius-small: 4px;
 
     --el-bg-color-page: #f1f5f9;
+
+    /* 侧边栏（始终为深色，不随明暗主题变化） */
+    --sidebar-bg: #0f172a;
+    --sidebar-text: #94a3b8;
+    --sidebar-text-active: #2dd4bf;
+    --sidebar-text-main: #fff;
+    --sidebar-border: rgba(148, 163, 184, 0.15);
+    --sidebar-hover-bg: rgba(45, 212, 191, 0.1);
+    --sidebar-active-border: #2dd4bf;
+    --sidebar-logo-start: #0d9488;
+    --sidebar-logo-end: #14b8a6;
 }
 
 
