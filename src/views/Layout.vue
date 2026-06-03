@@ -11,12 +11,18 @@
                         <rect x="2" y="8" width="40" height="30" rx="4" fill="url(#logo-grad)" />
                         <rect x="6" y="12" width="14" height="22" rx="2" fill="#fff" opacity="0.95" />
                         <rect x="22" y="12" width="16" height="22" rx="2" fill="#fff" opacity="0.8" />
-                        <line x1="13" y1="17" x2="17" y2="17" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
-                        <line x1="13" y1="21" x2="17" y2="21" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
-                        <line x1="13" y1="25" x2="16" y2="25" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
-                        <line x1="27" y1="17" x2="32" y2="17" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
-                        <line x1="27" y1="21" x2="33" y2="21" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
-                        <line x1="27" y1="25" x2="31" y2="25" stroke="var(--sidebar-text)" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="17" x2="17" y2="17" stroke="var(--sidebar-text)" stroke-width="1"
+                            stroke-linecap="round" />
+                        <line x1="13" y1="21" x2="17" y2="21" stroke="var(--sidebar-text)" stroke-width="1"
+                            stroke-linecap="round" />
+                        <line x1="13" y1="25" x2="16" y2="25" stroke="var(--sidebar-text)" stroke-width="1"
+                            stroke-linecap="round" />
+                        <line x1="27" y1="17" x2="32" y2="17" stroke="var(--sidebar-text)" stroke-width="1"
+                            stroke-linecap="round" />
+                        <line x1="27" y1="21" x2="33" y2="21" stroke="var(--sidebar-text)" stroke-width="1"
+                            stroke-linecap="round" />
+                        <line x1="27" y1="25" x2="31" y2="25" stroke="var(--sidebar-text)" stroke-width="1"
+                            stroke-linecap="round" />
                         <defs>
                             <linearGradient id="logo-grad" x1="0" y1="0" x2="44" y2="44">
                                 <stop offset="0%" stop-color="var(--sidebar-logo-start)" />
@@ -31,8 +37,7 @@
                 </div>
             </div>
             <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false"
-                router class="aside-menu"
-                @select="onMenuSelect">
+                router class="aside-menu" @select="onMenuSelect">
                 <el-menu-item index="/dashboard">
                     <el-icon>
                         <DataLine />
@@ -44,6 +49,12 @@
                         <Management />
                     </el-icon>
                     <span>图书管理</span>
+                </el-menu-item>
+                <el-menu-item index="/categories">
+                    <el-icon>
+                        <Collection />
+                    </el-icon>
+                    <span>分类管理</span>
                 </el-menu-item>
                 <el-menu-item index="/borrows">
                     <el-icon>
@@ -316,7 +327,9 @@ const breadcrumbs = computed(() => {
             &:hover {
                 background-color: var(--sidebar-hover-bg);
 
-                .el-icon { transform: scale(1.15); }
+                .el-icon {
+                    transform: scale(1.15);
+                }
             }
 
             &:focus,
@@ -367,9 +380,15 @@ const breadcrumbs = computed(() => {
         display: inline-flex;
         animation: icon-rotate 0.3s ease;
     }
+
     @keyframes icon-rotate {
-        from { transform: rotate(0deg); }
-        to   { transform: rotate(180deg); }
+        from {
+            transform: rotate(0deg);
+        }
+
+        to {
+            transform: rotate(180deg);
+        }
     }
 
     .header-left {
@@ -388,7 +407,10 @@ const breadcrumbs = computed(() => {
 
             .el-breadcrumb__inner {
                 transition: color 0.2s;
-                &:hover { color: var(--el-color-primary); }
+
+                &:hover {
+                    color: var(--el-color-primary);
+                }
             }
         }
     }
@@ -405,11 +427,19 @@ const breadcrumbs = computed(() => {
             display: inline-flex;
             animation: theme-spin 0.4s ease;
 
-            &:hover { color: #f59e0b; }
+            &:hover {
+                color: #f59e0b;
+            }
         }
+
         @keyframes theme-spin {
-            from { transform: rotate(0deg); }
-            to   { transform: rotate(360deg); }
+            from {
+                transform: rotate(0deg);
+            }
+
+            to {
+                transform: rotate(360deg);
+            }
         }
 
         .userInfo {
@@ -460,7 +490,7 @@ const breadcrumbs = computed(() => {
 
         &:hover {
             transform: translateY(-1px);
-            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
         }
     }
 }
@@ -470,10 +500,12 @@ const breadcrumbs = computed(() => {
 .tag-slide-leave-active {
     transition: all 0.25s ease;
 }
+
 .tag-slide-enter-from {
     opacity: 0;
     transform: translateY(-8px) scale(0.9);
 }
+
 .tag-slide-leave-to {
     opacity: 0;
     transform: translateY(4px) scale(0.95);
@@ -519,4 +551,3 @@ const breadcrumbs = computed(() => {
     }
 }
 </style>
-

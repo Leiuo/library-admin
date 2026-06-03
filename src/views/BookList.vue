@@ -120,14 +120,15 @@ import { UploadFilled } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';
-import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks, addLog } from '../api/mock';
+import { getBooks, getCategories, deleteBook, updateBook, addBook, deleteBooks, importBooks, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
 
 const userStore = useUserStore();
 
-// 分类从图书数据中动态提取，合并预设分类作为兜底
+// 分类从集中式分类数据和图书数据中合并提取
+const centralCategories = ref([]);
 const categories = computed(() => {
-    const set = new Set(['文学小说', '科技编程', '历史哲学', '科学科普', '经济管理', '艺术设计', '教育学习', '生活百科']);
+    const set = new Set(centralCategories.value.map(c => c.name));
     books.value.forEach(b => { if (b.category) set.add(b.category); });
     return [...set].sort();
 });
@@ -147,7 +148,9 @@ const handleSearch = () => {
 const fetchBooks = async () => {
     loading.value = true;
     try {
-        books.value = await getBooks();
+        const [bookData, catData] = await Promise.all([getBooks(), getCategories()]);
+        books.value = bookData;
+        centralCategories.value = catData;
     } catch (error) {
         ElMessage.error('获取图书列表失败');
     } finally {

@@ -68,6 +68,12 @@ const routes = [
                 ]
             },
             {
+                path: 'categories',
+                name: 'CategoryList',
+                component: () => import('../views/CategoryList.vue'),
+                meta: { title: '分类管理', KeepAlive: false }
+            },
+            {
                 path: 'logs',
                 name: 'OperationLog',
                 component: () => import('../views/OperationLog.vue'),

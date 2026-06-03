@@ -6,15 +6,8 @@
             </el-select>
             <el-input v-model="keyword" placeholder="搜索目标/详情" clearable @keyup.enter="refresh" style="width: 200px;" />
             <div class="date-picker-wrap">
-                <el-date-picker
-                    v-model="dateRange"
-                    type="daterange"
-                    range-separator="至"
-                    start-placeholder="开始日期"
-                    end-placeholder="结束日期"
-                    format="YYYY-MM-DD"
-                    value-format="YYYY-MM-DD"
-                />
+                <el-date-picker v-model="dateRange" type="daterange" range-separator="至" start-placeholder="开始日期"
+                    end-placeholder="结束日期" format="YYYY-MM-DD" value-format="YYYY-MM-DD" />
             </div>
             <el-button type="primary" @click="refresh">搜索</el-button>
             <el-popconfirm title="确定要清空所有操作日志吗？" @confirm="handleClear">
@@ -41,12 +34,8 @@
                 <el-table-column prop="target" label="操作对象" min-width="160" show-overflow-tooltip />
                 <el-table-column prop="detail" label="详情" min-width="120" show-overflow-tooltip />
             </el-table>
-            <PaginationBox
-                v-if="filteredLogs.length > 0"
-                v-model:current-page="currentPage"
-                v-model:page-size="pageSize"
-                :total="filteredLogs.length"
-            />
+            <PaginationBox v-if="filteredLogs.length > 0" v-model:current-page="currentPage"
+                v-model:page-size="pageSize" :total="filteredLogs.length" />
         </div>
     </div>
 </template>
@@ -87,7 +76,9 @@ const actionOptions = [
     { label: '缴纳罚款', value: 'pay_fine' },
     { label: '撤销删除图书', value: 'restore_book' },
     { label: '撤销删除读者', value: 'restore_reader' },
-    { label: '撤销删除借阅', value: 'restore_borrow' }
+    { label: '撤销删除借阅', value: 'restore_borrow' },
+    { label: '删除分类', value: 'delete_category' },
+    { label: '撤销删除分类', value: 'restore_category' }
 ];
 
 const actionLabel = (action) => {
@@ -181,7 +172,10 @@ onMounted(refresh);
 
 @media (max-width: 767px) {
     .log-container .search-area {
-        .el-input, .el-select, .date-picker-wrap {
+
+        .el-input,
+        .el-select,
+        .date-picker-wrap {
             width: 100% !important;
         }
     }

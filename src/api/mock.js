@@ -464,6 +464,99 @@ export const clearLogs = () => {
 };
 
 
+// -------------------- 分类管理模块 --------------------
+const STORAGE_CATEGORIES_KEY = 'library_categories';
+
+function initCategories() {
+    if (!localStorage.getItem(STORAGE_CATEGORIES_KEY)) {
+        const categories = [
+            { id: 1, name: '文学小说', description: '中外文学名著及畅销小说' },
+            { id: 2, name: '科技编程', description: '计算机科学与编程技术书籍' },
+            { id: 3, name: '历史哲学', description: '历史研究与哲学思想著作' },
+            { id: 4, name: '科学科普', description: '自然科学与科普读物' },
+            { id: 5, name: '经济管理', description: '经济学与管理学书籍' },
+            { id: 6, name: '艺术设计', description: '绘画、设计、音乐等艺术类' },
+            { id: 7, name: '教育学习', description: '教材教辅与学习参考书' },
+            { id: 8, name: '生活百科', description: '生活常识、健康养生等' }
+        ];
+        localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(categories));
+    }
+}
+initCategories();
+
+export const getCategories = () => {
+    initCategories();
+    const categories = getData(STORAGE_CATEGORIES_KEY);
+    const books = getData(STORAGE_KEYS.BOOKS);
+    return Promise.resolve(categories.map(cat => ({
+        ...cat,
+        bookCount: books.filter(b => b.category === cat.name).length
+    })));
+};
+
+export const addCategory = (category) => {
+    const categories = getData(STORAGE_CATEGORIES_KEY);
+    if (categories.some(c => c.name === category.name)) {
+        return Promise.reject(new Error('该分类名称已存在'));
+    }
+    const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
+    const newCategory = { ...category, id: newId };
+    categories.push(newCategory);
+    setData(STORAGE_CATEGORIES_KEY, categories);
+    return Promise.resolve(newCategory);
+};
+
+export const updateCategory = (id, data) => {
+    const categories = getData(STORAGE_CATEGORIES_KEY);
+    const idx = categories.findIndex(c => c.id === id);
+    if (idx === -1) return Promise.reject(new Error('分类不存在'));
+    if (data.name && data.name !== categories[idx].name && categories.some(c => c.name === data.name)) {
+        return Promise.reject(new Error('该分类名称已存在'));
+    }
+    const oldName = categories[idx].name;
+    categories[idx] = { ...categories[idx], ...data };
+    setData(STORAGE_CATEGORIES_KEY, categories);
+
+    // 同步更新图书中的分类名称
+    if (data.name && data.name !== oldName) {
+        const books = getData(STORAGE_KEYS.BOOKS);
+        books.forEach(b => {
+            if (b.category === oldName) b.category = data.name;
+        });
+        setData(STORAGE_KEYS.BOOKS, books);
+    }
+    return Promise.resolve(categories[idx]);
+};
+
+export const deleteCategory = (id) => {
+    const categories = getData(STORAGE_CATEGORIES_KEY);
+    const target = categories.find(c => c.id === id);
+    if (!target) return Promise.reject(new Error('分类不存在'));
+    const books = getData(STORAGE_KEYS.BOOKS);
+    if (books.some(b => b.category === target.name)) {
+        return Promise.reject(new Error(`该分类下有 ${books.filter(b => b.category === target.name).length} 本图书，不能删除`));
+    }
+    setData(STORAGE_CATEGORIES_KEY, categories.filter(c => c.id !== id));
+    return Promise.resolve();
+};
+
+export const deleteCategories = (ids) => {
+    const categories = getData(STORAGE_CATEGORIES_KEY);
+    const books = getData(STORAGE_KEYS.BOOKS);
+    const failedNames = [];
+    ids.forEach(id => {
+        const cat = categories.find(c => c.id === id);
+        if (cat && books.some(b => b.category === cat.name)) {
+            failedNames.push(cat.name);
+        }
+    });
+    if (failedNames.length) {
+        return Promise.reject(new Error(`分类"${failedNames.join('、')}"下尚有图书，不能删除`));
+    }
+    setData(STORAGE_CATEGORIES_KEY, categories.filter(c => !ids.includes(c.id)));
+    return Promise.resolve(ids.length);
+};
+
 // -------------------- 罚款管理模块 --------------------
 const STORAGE_FINE_PAID_KEY = 'library_fine_paid';
 
