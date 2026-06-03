@@ -59,7 +59,7 @@ import TableSkeleton from '../components/TableSkeleton.vue';
 const logs = ref([]);
 const loading = ref(false);
 const currentPage = ref(1);
-const pageSize = ref(20);
+const pageSize = ref(10);
 
 const actionFilter = ref('');
 const keyword = ref('');
