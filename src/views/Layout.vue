@@ -322,7 +322,8 @@ const breadcrumbs = computed(() => {
     .aside-footer {
         position: absolute;
         bottom: 10px;
-        left: 40%;
+        width: 100%;
+        text-align: center;
 
         .version {
             color: #64748b;
