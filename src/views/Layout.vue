@@ -168,10 +168,13 @@ const dynamicTags = ref([]);
 watch(
     () => route.path,
     (newPath) => {
-        const title = route.meta?.title;
-        if (title && !dynamicTags.value.some(tag => tag.path === newPath)) {
-            dynamicTags.value.push({ title, path: newPath });
+        let title = route.meta?.title;
+        if (!title) return;
+        if (dynamicTags.value.some(tag => tag.path === newPath)) return;
+        if (route.query.name) {
+            title = `${route.query.name} ${title}`;
         }
+        dynamicTags.value.push({ title, path: newPath, fullPath: route.fullPath });
     },
     { immediate: true }
 );
@@ -184,7 +187,7 @@ const handleClose = (tag) => {
     if (tag.path === route.path) {
         if (tags.length > 0) {
             const nextTab = tags[Math.min(index, tags.length - 1)];
-            router.push(nextTab.path);
+            router.push(nextTab.fullPath || nextTab.path);
         } else {
             router.push('/dashboard');
         }
@@ -192,7 +195,7 @@ const handleClose = (tag) => {
 };
 
 const handleClick = (tag) => {
-    router.push(tag.path);
+    router.push(tag.fullPath || tag.path);
 };
 
 

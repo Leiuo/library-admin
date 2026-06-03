@@ -39,7 +39,7 @@
 </template>
 
 <script setup>
-import { computed, reactive, ref, onMounted } from 'vue';
+import { computed, reactive, ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getReaders, getBorrows } from '../api/mock';
 import { ElMessage } from 'element-plus';
@@ -119,6 +119,12 @@ const rowClassName = ({ row }) => {
 };
 
 onMounted(() => {
+    fetchReader();
+    fetchFilteredBorrows();
+});
+
+watch(() => route.params.id, () => {
+    currentPage.value = 1;
     fetchReader();
     fetchFilteredBorrows();
 });

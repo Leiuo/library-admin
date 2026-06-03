@@ -174,9 +174,7 @@ const openReaderDialog = () => {
 }
 
 const goBorrowHistory = (row) => {
-    console.log(`去到${row.name}的借阅历史`);
-    router.push(`/reader/${row.id}/history`);
-
+    router.push({ path: `/reader/${row.id}/history`, query: { name: row.name } });
 }
 
 const openEditDialog = (row) => {
