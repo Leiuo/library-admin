@@ -7,7 +7,8 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="admins" border stripe v-loading="loading">
+            <TableSkeleton v-if="loading" :rows="5" :cols="4" />
+            <el-table v-else :data="admins" border stripe>
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="username" label="用户名" />
                 <el-table-column prop="role" label="角色" width="120">
@@ -55,6 +56,7 @@ import { ref, onMounted } from 'vue';
 import { getAdmins, addAdmin, updateAdmin, deleteAdmin, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import TableSkeleton from '../components/TableSkeleton.vue';
 
 const userStore = useUserStore();
 

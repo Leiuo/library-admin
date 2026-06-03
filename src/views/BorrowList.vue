@@ -19,7 +19,8 @@
             @undo="handleUndo" @close="clearUndo" />
 
         <div class="table-wrapper">
-            <el-table :data="paginatedBorrows" border stripe :row-class-name="rowClassName" v-loading="loading" @selection-change="handleSelectionChange">
+            <TableSkeleton v-if="loading" :rows="8" :cols="7" />
+            <el-table v-else :data="paginatedBorrows" border stripe :row-class-name="rowClassName" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="记录ID" width="70" />
                 <el-table-column prop="bookTitle" label="图书名称" />
@@ -101,6 +102,7 @@ import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
+import TableSkeleton from '../components/TableSkeleton.vue';
 import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows, getSettings, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
 

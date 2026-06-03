@@ -25,7 +25,8 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="paginatedLogs" border stripe v-loading="loading" max-height="calc(100vh - 260px)">
+            <TableSkeleton v-if="loading" :rows="8" :cols="5" />
+            <el-table v-else :data="paginatedLogs" border stripe max-height="calc(100vh - 260px)">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="time" label="操作时间" width="170" />
                 <el-table-column prop="operator" label="操作人" width="110" />
@@ -53,6 +54,7 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { getLogs, clearLogs } from '../api/mock';
 import { ElMessage } from 'element-plus';
 import PaginationBox from '../components/PaginationBox.vue';
+import TableSkeleton from '../components/TableSkeleton.vue';
 
 const logs = ref([]);
 const loading = ref(false);

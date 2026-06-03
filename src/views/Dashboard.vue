@@ -1,67 +1,86 @@
 <template>
     <div class="dashboard-container">
-        <!-- 顶部统计卡片 -->
-        <div class="stats-row">
+        <!-- 统计卡片 -->
+        <div class="stats-row" v-if="loading">
+            <div v-for="i in 4" :key="i" class="skeleton-stat">
+                <div class="skeleton-icon" />
+                <div class="skeleton-line skeleton-line--lg" />
+                <div class="skeleton-line skeleton-line--sm" />
+            </div>
+        </div>
+        <div class="stats-row" v-else>
             <StatCard :icon="Notebook" color="blue" :value="stats.totalBooks || 0" label="目前馆藏总量" />
             <StatCard :icon="User" color="orange" :value="stats.totalReaders || 0" label="注册读者" />
             <StatCard :icon="Stamp" color="green" :value="stats.borrowedBooks || 0" label="总借阅数量" />
             <StatCard :icon="TrendCharts" color="purple" :value="stats.activeBorrows || 0" label="进行中借阅" />
         </div>
 
-        <!-- 核心概览：趋势图 + 状态饼图 -->
-        <div class="charts-row charts-row--asymmetric" v-if="!loading">
-            <el-card class="chart-card chart-card--wide" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <span>月度借阅趋势</span>
-                        <el-radio-group v-model="trendYear" size="small" @change="updateTrendChart">
-                            <el-radio-button :label="2025">2025</el-radio-button>
-                            <el-radio-button :label="2026">2026</el-radio-button>
-                        </el-radio-group>
-                    </div>
-                </template>
-                <div ref="trendChartRef" class="chart-container chart-container--tall"></div>
-            </el-card>
+        <!-- 图表骨架 -->
+        <template v-if="loading">
+            <div class="charts-row charts-row--asymmetric">
+                <div class="skeleton-chart skeleton-chart--wide" />
+                <div class="skeleton-chart skeleton-chart--narrow" />
+            </div>
+            <div class="charts-row charts-row--three">
+                <div class="skeleton-chart" v-for="i in 3" :key="i" />
+            </div>
+        </template>
 
-            <el-card class="chart-card chart-card--narrow" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <span>图书状态分布</span>
-                    </div>
-                </template>
-                <div ref="statusChartRef" class="chart-container chart-container--tall"></div>
-            </el-card>
-        </div>
+        <!-- 真实图表 -->
+        <template v-else>
+            <div class="charts-row charts-row--asymmetric">
+                <el-card class="chart-card chart-card--wide" shadow="hover">
+                    <template #header>
+                        <div class="card-header">
+                            <span>月度借阅趋势</span>
+                            <el-radio-group v-model="trendYear" size="small" @change="updateTrendChart">
+                                <el-radio-button :label="2025">2025</el-radio-button>
+                                <el-radio-button :label="2026">2026</el-radio-button>
+                            </el-radio-group>
+                        </div>
+                    </template>
+                    <div ref="trendChartRef" class="chart-container chart-container--tall"></div>
+                </el-card>
 
-        <!-- 排行 & 分类 -->
-        <div class="charts-row charts-row--three" v-if="!loading">
-            <el-card class="chart-card" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <span>热门图书 TOP5</span>
-                    </div>
-                </template>
-                <div ref="hotBooksChartRef" class="chart-container"></div>
-            </el-card>
+                <el-card class="chart-card chart-card--narrow" shadow="hover">
+                    <template #header>
+                        <div class="card-header">
+                            <span>图书状态分布</span>
+                        </div>
+                    </template>
+                    <div ref="statusChartRef" class="chart-container chart-container--tall"></div>
+                </el-card>
+            </div>
 
-            <el-card class="chart-card" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <span>读者借阅排行 TOP5</span>
-                    </div>
-                </template>
-                <div ref="topReadersChartRef" class="chart-container"></div>
-            </el-card>
+            <div class="charts-row charts-row--three">
+                <el-card class="chart-card" shadow="hover">
+                    <template #header>
+                        <div class="card-header">
+                            <span>热门图书 TOP5</span>
+                        </div>
+                    </template>
+                    <div ref="hotBooksChartRef" class="chart-container"></div>
+                </el-card>
 
-            <el-card class="chart-card" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <span>图书分类分布</span>
-                    </div>
-                </template>
-                <div ref="categoryChartRef" class="chart-container"></div>
-            </el-card>
-        </div>
+                <el-card class="chart-card" shadow="hover">
+                    <template #header>
+                        <div class="card-header">
+                            <span>读者借阅排行 TOP5</span>
+                        </div>
+                    </template>
+                    <div ref="topReadersChartRef" class="chart-container"></div>
+                </el-card>
+
+                <el-card class="chart-card" shadow="hover">
+                    <template #header>
+                        <div class="card-header">
+                            <span>图书分类分布</span>
+                        </div>
+                    </template>
+                    <div ref="categoryChartRef" class="chart-container"></div>
+                </el-card>
+            </div>
+        </template>
     </div>
 </template>
 
@@ -558,9 +577,61 @@ onUnmounted(() => {
     .charts-row--three {
         .chart-card { min-width: 260px; }
     }
+
+    // 骨架屏
+    .skeleton-stat {
+        flex: 1 1 180px;
+        min-width: 140px;
+        display: flex;
+        flex-direction: column;
+        align-items: center;
+        gap: 10px;
+        padding: 20px 16px;
+        background: #fff;
+        border-radius: 8px;
+        border: 1px solid #e2e8f0;
+        animation: skeleton-pulse 1.6s ease-in-out infinite;
+
+        .skeleton-icon {
+            width: 48px;
+            height: 48px;
+            border-radius: 12px;
+            background: #e2e8f0;
+        }
+    }
+
+    .skeleton-line {
+        height: 14px;
+        border-radius: 4px;
+        background: #e2e8f0;
+
+        &--lg { width: 56px; height: 26px; border-radius: 6px; }
+        &--sm { width: 80px; }
+    }
+
+    .skeleton-chart {
+        background: #fff;
+        border: 1px solid #e2e8f0;
+        border-radius: 8px;
+        animation: skeleton-pulse 1.6s ease-in-out infinite;
+
+        &--wide   { flex: 2; min-width: 320px; height: 368px; }
+        &--narrow { flex: 1; min-width: 240px; height: 368px; }
+    }
+
+    .charts-row--three .skeleton-chart {
+        flex: 1;
+        min-width: 260px;
+        height: 328px;
+    }
 }
 
-// 平板：非对称布局改为堆叠，三栏改为两栏
+@keyframes skeleton-pulse {
+    0%, 100% { opacity: 0.4; }
+    50%      { opacity: 0.75; }
+}
+
+// 平板
 @media (max-width: 1023px) {
     .dashboard-container {
         .stats-row {
@@ -587,10 +658,18 @@ onUnmounted(() => {
                 min-width: 0;
             }
         }
+
+        .skeleton-chart {
+            &--wide, &--narrow { flex: 1 1 100%; min-width: 0; height: 300px; }
+        }
+        .charts-row--three .skeleton-chart {
+            min-width: 0;
+            height: 280px;
+        }
     }
 }
 
-// 手机：全部单列堆叠
+// 手机
 @media (max-width: 767px) {
     .dashboard-container {
         .stats-row {
@@ -609,6 +688,33 @@ onUnmounted(() => {
                 .chart-container { height: 250px; }
                 .chart-container--tall { height: 260px; }
             }
+        }
+
+        .skeleton-chart {
+            &--wide, &--narrow { flex: 1 1 100%; min-width: 0; height: 250px; }
+        }
+        .charts-row--three .skeleton-chart {
+            flex: 1 1 100%;
+            height: 220px;
+        }
+    }
+}
+</style>
+
+<style lang="less">
+html.dark {
+    .dashboard-container {
+        .skeleton-stat {
+            background: #1e293b;
+            border-color: #334155;
+
+            .skeleton-icon,
+            .skeleton-line { background: #334155; }
+        }
+
+        .skeleton-chart {
+            background: #1e293b;
+            border-color: #334155;
         }
     }
 }

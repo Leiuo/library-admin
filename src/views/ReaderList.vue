@@ -14,7 +14,8 @@
             @undo="handleUndo" @close="clearUndo" />
 
         <div class="table-wrapper">
-            <el-table :data="paginatedReaders" border stripe v-loading="loading"
+            <TableSkeleton v-if="loading" :rows="8" :cols="4" />
+            <el-table v-else :data="paginatedReaders" border stripe
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="60" />
@@ -90,6 +91,7 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { UploadFilled } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
+import TableSkeleton from '../components/TableSkeleton.vue';
 import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders, addLog } from '../api/mock';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';

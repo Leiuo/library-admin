@@ -22,7 +22,8 @@
 
         <!-- 表格 -->
         <div class="table-wrapper">
-            <el-table :data="paginatedFines" border stripe v-loading="loading"
+            <TableSkeleton v-if="loading" :rows="8" :cols="6" />
+            <el-table v-else :data="paginatedFines" border stripe
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" :selectable="isUnpaid" />
                 <el-table-column prop="bookTitle" label="图书名称" show-overflow-tooltip />
@@ -72,6 +73,7 @@ import { useUserStore } from '../stores/user';
 import { WarningFilled, Money, CircleCheckFilled } from '@element-plus/icons-vue';
 import StatCard from '../components/StatCard.vue';
 import PaginationBox from '../components/PaginationBox.vue';
+import TableSkeleton from '../components/TableSkeleton.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();

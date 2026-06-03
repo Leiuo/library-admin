@@ -13,7 +13,8 @@
         </div>
 
         <div class="table-wrapper">
-            <el-table :data="paginatedBorrowsRecords" border stripe v-loading="loading" :row-class-name="rowClassName">
+            <TableSkeleton v-if="loading" :rows="8" :cols="5" />
+            <el-table v-else :data="paginatedBorrowsRecords" border stripe :row-class-name="rowClassName">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="bookTitle" label="图书名称" />
                 <el-table-column prop="borrowDate" label="借书日期" />
@@ -43,6 +44,7 @@ import { ElMessage } from 'element-plus';
 import { Collection, Reading, CircleCheckFilled, WarningFilled } from '@element-plus/icons-vue';
 import StatCard from '../components/StatCard.vue';
 import PaginationBox from '../components/PaginationBox.vue';
+import TableSkeleton from '../components/TableSkeleton.vue';
 
 const router = useRouter();
 const route = useRoute();
