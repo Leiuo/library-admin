@@ -92,10 +92,12 @@
         <el-container class="layout-right">
             <el-header class="layout-header">
                 <div class="header-left">
-                    <el-icon size="20" @click="toggleCollapse">
-                        <Expand v-if="isCollapse" />
-                        <Fold v-else />
-                    </el-icon>
+                    <span class="toggle-icon" :key="isCollapse">
+                        <el-icon size="20" @click="toggleCollapse">
+                            <Expand v-if="isCollapse" />
+                            <Fold v-else />
+                        </el-icon>
+                    </span>
                     <el-breadcrumb separator="|" class="header-breadcrumb">
                         <el-breadcrumb-item :to="{ path: '/' }">首页</el-breadcrumb-item>
                         <el-breadcrumb-item v-for="item in breadcrumbs" :key="item.path">
@@ -104,10 +106,12 @@
                     </el-breadcrumb>
                 </div>
                 <div class="header-right">
-                    <el-icon size="20" class="theme-toggle" @click="themeStore.toggle()">
-                        <Sunny v-if="themeStore.isDark" />
-                        <Moon v-else />
-                    </el-icon>
+                    <span class="theme-toggle" :key="themeStore.isDark">
+                        <el-icon size="20" @click="themeStore.toggle()">
+                            <Sunny v-if="themeStore.isDark" />
+                            <Moon v-else />
+                        </el-icon>
+                    </span>
                     <div class="userInfo">
                         <el-avatar :src="userStore.user_avatar" :size="30" />
                         <span class="user-name">{{ userStore.user_name }}</span>
@@ -117,12 +121,14 @@
             </el-header>
             <el-main>
                 <div class="main-header">
-                    <el-tag v-for="tag in dynamicTags" :key="tag.path" closable :disable-transitions="false"
-                        :effect="route.path === tag.path ? 'dark' : 'plain'"
-                        :type="route.path === tag.path ? 'primary' : 'info'" @close="handleClose(tag)"
-                        @click="handleClick(tag)" size="large">
-                        {{ tag.title }}
-                    </el-tag>
+                    <transition-group name="tag-slide" tag="div" class="tags-wrapper">
+                        <el-tag v-for="tag in dynamicTags" :key="tag.path" closable :disable-transitions="false"
+                            :effect="route.path === tag.path ? 'dark' : 'plain'"
+                            :type="route.path === tag.path ? 'primary' : 'info'" @close="handleClose(tag)"
+                            @click="handleClick(tag)" size="large">
+                            {{ tag.title }}
+                        </el-tag>
+                    </transition-group>
                 </div>
 
                 <!-- <router-view /> -->
@@ -295,8 +301,14 @@ const breadcrumbs = computed(() => {
         .el-sub-menu .el-menu-item {
             border-left: 5px solid transparent;
 
+            .el-icon {
+                transition: transform 0.25s ease;
+            }
+
             &:hover {
                 background-color: rgba(45, 212, 191, 0.1);
+
+                .el-icon { transform: scale(1.15); }
             }
 
             &:focus,
@@ -341,6 +353,15 @@ const breadcrumbs = computed(() => {
     align-items: center;
     border-bottom: 1px solid #e2e8f0;
 
+    .toggle-icon {
+        display: inline-flex;
+        animation: icon-rotate 0.3s ease;
+    }
+    @keyframes icon-rotate {
+        from { transform: rotate(0deg); }
+        to   { transform: rotate(180deg); }
+    }
+
     .header-left {
         display: flex;
         gap: 20px;
@@ -354,6 +375,11 @@ const breadcrumbs = computed(() => {
 
         .header-breadcrumb {
             min-width: 0;
+
+            .el-breadcrumb__inner {
+                transition: color 0.2s;
+                &:hover { color: #0d9488; }
+            }
         }
     }
 
@@ -366,11 +392,14 @@ const breadcrumbs = computed(() => {
         .theme-toggle {
             cursor: pointer;
             color: #94a3b8;
-            transition: color 0.3s;
+            display: inline-flex;
+            animation: theme-spin 0.4s ease;
 
-            &:hover {
-                color: #f59e0b;
-            }
+            &:hover { color: #f59e0b; }
+        }
+        @keyframes theme-spin {
+            from { transform: rotate(0deg); }
+            to   { transform: rotate(360deg); }
         }
 
         .userInfo {
@@ -407,20 +436,37 @@ const breadcrumbs = computed(() => {
 
 .main-header {
     margin-bottom: 16px;
-    display: flex;
-    gap: 8px;
+
+    .tags-wrapper {
+        display: flex;
+        gap: 8px;
+    }
 
     .el-tag {
         font-size: 13px;
         border-radius: 8px;
         cursor: pointer;
-        transition: all 0.3s ease;
+        transition: all 0.2s ease;
 
-        // &:hover {
-        //     background-color: #5eead4;
-        //     color: #fff;
-        // }
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+        }
     }
+}
+
+/* 标签页过渡 */
+.tag-slide-enter-active,
+.tag-slide-leave-active {
+    transition: all 0.25s ease;
+}
+.tag-slide-enter-from {
+    opacity: 0;
+    transform: translateY(-8px) scale(0.9);
+}
+.tag-slide-leave-to {
+    opacity: 0;
+    transform: translateY(4px) scale(0.95);
 }
 
 // 移动端：侧边栏变为覆盖式

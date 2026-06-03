@@ -546,6 +546,12 @@ onUnmounted(() => {
         .chart-card {
             flex: 1;
             min-width: 0;
+            transition: transform 0.2s, box-shadow 0.2s;
+
+            &:hover {
+                transform: translateY(-2px);
+                box-shadow: 0 4px 16px rgba(0,0,0,0.06);
+            }
 
             .card-header {
                 display: flex;
@@ -609,6 +615,23 @@ onUnmounted(() => {
         &--sm { width: 80px; }
     }
 
+    /* 卡片入场交错动画 */
+    .stats-row > * {
+        animation: fadeInUp 0.4s ease backwards;
+    }
+    .charts-row > .chart-card {
+        animation: fadeInUp 0.4s ease backwards;
+    }
+    .stats-row > *:nth-child(1),
+    .charts-row--asymmetric > .chart-card:nth-child(1) { animation-delay: 0.05s; }
+    .stats-row > *:nth-child(2),
+    .charts-row--asymmetric > .chart-card:nth-child(2) { animation-delay: 0.12s; }
+    .stats-row > *:nth-child(3),
+    .charts-row--three > .chart-card:nth-child(1) { animation-delay: 0.05s; }
+    .stats-row > *:nth-child(4),
+    .charts-row--three > .chart-card:nth-child(2) { animation-delay: 0.12s; }
+    .charts-row--three > .chart-card:nth-child(3) { animation-delay: 0.2s; }
+
     .skeleton-chart {
         background: #fff;
         border: 1px solid #e2e8f0;
@@ -629,6 +652,17 @@ onUnmounted(() => {
 @keyframes skeleton-pulse {
     0%, 100% { opacity: 0.4; }
     50%      { opacity: 0.75; }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(16px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
 }
 
 // 平板

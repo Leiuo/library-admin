@@ -48,7 +48,15 @@ defineProps({
         justify-content: center;
         flex-shrink: 0;
 
-        .el-icon { font-size: 28px; color: #fff; }
+        .el-icon {
+            font-size: 28px;
+            color: #fff;
+            transition: transform 0.25s ease;
+        }
+    }
+
+    &:hover .stat-icon .el-icon {
+        transform: scale(1.12);
     }
 
     .blue   { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); }

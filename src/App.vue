@@ -148,6 +148,48 @@ html.dark .el-checkbox__inner {
     border-color: #115e59 !important;
 }
 
+/* ===== 微交互 ===== */
+
+/* 按钮按下缩放 */
+.el-button {
+    transition: transform 0.15s ease, background-color 0.2s, border-color 0.2s !important;
+}
+.el-button:active {
+    transform: scale(0.97);
+}
+
+/* 表格行 hover 平滑过渡 */
+.el-table__body tr {
+    transition: background-color 0.2s ease;
+}
+
+/* 对话框弹出: scale + fade */
+.el-dialog {
+    animation: dialog-in 0.25s cubic-bezier(0.22, 0.61, 0.36, 1);
+}
+@keyframes dialog-in {
+    from {
+        opacity: 0;
+        transform: scale(0.93) translateY(12px);
+    }
+    to {
+        opacity: 1;
+        transform: scale(1) translateY(0);
+    }
+}
+
+/* 减少动画偏好 */
+@media (prefers-reduced-motion: reduce) {
+    .el-button { transition: none !important; }
+    .el-dialog { animation: none; }
+    .el-table__body tr { transition: none; }
+    *,
+    *::before,
+    *::after {
+        animation-duration: 0.01ms !important;
+    }
+}
+
 .fade-enter-active,
 .fade-leave-active {
     transition: opacity 0.3s ease;

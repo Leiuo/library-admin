@@ -180,6 +180,7 @@ const handleLogin = async () => {
             .brand-logo {
                 margin-bottom: 28px;
                 filter: drop-shadow(0 8px 24px rgba(13, 148, 136, 0.3));
+                animation: fadeInUp 0.5s ease backwards;
             }
 
             .brand-name {
@@ -189,6 +190,7 @@ const handleLogin = async () => {
                 letter-spacing: -1.5px;
                 line-height: 1.15;
                 margin: 0;
+                animation: fadeInUp 0.5s 0.1s ease backwards;
             }
 
             .brand-divider {
@@ -197,6 +199,7 @@ const handleLogin = async () => {
                 background: linear-gradient(90deg, #0d9488, #2dd4bf);
                 border-radius: 2px;
                 margin: 20px auto;
+                animation: fadeInUp 0.5s 0.18s ease backwards;
             }
 
             .brand-slogan {
@@ -204,6 +207,7 @@ const handleLogin = async () => {
                 font-size: 15px;
                 line-height: 1.6;
                 margin: 0;
+                animation: fadeInUp 0.5s 0.24s ease backwards;
             }
         }
     }
@@ -242,6 +246,7 @@ const handleLogin = async () => {
         justify-content: space-evenly;
 
         .form-header {
+            animation: fadeInUp 0.5s 0.3s ease backwards;
             .form-title {
                 font-size: 28px;
                 font-weight: bold;
@@ -255,6 +260,7 @@ const handleLogin = async () => {
         }
 
         .login-form {
+            animation: fadeInUp 0.5s 0.38s ease backwards;
             width: 100%;
 
             .field-label {
@@ -278,6 +284,7 @@ const handleLogin = async () => {
         .tip {
             font-size: 12px;
             background: #f8fafc;
+            animation: fadeInUp 0.5s 0.44s ease backwards;
             color: #64748b;
             border: 1px solid #e2e8f0;
             padding: 10px 15px;
@@ -293,6 +300,17 @@ const handleLogin = async () => {
                 background-color: #0d9488;
             }
         }
+    }
+}
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(18px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
     }
 }
 </style>
