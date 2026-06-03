@@ -15,6 +15,7 @@
 
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="4" />
+            <el-empty v-else-if="filteredReaders.length === 0" description="暂无读者数据" />
             <el-table v-else :data="paginatedReaders" border stripe
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
@@ -31,6 +32,7 @@
                 </el-table-column>
             </el-table>
             <PaginationBox
+                v-if="filteredReaders.length > 0"
                 v-model:current-page="currentPage"
                 v-model:page-size="pageSize"
                 :total="filteredReaders.length"

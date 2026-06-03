@@ -26,6 +26,7 @@
 
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="5" />
+            <el-empty v-else-if="filteredLogs.length === 0" description="暂无操作日志" />
             <el-table v-else :data="paginatedLogs" border stripe max-height="calc(100vh - 260px)">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="time" label="操作时间" width="170" />
@@ -41,6 +42,7 @@
                 <el-table-column prop="detail" label="详情" min-width="120" show-overflow-tooltip />
             </el-table>
             <PaginationBox
+                v-if="filteredLogs.length > 0"
                 v-model:current-page="currentPage"
                 v-model:page-size="pageSize"
                 :total="filteredLogs.length"

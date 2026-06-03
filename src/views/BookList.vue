@@ -18,6 +18,7 @@
 
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="6" />
+            <el-empty v-else-if="filteredBooks.length === 0" description="暂无图书数据" />
             <el-table v-else :data="paginatedBooks" border stripe
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
@@ -46,6 +47,7 @@
                 </el-table-column>
             </el-table>
             <PaginationBox
+                v-if="filteredBooks.length > 0"
                 v-model:current-page="currentPage"
                 v-model:page-size="pageSize"
                 :total="filteredBooks.length"
