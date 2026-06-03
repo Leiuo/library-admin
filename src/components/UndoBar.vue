@@ -26,18 +26,18 @@ defineEmits(['undo', 'close']);
     gap: 8px;
     margin-bottom: 12px;
     padding: 10px 16px;
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
+    background: var(--el-color-success-light-9);
+    border: 1px solid var(--el-color-success-light-7);
     border-radius: 8px;
     font-size: 14px;
-    color: #065f46;
+    color: var(--el-color-success-dark-2);
 
     .undo-close {
         margin-left: auto;
         cursor: pointer;
-        color: #6b7280;
+        color: var(--el-text-color-secondary);
 
-        &:hover { color: #374151; }
+        &:hover { color: var(--el-text-color-primary); }
     }
 }
 
@@ -52,10 +52,3 @@ defineEmits(['undo', 'close']);
 }
 </style>
 
-<style lang="less">
-html.dark .undo-bar {
-    background: #064e3b;
-    border-color: #065f46;
-    color: #a7f3d0;
-}
-</style>

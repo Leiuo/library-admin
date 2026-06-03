@@ -63,7 +63,7 @@ const colWidths = computed(() => {
     }
 
     .skeleton-cell {
-        background: #e2e8f0;
+        background: var(--el-fill-color);
         border-radius: 4px;
     }
 }
@@ -74,8 +74,3 @@ const colWidths = computed(() => {
 }
 </style>
 
-<style lang="less">
-html.dark .table-skeleton .skeleton-cell {
-    background: #334155;
-}
-</style>

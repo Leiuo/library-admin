@@ -69,7 +69,7 @@ defineProps({
         text-align: center;
 
         .stat-value { font-size: 28px; font-weight: 600; }
-        .stat-label { color: #909399; font-size: 13px; }
+        .stat-label { color: var(--el-text-color-secondary); font-size: 13px; }
     }
 }
 
@@ -111,8 +111,3 @@ defineProps({
 }
 </style>
 
-<style lang="less">
-html.dark .stat-card .stat-label {
-    color: #94a3b8;
-}
-</style>

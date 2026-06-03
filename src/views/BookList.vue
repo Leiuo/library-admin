@@ -429,7 +429,7 @@ onMounted(() => {
         p {
             margin: 4px 0;
             font-size: 14px;
-            color: #666;
+            color: var(--el-text-color-regular);
         }
     }
 
@@ -469,8 +469,3 @@ onMounted(() => {
 }
 </style>
 
-<style lang="less">
-html.dark .booklist-container .import-tips p {
-    color: #94a3b8;
-}
-</style>

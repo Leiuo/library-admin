@@ -128,7 +128,7 @@ const handleLogin = async () => {
     right: 20px;
     z-index: 10;
     cursor: pointer;
-    color: #94a3b8;
+    color: var(--el-text-color-secondary);
     transition: color 0.3s;
     &:hover { color: #f59e0b; }
 }
@@ -244,6 +244,7 @@ const handleLogin = async () => {
         display: flex;
         flex-direction: column;
         justify-content: space-evenly;
+        background: var(--el-bg-color);
 
         .form-header {
             animation: fadeInUp 0.5s 0.3s ease backwards;
@@ -251,10 +252,11 @@ const handleLogin = async () => {
                 font-size: 28px;
                 font-weight: bold;
                 margin-bottom: 8px;
+                color: var(--el-text-color-primary);
             }
 
             .form-subtitle {
-                color: #64748b;
+                color: var(--el-text-color-secondary);
                 font-size: 14px;
             }
         }
@@ -265,7 +267,7 @@ const handleLogin = async () => {
 
             .field-label {
                 font-size: 13px;
-                color: #334155;
+                color: var(--el-text-color-regular);
             }
 
             .submit-btn {
@@ -283,10 +285,10 @@ const handleLogin = async () => {
 
         .tip {
             font-size: 12px;
-            background: #f8fafc;
+            background: var(--el-fill-color-light);
             animation: fadeInUp 0.5s 0.44s ease backwards;
-            color: #64748b;
-            border: 1px solid #e2e8f0;
+            color: var(--el-text-color-secondary);
+            border: 1px solid var(--el-border-color-light);
             padding: 10px 15px;
             border-radius: 8px;
             display: flex;
@@ -317,25 +319,6 @@ const handleLogin = async () => {
 
 <style lang="less">
 html.dark {
-    .login-container .form-container {
-        background: #1e293b;
-    }
-
-    .login-container .form-header {
-        .form-title { color: #f1f5f9; }
-        .form-subtitle { color: #94a3b8; }
-    }
-
-    .login-container .field-label {
-        color: #e2e8f0 !important;
-    }
-
-    .login-container .form-container .tip {
-        background: #0f172a !important;
-        border-color: #334155 !important;
-        color: #cbd5e1 !important;
-    }
-
     .login-container .brand-panel {
         background:
             radial-gradient(circle, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
@@ -348,11 +331,6 @@ html.dark {
         .brand-glow--bottom {
             background: radial-gradient(circle, rgba(45, 212, 191, 0.05), transparent 70%);
         }
-    }
-
-    .theme-switch {
-        color: #cbd5e1;
-        &:hover { color: #f59e0b; }
     }
 }
 </style>

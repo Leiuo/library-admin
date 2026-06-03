@@ -72,7 +72,7 @@ const goBack = () => {
             position: absolute;
             font-size: 120px;
             font-weight: 700;
-            color: #e2e8f0;
+            color: var(--el-border-color);
             opacity: 0.4;
             animation: float 8s ease-in-out infinite;
 
@@ -175,13 +175,13 @@ const goBack = () => {
     .error-title {
         font-size: 22px;
         font-weight: 600;
-        color: #1e293b;
+        color: var(--el-text-color-primary);
         margin-bottom: 10px;
     }
 
     .error-desc {
         font-size: 14px;
-        color: #94a3b8;
+        color: var(--el-text-color-secondary);
         text-align: center;
         line-height: 1.7;
         margin-bottom: 32px;
@@ -244,21 +244,9 @@ const goBack = () => {
 <style lang="less">
 html.dark {
     .not-found {
-        .bg-decor .decor {
-            color: #334155;
-        }
-
-        .error-title {
-            color: #e2e8f0;
-        }
-
-        .error-desc {
-            color: #64748b;
-        }
-
         .book .page-left,
         .book .page-right {
-            background: linear-gradient(135deg, #1e293b, #334155);
+            background: linear-gradient(135deg, var(--el-bg-color), var(--el-fill-color-light));
         }
 
         .magnifier-circle {

@@ -593,23 +593,23 @@ onUnmounted(() => {
         align-items: center;
         gap: 10px;
         padding: 20px 16px;
-        background: #fff;
+        background: var(--el-bg-color);
         border-radius: 8px;
-        border: 1px solid #e2e8f0;
+        border: 1px solid var(--el-border-color);
         animation: skeleton-pulse 1.6s ease-in-out infinite;
 
         .skeleton-icon {
             width: 48px;
             height: 48px;
             border-radius: 12px;
-            background: #e2e8f0;
+            background: var(--el-fill-color-light);
         }
     }
 
     .skeleton-line {
         height: 14px;
         border-radius: 4px;
-        background: #e2e8f0;
+        background: var(--el-fill-color-light);
 
         &--lg { width: 56px; height: 26px; border-radius: 6px; }
         &--sm { width: 80px; }
@@ -633,8 +633,8 @@ onUnmounted(() => {
     .charts-row--three > .chart-card:nth-child(3) { animation-delay: 0.2s; }
 
     .skeleton-chart {
-        background: #fff;
-        border: 1px solid #e2e8f0;
+        background: var(--el-bg-color);
+        border: 1px solid var(--el-border-color);
         border-radius: 8px;
         animation: skeleton-pulse 1.6s ease-in-out infinite;
 
@@ -735,21 +735,3 @@ onUnmounted(() => {
 }
 </style>
 
-<style lang="less">
-html.dark {
-    .dashboard-container {
-        .skeleton-stat {
-            background: #1e293b;
-            border-color: #334155;
-
-            .skeleton-icon,
-            .skeleton-line { background: #334155; }
-        }
-
-        .skeleton-chart {
-            background: #1e293b;
-            border-color: #334155;
-        }
-    }
-}
-</style>

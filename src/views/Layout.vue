@@ -326,7 +326,7 @@ const breadcrumbs = computed(() => {
         text-align: center;
 
         .version {
-            color: #64748b;
+            color: var(--el-text-color-secondary);
             font-size: 12px;
         }
     }
@@ -344,7 +344,7 @@ const breadcrumbs = computed(() => {
     overflow: hidden;
 
     :deep(.el-main) {
-        background-color: #f1f5f9;
+        background-color: var(--el-bg-color-page);
     }
 }
 
@@ -352,7 +352,8 @@ const breadcrumbs = computed(() => {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    border-bottom: 1px solid #e2e8f0;
+    background-color: var(--el-bg-color);
+    border-bottom: 1px solid var(--el-border-color);
 
     .toggle-icon {
         display: inline-flex;
@@ -392,7 +393,7 @@ const breadcrumbs = computed(() => {
 
         .theme-toggle {
             cursor: pointer;
-            color: #94a3b8;
+            color: var(--el-text-color-secondary);
             display: inline-flex;
             animation: theme-spin 0.4s ease;
 
@@ -419,7 +420,7 @@ const breadcrumbs = computed(() => {
             }
 
             .user-name {
-                color: #606266;
+                color: var(--el-text-color-regular);
                 font-size: 12px;
 
                 &:hover {
@@ -511,37 +512,3 @@ const breadcrumbs = computed(() => {
 }
 </style>
 
-<style lang="less">
-html.dark {
-    .layout-aside {
-        .version {
-            color: #94a3b8;
-        }
-    }
-
-    .layout-header {
-        background-color: #1e293b;
-        border-bottom-color: #334155;
-    }
-
-    .layout-right .el-main {
-        background-color: #0f172a;
-    }
-
-    .layout-header .header-right .theme-toggle {
-        color: #cbd5e1;
-
-        &:hover {
-            color: #f59e0b;
-        }
-    }
-
-    .layout-header .header-right .user-name {
-        color: #cbd5e1 !important;
-    }
-
-    .header-breadcrumb .el-breadcrumb__inner {
-        color: #94a3b8;
-    }
-}
-</style>
