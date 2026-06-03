@@ -8,36 +8,37 @@
             <StatCard :icon="TrendCharts" color="purple" :value="stats.activeBorrows || 0" label="进行中借阅" />
         </div>
 
-        <!-- 图表区域（仅在有数据时渲染） -->
-        <div class="charts-row" v-if="!loading">
-            <el-card class="chart-card" shadow="hover">
+        <!-- 核心概览：趋势图 + 状态饼图 -->
+        <div class="charts-row charts-row--asymmetric" v-if="!loading">
+            <el-card class="chart-card chart-card--wide" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <span>📊 当前图书状态分布</span>
-                    </div>
-                </template>
-                <div ref="statusChartRef" class="chart-container"></div>
-            </el-card>
-
-            <el-card class="chart-card" shadow="hover">
-                <template #header>
-                    <div class="card-header">
-                        <span>📈 月度借阅趋势</span>
+                        <span>月度借阅趋势</span>
                         <el-radio-group v-model="trendYear" size="small" @change="updateTrendChart">
                             <el-radio-button :label="2025">2025</el-radio-button>
                             <el-radio-button :label="2026">2026</el-radio-button>
                         </el-radio-group>
                     </div>
                 </template>
-                <div ref="trendChartRef" class="chart-container"></div>
+                <div ref="trendChartRef" class="chart-container chart-container--tall"></div>
+            </el-card>
+
+            <el-card class="chart-card chart-card--narrow" shadow="hover">
+                <template #header>
+                    <div class="card-header">
+                        <span>图书状态分布</span>
+                    </div>
+                </template>
+                <div ref="statusChartRef" class="chart-container chart-container--tall"></div>
             </el-card>
         </div>
 
-        <div class="charts-row" v-if="!loading">
+        <!-- 排行 & 分类 -->
+        <div class="charts-row charts-row--three" v-if="!loading">
             <el-card class="chart-card" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <span>🏆 热门图书 TOP5（按借阅次数）</span>
+                        <span>热门图书 TOP5</span>
                     </div>
                 </template>
                 <div ref="hotBooksChartRef" class="chart-container"></div>
@@ -46,18 +47,16 @@
             <el-card class="chart-card" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <span>👥 读者借阅排行 TOP5</span>
+                        <span>读者借阅排行 TOP5</span>
                     </div>
                 </template>
                 <div ref="topReadersChartRef" class="chart-container"></div>
             </el-card>
-        </div>
 
-        <div class="charts-row" v-if="!loading">
             <el-card class="chart-card" shadow="hover">
                 <template #header>
                     <div class="card-header">
-                        <span>📚 图书分类分布</span>
+                        <span>图书分类分布</span>
                     </div>
                 </template>
                 <div ref="categoryChartRef" class="chart-container"></div>
@@ -195,7 +194,7 @@ const renderTrendChart = () => {
     trendChart.setOption({
         tooltip: {
             trigger: 'axis',
-            axisPointer: { type: 'shadow' }
+            axisPointer: { type: 'cross' }
         },
         xAxis: {
             type: 'category',
@@ -521,36 +520,50 @@ onUnmounted(() => {
 
     .charts-row {
         display: flex;
-        gap: 15px;
-        margin-bottom: 15px;
+        gap: 16px;
+        margin-bottom: 16px;
         flex-wrap: wrap;
-        // overflow: auto;
 
         .chart-card {
-            min-width: 400px;
             flex: 1;
+            min-width: 0;
 
             .card-header {
                 display: flex;
                 justify-content: space-between;
                 align-items: center;
-                // font-weight: 550;
+                font-size: 15px;
+                font-weight: 500;
             }
 
             .chart-container {
                 width: 100%;
-                height: 320px;
+                height: 300px;
                 min-width: 0;
                 flex: 1;
                 overflow: hidden;
             }
+
+            .chart-container--tall {
+                height: 340px;
+            }
         }
+    }
+
+    .charts-row--asymmetric {
+        .chart-card--wide   { flex: 2; min-width: 320px; }
+        .chart-card--narrow { flex: 1; min-width: 240px; }
+    }
+
+    .charts-row--three {
+        .chart-card { min-width: 260px; }
     }
 }
 
-// 平板：图表堆叠，卡片两列
+// 平板：非对称布局改为堆叠，三栏改为两栏
 @media (max-width: 1023px) {
-    .dashboard-container {        .stats-row {
+    .dashboard-container {
+        .stats-row {
             gap: 8px;
             margin-bottom: 16px;
         }
@@ -562,22 +575,27 @@ onUnmounted(() => {
             .chart-card {
                 min-width: 300px;
 
-                .chart-container {
-                    height: 280px;
-                }
+                .chart-container { height: 280px; }
+                .chart-container--tall { height: 300px; }
+            }
+        }
+
+        .charts-row--asymmetric {
+            .chart-card--wide,
+            .chart-card--narrow {
+                flex: 1 1 100%;
+                min-width: 0;
             }
         }
     }
 }
 
-// 手机：图表全宽堆叠
+// 手机：全部单列堆叠
 @media (max-width: 767px) {
     .dashboard-container {
         .stats-row {
             gap: 6px;
             margin-bottom: 12px;
-
-            // StatCard 响应式由组件自身管理
         }
 
         .charts-row {
@@ -588,9 +606,8 @@ onUnmounted(() => {
                 min-width: 0;
                 flex: 1 1 100%;
 
-                .chart-container {
-                    height: 250px;
-                }
+                .chart-container { height: 250px; }
+                .chart-container--tall { height: 260px; }
             }
         }
     }
