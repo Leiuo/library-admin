@@ -8,13 +8,31 @@
         </div>
 
         <div class="brand-panel">
+            <div class="brand-glow brand-glow--top"></div>
+            <div class="brand-glow brand-glow--bottom"></div>
             <div class="brand-content">
-                <div class="brand-marker" />
-                <h2 class="brand-name">Library Admin</h2>
-                <p class="brand-slogan">
-                    图书馆后台管理系统<br>
-                    为您的图书馆提供高效便捷的管理工具
-                </p>
+                <div class="brand-logo">
+                    <svg viewBox="0 0 44 44" width="72" height="72" fill="none">
+                        <rect x="2" y="8" width="40" height="30" rx="4" fill="url(#login-logo-grad)" />
+                        <rect x="6" y="12" width="14" height="22" rx="2" fill="#fff" opacity="0.95" />
+                        <rect x="22" y="12" width="16" height="22" rx="2" fill="#fff" opacity="0.8" />
+                        <line x1="13" y1="17" x2="17" y2="17" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="21" x2="17" y2="21" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="25" x2="16" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="17" x2="32" y2="17" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="21" x2="33" y2="21" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="25" x2="31" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <defs>
+                            <linearGradient id="login-logo-grad" x1="0" y1="0" x2="44" y2="44">
+                                <stop offset="0%" stop-color="#0d9488" />
+                                <stop offset="100%" stop-color="#2dd4bf" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <h2 class="brand-name">LibraryAdmin</h2>
+                <div class="brand-divider"></div>
+                <p class="brand-slogan">图书馆后台管理系统</p>
             </div>
         </div>
 
@@ -125,34 +143,96 @@ const handleLogin = async () => {
         flex-direction: column;
         align-items: center;
         justify-content: center;
-        background: #0f172a;
         position: relative;
+        overflow: hidden;
+        background:
+            radial-gradient(circle, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
+            linear-gradient(160deg, #0f172a 0%, #0c2333 45%, #0a1628 100%);
+        background-size: 28px 28px, 100% 100%;
+
+        .brand-glow {
+            position: absolute;
+            border-radius: 50%;
+            pointer-events: none;
+
+            &--top {
+                width: 360px;
+                height: 360px;
+                background: radial-gradient(circle, rgba(13, 148, 136, 0.12), transparent 70%);
+                top: -100px;
+                right: -80px;
+            }
+
+            &--bottom {
+                width: 280px;
+                height: 280px;
+                background: radial-gradient(circle, rgba(45, 212, 191, 0.08), transparent 70%);
+                bottom: -80px;
+                left: -60px;
+            }
+        }
 
         .brand-content {
-            .brand-marker {
-                width: 32px;
-                height: 3px;
-                background: #0d9488;
-                border-radius: 2px;
-                margin-bottom: 15px;
+            position: relative;
+            z-index: 1;
+            text-align: center;
+
+            .brand-logo {
+                margin-bottom: 28px;
+                filter: drop-shadow(0 8px 24px rgba(13, 148, 136, 0.3));
             }
 
             .brand-name {
                 color: #fff;
-                font-size: 40px;
-                margin-bottom: 32px;
-                font-weight: 700;
+                font-size: 44px;
+                font-weight: 800;
                 letter-spacing: -1.5px;
-                line-height: 1.2;
+                line-height: 1.15;
+                margin: 0;
+            }
+
+            .brand-divider {
+                width: 40px;
+                height: 3px;
+                background: linear-gradient(90deg, #0d9488, #2dd4bf);
+                border-radius: 2px;
+                margin: 20px auto;
             }
 
             .brand-slogan {
                 color: #94a3b8;
                 font-size: 15px;
-                line-height: 1.7;
+                line-height: 1.6;
+                margin: 0;
             }
         }
     }
+
+@media (max-width: 767px) {
+    .login-container {
+        flex-direction: column;
+
+        .brand-panel {
+            flex: 0 0 200px;
+
+            .brand-logo svg {
+                width: 48px;
+                height: 48px;
+            }
+
+            .brand-name { font-size: 28px; }
+            .brand-divider { margin: 14px auto; }
+            .brand-slogan { font-size: 13px; }
+        }
+
+        .form-container {
+            width: 100%;
+            padding: 32px 24px;
+            justify-content: flex-start;
+            gap: 24px;
+        }
+    }
+}
 
     .form-container {
         width: 480px;
@@ -239,7 +319,17 @@ html.dark {
     }
 
     .login-container .brand-panel {
-        background: #020617;
+        background:
+            radial-gradient(circle, rgba(148, 163, 184, 0.04) 1px, transparent 1px),
+            linear-gradient(160deg, #020617 0%, #06121f 45%, #020617 100%);
+        background-size: 28px 28px, 100% 100%;
+
+        .brand-glow--top {
+            background: radial-gradient(circle, rgba(13, 148, 136, 0.08), transparent 70%);
+        }
+        .brand-glow--bottom {
+            background: radial-gradient(circle, rgba(45, 212, 191, 0.05), transparent 70%);
+        }
     }
 
     .theme-switch {
