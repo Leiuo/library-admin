@@ -277,6 +277,11 @@ const handleUndo = () => {
         readers.splice(index, 0, item);
     }
     localStorage.setItem('library_readers', JSON.stringify(readers));
+    const restoredItems = undoState.value.items;
+    const detail = restoredItems.length === 1
+        ? restoredItems[0].item.name
+        : `${restoredItems.length} 位读者`;
+    addLog(userStore.user_name, 'restore_reader', detail);
     clearUndo();
     fetchReaders();
     ElMessage.success('已撤销删除');

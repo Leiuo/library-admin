@@ -409,6 +409,11 @@ const handleUndo = () => {
 
     localStorage.setItem('library_borrows', JSON.stringify(borrows));
     localStorage.setItem('library_books', JSON.stringify(books));
+    const restoredItems = undoState.value.items;
+    const detail = restoredItems.length === 1
+        ? `记录#${restoredItems[0].item.id}`
+        : `${restoredItems.length} 条记录`;
+    addLog(userStore.user_name, 'restore_borrow', detail);
     clearUndo();
     fetchBorrows();
     ElMessage.success('已撤销删除');

@@ -310,6 +310,11 @@ const handleUndo = () => {
         books.splice(index, 0, item);
     }
     localStorage.setItem('library_books', JSON.stringify(books));
+    const restoredItems = undoState.value.items;
+    const detail = restoredItems.length === 1
+        ? `《${restoredItems[0].item.title}》`
+        : `${restoredItems.length} 本图书`;
+    addLog(userStore.user_name, 'restore_book', detail);
     clearUndo();
     fetchBooks();
     ElMessage.success('已撤销删除');

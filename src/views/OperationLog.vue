@@ -82,7 +82,10 @@ const actionOptions = [
     { label: '编辑管理员', value: 'edit_admin' },
     { label: '删除管理员', value: 'delete_admin' },
     { label: '保存设置', value: 'save_settings' },
-    { label: '缴纳罚款', value: 'pay_fine' }
+    { label: '缴纳罚款', value: 'pay_fine' },
+    { label: '撤销删除图书', value: 'restore_book' },
+    { label: '撤销删除读者', value: 'restore_reader' },
+    { label: '撤销删除借阅', value: 'restore_borrow' }
 ];
 
 const actionLabel = (action) => {
@@ -92,7 +95,7 @@ const actionLabel = (action) => {
 
 const actionTagType = (action) => {
     if (action.includes('delete')) return 'danger';
-    if (action.includes('add') || action.includes('import') || action === 'borrow') return 'success';
+    if (action.includes('add') || action.includes('import') || action.includes('restore') || action === 'borrow') return 'success';
     if (action.includes('edit') || action === 'return') return 'warning';
     if (action === 'pay_fine') return 'success';
     return 'info';
