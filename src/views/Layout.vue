@@ -6,10 +6,29 @@
         <el-aside class="layout-aside" :class="{ 'aside-mobile-open': isMobile && !isCollapse }"
             :width="isMobile || !isCollapse ? '220px' : '66px'">
             <div class="aside-title">
-                <el-icon size="24">
-                    <Reading />
-                </el-icon>
-                <h3 v-if="isMobile || !isCollapse">图书馆管理系统</h3>
+                <div class="logo-mark">
+                    <svg viewBox="0 0 44 44" width="36" height="36" fill="none">
+                        <rect x="2" y="8" width="40" height="30" rx="4" fill="url(#logo-grad)" />
+                        <rect x="6" y="12" width="14" height="22" rx="2" fill="#fff" opacity="0.95" />
+                        <rect x="22" y="12" width="16" height="22" rx="2" fill="#fff" opacity="0.8" />
+                        <line x1="13" y1="17" x2="17" y2="17" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="21" x2="17" y2="21" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="13" y1="25" x2="16" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="17" x2="32" y2="17" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="21" x2="33" y2="21" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <line x1="27" y1="25" x2="31" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
+                        <defs>
+                            <linearGradient id="logo-grad" x1="0" y1="0" x2="44" y2="44">
+                                <stop offset="0%" stop-color="#0d9488" />
+                                <stop offset="100%" stop-color="#14b8a6" />
+                            </linearGradient>
+                        </defs>
+                    </svg>
+                </div>
+                <div v-if="isMobile || !isCollapse" class="title-text">
+                    <div class="title-main">LibraryAdmin</div>
+                    <div class="title-sub">图书馆管理系统</div>
+                </div>
             </div>
             <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false"
                 router background-color="#0f172a" text-color="#94a3b8" active-text-color="#2dd4bf" class="aside-menu"
@@ -233,16 +252,39 @@ const breadcrumbs = computed(() => {
     position: relative;
 
     .aside-title {
-        color: #fff;
-        height: 30px;
         display: flex;
-        gap: 8px;
         align-items: center;
         justify-content: center;
-        margin: 20px 0;
+        gap: 10px;
+        padding: 22px 12px 18px;
+        border-bottom: 1px solid rgba(148, 163, 184, 0.15);
 
-        h3 {
-            white-space: nowrap;
+        .logo-mark {
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .title-text {
+            min-width: 0;
+            line-height: 1.25;
+            overflow: hidden;
+
+            .title-main {
+                font-size: 16px;
+                font-weight: 700;
+                color: #fff;
+                letter-spacing: -.3px;
+                white-space: nowrap;
+            }
+
+            .title-sub {
+                font-size: 11px;
+                color: #94a3b8;
+                margin-top: 1px;
+                white-space: nowrap;
+            }
         }
     }
 
@@ -425,10 +467,6 @@ const breadcrumbs = computed(() => {
 <style lang="less">
 html.dark {
     .layout-aside {
-        .aside-title {
-            color: #e2e8f0;
-        }
-
         .version {
             color: #94a3b8;
         }
