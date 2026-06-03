@@ -2,53 +2,10 @@
     <div class="dashboard-container">
         <!-- 顶部统计卡片 -->
         <div class="stats-row">
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon blue">
-                    <el-icon>
-                        <Notebook />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.totalBooks || 0 }}</div>
-                    <div class="stat-label">目前馆藏总量</div>
-                </div>
-            </el-card>
-
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon orange">
-                    <el-icon>
-                        <User />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.totalReaders || 0 }}</div>
-                    <div class="stat-label">注册读者</div>
-                </div>
-            </el-card>
-
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon green">
-                    <el-icon>
-                        <Stamp />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.borrowedBooks || 0 }}</div>
-                    <div class="stat-label">总借阅数量</div>
-                </div>
-            </el-card>
-
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon purple">
-                    <el-icon>
-                        <TrendCharts />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.activeBorrows || 0 }}</div>
-                    <div class="stat-label">进行中借阅</div>
-                </div>
-            </el-card>
+            <StatCard :icon="Notebook" color="blue" :value="stats.totalBooks || 0" label="目前馆藏总量" />
+            <StatCard :icon="User" color="orange" :value="stats.totalReaders || 0" label="注册读者" />
+            <StatCard :icon="Stamp" color="green" :value="stats.borrowedBooks || 0" label="总借阅数量" />
+            <StatCard :icon="TrendCharts" color="purple" :value="stats.activeBorrows || 0" label="进行中借阅" />
         </div>
 
         <!-- 图表区域（仅在有数据时渲染） -->
@@ -113,6 +70,8 @@
 import { reactive, ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import * as echarts from 'echarts';
 import { getBooks, getBorrows, getReaders } from '../api/mock';
+import { Notebook, User, Stamp, TrendCharts } from '@element-plus/icons-vue';
+import StatCard from '../components/StatCard.vue';
 import { useThemeStore } from '../stores/theme';
 
 const themeStore = useThemeStore();
@@ -557,70 +516,7 @@ onUnmounted(() => {
         margin-bottom: 24px;
         flex-wrap: wrap;
 
-        .stat-card {
-            flex: 1 1 180px;
-            min-width: 140px;
-            cursor: pointer;
-
-            &:hover {
-                transform: translateY(-3px);
-                border-color: #90939975;
-            }
-
-            :deep(.el-card__body) {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-                justify-content: center;
-            }
-
-            .stat-icon {
-                width: 52px;
-                height: 52px;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                flex-shrink: 0;
-                margin-bottom: 5px;
-
-                .el-icon {
-                    font-size: 30px;
-                    color: #fff;
-                }
-            }
-
-            .blue {
-                background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-            }
-
-            .green {
-                background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
-            }
-
-            .orange {
-                background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            }
-
-            .purple {
-                background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%);
-            }
-
-            .stat-info {
-                text-align: center;
-
-                .stat-value {
-                    font-size: 32px;
-                    font-weight: 600;
-                }
-
-                .stat-label {
-                    color: #909399;
-                    font-size: 14px;
-                    margin-top: 5px;
-                }
-            }
-        }
+        // StatCard 样式已由组件自身管理
     }
 
     .charts-row {
@@ -654,29 +550,9 @@ onUnmounted(() => {
 
 // 平板：图表堆叠，卡片两列
 @media (max-width: 1023px) {
-    .dashboard-container {
-        .stats-row {
+    .dashboard-container {        .stats-row {
             gap: 8px;
             margin-bottom: 16px;
-
-            .stat-card {
-                flex: 1 1 calc(50% - 4px);
-                min-width: 150px;
-
-                .stat-icon {
-                    width: 42px;
-                    height: 42px;
-                    border-radius: 10px;
-
-                    .el-icon {
-                        font-size: 24px;
-                    }
-                }
-
-                .stat-info .stat-value {
-                    font-size: 26px;
-                }
-            }
         }
 
         .charts-row {
@@ -701,30 +577,7 @@ onUnmounted(() => {
             gap: 6px;
             margin-bottom: 12px;
 
-            .stat-card {
-                flex: 1 1 calc(50% - 3px);
-                min-width: 0;
-
-                .stat-icon {
-                    width: 36px;
-                    height: 36px;
-                    border-radius: 8px;
-
-                    .el-icon {
-                        font-size: 20px;
-                    }
-                }
-
-                .stat-info {
-                    .stat-value {
-                        font-size: 22px;
-                    }
-
-                    .stat-label {
-                        font-size: 12px;
-                    }
-                }
-            }
+            // StatCard 响应式由组件自身管理
         }
 
         .charts-row {
@@ -740,14 +593,6 @@ onUnmounted(() => {
                 }
             }
         }
-    }
-}
-</style>
-
-<style lang="less">
-html.dark {
-    .dashboard-container .stat-card .stat-label {
-        color: #94a3b8;
     }
 }
 </style>

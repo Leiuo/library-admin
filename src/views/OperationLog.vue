@@ -39,16 +39,11 @@
                 <el-table-column prop="target" label="操作对象" min-width="160" show-overflow-tooltip />
                 <el-table-column prop="detail" label="详情" min-width="120" show-overflow-tooltip />
             </el-table>
-            <div class="pagination-wrapper">
-                <el-pagination
-                    v-model:current-page="currentPage"
-                    v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]"
-                    :total="filteredLogs.length"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    background
-                />
-            </div>
+            <PaginationBox
+                v-model:current-page="currentPage"
+                v-model:page-size="pageSize"
+                :total="filteredLogs.length"
+            />
         </div>
     </div>
 </template>
@@ -57,6 +52,7 @@
 import { ref, computed, onMounted, watch } from 'vue';
 import { getLogs, clearLogs } from '../api/mock';
 import { ElMessage } from 'element-plus';
+import PaginationBox from '../components/PaginationBox.vue';
 
 const logs = ref([]);
 const loading = ref(false);
@@ -174,11 +170,6 @@ onMounted(refresh);
         overflow-x: auto;
     }
 
-    .pagination-wrapper {
-        margin-top: 16px;
-        display: flex;
-        justify-content: flex-end;
-    }
 }
 
 @media (max-width: 767px) {

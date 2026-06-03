@@ -6,50 +6,10 @@
         </div>
 
         <div class="history-stat">
-            <el-card class="stat-card total-borrow-card" shadow="hover">
-                <div class="stat-icon blue">
-                    <el-icon>
-                        <Collection />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.totalBorrows || 0 }}</div>
-                    <div class="stat-label">累计借阅</div>
-                </div>
-            </el-card>
-            <el-card class="stat-card borrowing-card" shadow="hover">
-                <div class="stat-icon orange">
-                    <el-icon>
-                        <Reading />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.activeBorrows || 0 }}</div>
-                    <div class="stat-label">借出中</div>
-                </div>
-            </el-card>
-            <el-card class="stat-card returned-card" shadow="hover">
-                <div class="stat-icon green">
-                    <el-icon>
-                        <CircleCheckFilled />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value returned-value">{{ stats.returnedBorrows || 0 }}</div>
-                    <div class="stat-label returned-label">已归还</div>
-                </div>
-            </el-card>
-            <el-card class="stat-card overdue-card" shadow="hover">
-                <div class="stat-icon red">
-                    <el-icon>
-                        <WarningFilled />
-                    </el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value overdue-value">{{ stats.overdue || 0 }}</div>
-                    <div class="stat-label overdue-label">逾期中</div>
-                </div>
-            </el-card>
+            <StatCard :icon="Collection" color="blue" :value="stats.totalBorrows || 0" label="累计借阅" />
+            <StatCard :icon="Reading" color="orange" :value="stats.activeBorrows || 0" label="借出中" />
+            <StatCard :icon="CircleCheckFilled" color="green" :value="stats.returnedBorrows || 0" label="已归还" />
+            <StatCard :icon="WarningFilled" color="red" :value="stats.overdue || 0" label="逾期中" />
         </div>
 
         <div class="table-wrapper">
@@ -66,11 +26,11 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <div class="pagination-wrapper">
-                <el-pagination v-model:current-page="currentPage" v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]" :total="filteredBorrows.length"
-                    layout="total, sizes, prev, pager, next, jumper" background />
-            </div>
+            <PaginationBox
+                v-model:current-page="currentPage"
+                v-model:page-size="pageSize"
+                :total="filteredBorrows.length"
+            />
         </div>
     </div>
 </template>
@@ -80,6 +40,9 @@ import { computed, reactive, ref, onMounted } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
 import { getReaders, getBorrows } from '../api/mock';
 import { ElMessage } from 'element-plus';
+import { Collection, Reading, CircleCheckFilled, WarningFilled } from '@element-plus/icons-vue';
+import StatCard from '../components/StatCard.vue';
+import PaginationBox from '../components/PaginationBox.vue';
 
 const router = useRouter();
 const route = useRoute();
@@ -166,117 +129,18 @@ onMounted(() => {
         margin-bottom: 16px;
     }
 
-    .total-borrow-card:hover,
-    .borrowing-card:hover {
-        border-color: #90939975;
-    }
-
     .history-stat {
         display: flex;
         gap: 10px;
         margin-bottom: 24px;
-
-        .stat-card {
-            flex: 1;
-            cursor: pointer;
-
-            &:hover {
-                transform: translateY(-3px);
-            }
-
-            :deep(.el-card__body) {
-                display: flex;
-                flex-direction: column;
-                justify-content: center;
-                align-items: center;
-            }
-
-            .stat-icon {
-                width: 52px;
-                height: 52px;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 5px;
-
-                .el-icon {
-                    color: #fff;
-                    font-size: 32px;
-                }
-            }
-
-            .blue {
-                background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%);
-            }
-
-            .green {
-                background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%);
-            }
-
-            .orange {
-                background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%);
-            }
-
-            .red {
-                background: linear-gradient(135deg, #ef4444 0%, #f87171 100%);
-            }
-
-            .stat-info {
-                text-align: center;
-
-                .stat-value {
-                    font-size: 32px;
-                    font-weight: 600;
-                }
-
-                .stat-label {
-                    color: #909399;
-                    font-size: 14px;
-                    margin-top: 5px;
-                }
-
-                .returned-value,
-                .returned-label {
-                    color: #22c55e;
-                }
-
-                .overdue-value,
-                .overdue-label {
-                    color: #ef4444;
-                }
-            }
-        }
-
-        .returned-card:hover {
-            border-color: #22c55e62;
-        }
-
-        .overdue-card:hover {
-            border-color: rgba(239, 68, 68, 0.3);
-        }
     }
 
     .table-wrapper {
         overflow-x: auto;
-
-        .pagination-wrapper {
-            margin-top: 16px;
-            display: flex;
-            justify-content: flex-end;
-        }
     }
 
     :deep(.overdue-row) {
         background-color: rgba(161, 11, 11, 0.159) !important;
-    }
-}
-</style>
-
-<style lang="less">
-html.dark {
-    .history-stat .stat-card {
-        .stat-label { color: #94a3b8; }
     }
 }
 </style>

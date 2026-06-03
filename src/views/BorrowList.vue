@@ -15,13 +15,8 @@
             </el-button>
         </div>
 
-        <transition name="undo-fade">
-            <div v-if="undoState" class="undo-bar">
-                <span>{{ undoState.message }}</span>
-                <el-button link type="primary" @click="handleUndo">撤销</el-button>
-                <el-icon class="undo-close" @click="clearUndo"><Close /></el-icon>
-            </div>
-        </transition>
+        <UndoBar :visible="!!undoState" :message="undoState?.message || ''"
+            @undo="handleUndo" @close="clearUndo" />
 
         <div class="table-wrapper">
             <el-table :data="paginatedBorrows" border stripe :row-class-name="rowClassName" v-loading="loading" @selection-change="handleSelectionChange">
@@ -55,13 +50,10 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-wrapper">
-                <el-pagination
+                <PaginationBox
                     v-model:current-page="currentPage"
                     v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]"
                     :total="filteredBorrows.length"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    background
                 />
             </div>
         </div>
@@ -107,7 +99,8 @@
 <script setup>
 import { ref, onMounted, onUnmounted, computed, watch } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
-import { Close } from '@element-plus/icons-vue';
+import UndoBar from '../components/UndoBar.vue';
+import PaginationBox from '../components/PaginationBox.vue';
 import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows, getSettings, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
 
@@ -430,36 +423,6 @@ onUnmounted(() => {
 </script>
 
 <style lang="less" scoped>
-.undo-bar {
-    display: flex;
-    align-items: center;
-    gap: 8px;
-    padding: 10px 16px;
-    margin-bottom: 12px;
-    background: #ecfdf5;
-    border: 1px solid #a7f3d0;
-    border-radius: 8px;
-    font-size: 14px;
-    color: #065f46;
-
-    .undo-close {
-        margin-left: auto;
-        cursor: pointer;
-        color: #6b7280;
-        &:hover { color: #374151; }
-    }
-}
-
-.undo-fade-enter-active,
-.undo-fade-leave-active {
-    transition: all 0.3s ease;
-}
-.undo-fade-enter-from,
-.undo-fade-leave-to {
-    opacity: 0;
-    transform: translateY(-8px);
-}
-
 .borrowlist-container {
     .search-area {
         margin-bottom: 16px;
@@ -476,11 +439,6 @@ onUnmounted(() => {
         overflow-x: auto;
     }
 
-    .pagination-wrapper {
-        margin-top: 16px;
-        display: flex;
-        justify-content: flex-end;
-    }
 
     .fine-text {
         color: #ef4444;
@@ -511,16 +469,6 @@ onUnmounted(() => {
 @media (min-width: 768px) and (max-width: 1023px) {
     :deep(.el-dialog) {
         width: 60% !important;
-    }
-}
-</style>
-
-<style lang="less">
-html.dark {
-    .undo-bar {
-        background: #064e3b;
-        border-color: #065f46;
-        color: #a7f3d0;
     }
 }
 </style>

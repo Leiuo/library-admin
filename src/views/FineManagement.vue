@@ -2,33 +2,9 @@
     <div class="fine-container">
         <!-- 统计卡片 -->
         <div class="stats-row">
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon red">
-                    <el-icon><WarningFilled /></el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.overdueCount }}</div>
-                    <div class="stat-label">逾期借阅</div>
-                </div>
-            </el-card>
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon orange">
-                    <el-icon><Money /></el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.unpaidAmount.toFixed(1) }}</div>
-                    <div class="stat-label">未缴罚款（元）</div>
-                </div>
-            </el-card>
-            <el-card class="stat-card" shadow="hover">
-                <div class="stat-icon green">
-                    <el-icon><CircleCheckFilled /></el-icon>
-                </div>
-                <div class="stat-info">
-                    <div class="stat-value">{{ stats.paidAmount.toFixed(1) }}</div>
-                    <div class="stat-label">已缴罚款（元）</div>
-                </div>
-            </el-card>
+            <StatCard :icon="WarningFilled" color="red" :value="stats.overdueCount" label="逾期借阅" />
+            <StatCard :icon="Money" color="orange" :value="stats.unpaidAmount.toFixed(1)" label="未缴罚款（元）" />
+            <StatCard :icon="CircleCheckFilled" color="green" :value="stats.paidAmount.toFixed(1)" label="已缴罚款（元）" />
         </div>
 
         <!-- 搜索/筛选 -->
@@ -79,13 +55,10 @@
                 </el-table-column>
             </el-table>
             <div class="pagination-wrapper">
-                <el-pagination
+                <PaginationBox
                     v-model:current-page="currentPage"
                     v-model:page-size="pageSize"
-                    :page-sizes="[10, 20, 50]"
                     :total="filteredFines.length"
-                    layout="total, sizes, prev, pager, next, jumper"
-                    background
                 />
             </div>
         </div>
@@ -97,6 +70,8 @@ import { ref, computed, onMounted, watch } from 'vue';
 import { getBorrows, getSettings, getPaidFines, payFines, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
 import { WarningFilled, Money, CircleCheckFilled } from '@element-plus/icons-vue';
+import StatCard from '../components/StatCard.vue';
+import PaginationBox from '../components/PaginationBox.vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();
@@ -216,43 +191,7 @@ onMounted(fetchData);
         margin-bottom: 20px;
         flex-wrap: wrap;
 
-        .stat-card {
-            flex: 1 1 160px;
-            min-width: 140px;
-
-            &:hover {
-                transform: translateY(-3px);
-                border-color: #90939975;
-            }
-
-            :deep(.el-card__body) {
-                display: flex;
-                flex-direction: column;
-                align-items: center;
-            }
-
-            .stat-icon {
-                width: 46px;
-                height: 46px;
-                border-radius: 12px;
-                display: flex;
-                align-items: center;
-                justify-content: center;
-                margin-bottom: 6px;
-
-                .el-icon { font-size: 26px; color: #fff; }
-            }
-
-            .red    { background: linear-gradient(135deg, #ef4444 0%, #f87171 100%); }
-            .orange { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
-            .green  { background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%); }
-
-            .stat-info {
-                text-align: center;
-                .stat-value { font-size: 28px; font-weight: 600; }
-                .stat-label { color: #909399; font-size: 13px; margin-top: 2px; }
-            }
-        }
+        // StatCard 样式已由组件自身管理
     }
 
     .search-area {
@@ -266,11 +205,6 @@ onMounted(fetchData);
         overflow-x: auto;
     }
 
-    .pagination-wrapper {
-        margin-top: 16px;
-        display: flex;
-        justify-content: flex-end;
-    }
 
     .overdue-days { color: #ef4444; font-weight: 500; }
     .fine-amount { color: #f59e0b; font-weight: 500; }
@@ -280,22 +214,11 @@ onMounted(fetchData);
     .fine-container {
         .stats-row {
             gap: 8px;
-            .stat-card {
-                flex: 1 1 calc(50% - 4px);
-                min-width: 140px;
-            }
+            // StatCard 响应式由组件自身管理
         }
         .search-area .el-input {
             width: 100% !important;
         }
-    }
-}
-</style>
-
-<style lang="less">
-html.dark {
-    .fine-container .stat-card .stat-label {
-        color: #94a3b8;
     }
 }
 </style>
