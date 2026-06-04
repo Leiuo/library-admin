@@ -78,7 +78,9 @@ const actionOptions = [
     { label: '撤销删除读者', value: 'restore_reader' },
     { label: '撤销删除借阅', value: 'restore_borrow' },
     { label: '删除分类', value: 'delete_category' },
-    { label: '撤销删除分类', value: 'restore_category' }
+    { label: '撤销删除分类', value: 'restore_category' },
+    { label: '删除公告', value: 'delete_announcement' },
+    { label: '撤销删除公告', value: 'restore_announcement' }
 ];
 
 const actionLabel = (action) => {
