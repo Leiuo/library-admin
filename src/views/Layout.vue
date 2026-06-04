@@ -138,14 +138,23 @@
             </el-header>
             <el-main>
                 <div class="main-header">
-                    <transition-group name="tag-slide" tag="div" class="tags-wrapper">
-                        <el-tag v-for="tag in dynamicTags" :key="tag.path" closable :disable-transitions="false"
-                            :effect="route.path === tag.path ? 'dark' : 'plain'"
-                            :type="route.path === tag.path ? 'primary' : 'info'" @close="handleClose(tag)"
-                            @click="handleClick(tag)" size="large">
-                            {{ tag.title }}
+                    <div class="tags-wrapper">
+                        <el-tag class="home-tag"
+                            :effect="route.path === homePath ? 'dark' : 'plain'"
+                            :type="route.path === homePath ? 'primary' : 'info'"
+                            @click="goHome" size="large">
+                            通知公告
+                            <el-icon class="home-tag-icon"><HomeFilled /></el-icon>
                         </el-tag>
-                    </transition-group>
+                        <transition-group name="tag-slide" tag="div" class="tags-dynamic">
+                            <el-tag v-for="tag in dynamicTags" :key="tag.path" closable :disable-transitions="false"
+                                :effect="route.path === tag.path ? 'dark' : 'plain'"
+                                :type="route.path === tag.path ? 'primary' : 'info'" @close="handleClose(tag)"
+                                @click="handleClick(tag)" size="large">
+                                {{ tag.title }}
+                            </el-tag>
+                        </transition-group>
+                    </div>
                 </div>
 
                 <!-- <router-view /> -->
@@ -169,7 +178,7 @@ import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { useRoute, useRouter } from 'vue-router';
 import { ref, computed, watch, onMounted, onUnmounted } from 'vue';
-import { DataLine, Setting, DocumentChecked, Money, Sunny, Moon } from '@element-plus/icons-vue';
+import { DataLine, Setting, DocumentChecked, Money, Sunny, Moon, HomeFilled } from '@element-plus/icons-vue';
 import { ElMessageBox } from 'element-plus';
 
 const userStore = useUserStore();
@@ -180,11 +189,13 @@ const router = useRouter();
 const isCollapse = ref(false);
 const isMobile = ref(window.innerWidth < 768);
 
+const homePath = '/announcements';
 const dynamicTags = ref([]);
 
 watch(
     () => route.path,
     (newPath) => {
+        if (newPath === homePath) return;
         let title = route.meta?.title;
         if (!title) return;
         if (dynamicTags.value.some(tag => tag.path === newPath)) return;
@@ -213,6 +224,10 @@ const handleClose = (tag) => {
 
 const handleClick = (tag) => {
     router.push(tag.fullPath || tag.path);
+};
+
+const goHome = () => {
+    router.push(homePath);
 };
 
 
@@ -380,6 +395,8 @@ const breadcrumbs = computed(() => {
 
     :deep(.el-main) {
         background-color: var(--el-bg-color-page);
+
+        --el-main-padding: 0 20px 20px 20px;
     }
 }
 
@@ -489,11 +506,46 @@ const breadcrumbs = computed(() => {
 }
 
 .main-header {
-    margin-bottom: 16px;
+    position: sticky;
+    top: 0;
+    z-index: 10;
+    margin-bottom: 8px;
+    padding-top: 8px;
+    padding-bottom: 4px;
+    background-color: var(--el-bg-color-page);
 
     .tags-wrapper {
         display: flex;
         gap: 8px;
+        align-items: center;
+    }
+
+    .tags-dynamic {
+        display: flex;
+        gap: 8px;
+    }
+
+    .home-tag {
+        font-size: 13px;
+        border-radius: 8px;
+        cursor: pointer;
+        transition: all 0.2s ease;
+        flex-shrink: 0;
+
+        .home-tag-icon {
+            margin-left: 2px;
+            font-size: 12px;
+            opacity: 0.65;
+        }
+
+        &:hover {
+            transform: translateY(-1px);
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+
+            .home-tag-icon {
+                opacity: 1;
+            }
+        }
     }
 
     .el-tag {
