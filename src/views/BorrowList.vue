@@ -21,7 +21,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="7" />
             <el-empty v-else-if="filteredBorrows.length === 0" description="暂无借阅记录" />
-            <el-table v-else :data="paginatedBorrows" border stripe :row-class-name="rowClassName" @selection-change="handleSelectionChange">
+            <el-table v-else :data="paginatedBorrows" :row-class-name="rowClassName" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="记录ID" width="70" />
                 <el-table-column prop="bookTitle" label="图书名称" />

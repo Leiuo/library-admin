@@ -20,7 +20,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="5" />
             <el-empty v-else-if="filteredLogs.length === 0" description="暂无操作日志" />
-            <el-table v-else :data="paginatedLogs" border stripe max-height="calc(100vh - 260px)">
+            <el-table v-else :data="paginatedLogs" max-height="calc(100vh - 260px)">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="time" label="操作时间" width="170" />
                 <el-table-column prop="operator" label="操作人" width="110" />

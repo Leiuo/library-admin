@@ -93,9 +93,48 @@ body,
     transform: scale(0.97);
 }
 
+/* ===== 表格简约化 ===== */
+:root {
+    --el-table-header-bg-color: #f8fafc;
+    --el-table-row-hover-bg-color: #f0fdfa;
+}
+
+.el-table {
+    border-radius: 8px;
+    overflow: hidden;
+}
+
+.el-table th.el-table__cell {
+    font-weight: 500;
+    font-size: 13px;
+    letter-spacing: 0.02em;
+    border-bottom: 1px solid #cbd5e1;
+}
+
+.el-table td.el-table__cell {
+    border-bottom: 1px solid #e2e8f0;
+}
+
+.el-table__body tr:hover > td {
+    background-color: #f0fdfa !important;
+}
+
 /* 表格行 hover 平滑过渡 */
 .el-table__body tr {
-    transition: background-color 0.2s ease;
+    transition: background-color 0.15s ease;
+}
+
+/* 暗色模式表格 */
+html.dark .el-table th.el-table__cell {
+    border-bottom-color: #334155;
+}
+
+html.dark .el-table td.el-table__cell {
+    border-bottom-color: #1e293b;
+}
+
+html.dark .el-table__body tr:hover > td {
+    background-color: rgba(13, 148, 136, 0.12) !important;
 }
 
 /* 对话框弹出: scale + fade */

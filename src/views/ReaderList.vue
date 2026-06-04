@@ -16,7 +16,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="4" />
             <el-empty v-else-if="filteredReaders.length === 0" description="暂无读者数据" />
-            <el-table v-else :data="paginatedReaders" border stripe
+            <el-table v-else :data="paginatedReaders"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="60" />
@@ -72,7 +72,7 @@
             </el-upload>
             <div v-if="previewData.length" class="preview-table">
                 <p>预览（共 {{ previewData.length }} 条）</p>
-                <el-table :data="previewData.slice(0, 5)" border size="small" max-height="200">
+                <el-table :data="previewData.slice(0, 5)" size="small" max-height="200">
                     <el-table-column prop="cardNo" label="借书证号" />
                     <el-table-column prop="name" label="姓名" />
                     <el-table-column prop="phone" label="电话" />

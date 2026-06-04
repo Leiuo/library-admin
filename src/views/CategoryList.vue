@@ -15,7 +15,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="4" />
             <el-empty v-else-if="filteredCategories.length === 0" description="暂无分类数据" />
-            <el-table v-else :data="paginatedCategories" border stripe
+            <el-table v-else :data="paginatedCategories"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="70" />

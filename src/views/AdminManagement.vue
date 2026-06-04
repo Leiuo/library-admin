@@ -9,7 +9,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="5" :cols="4" />
             <el-empty v-else-if="admins.length === 0" description="暂无管理员数据" />
-            <el-table v-else :data="admins" border stripe>
+            <el-table v-else :data="admins">
                 <el-table-column prop="id" label="ID" width="60" />
                 <el-table-column prop="username" label="用户名" />
                 <el-table-column prop="role" label="角色" width="120">

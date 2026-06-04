@@ -24,7 +24,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="6" />
             <el-empty v-else-if="filteredFines.length === 0" description="暂无罚款记录" />
-            <el-table v-else :data="paginatedFines" border stripe
+            <el-table v-else :data="paginatedFines"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" :selectable="isUnpaid" />
                 <el-table-column prop="bookTitle" label="图书名称" show-overflow-tooltip />

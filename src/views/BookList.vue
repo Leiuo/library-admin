@@ -19,7 +19,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="6" />
             <el-empty v-else-if="filteredBooks.length === 0" description="暂无图书数据" />
-            <el-table v-else :data="paginatedBooks" border stripe
+            <el-table v-else :data="paginatedBooks"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
                 <el-table-column prop="id" label="ID" width="60" />
@@ -96,7 +96,7 @@
             </el-upload>
             <div v-if="previewData.length" class="preview-table">
                 <p>预览（共 {{ previewData.length }} 条）</p>
-                <el-table :data="previewData.slice(0, 5)" border size="small" max-height="200">
+                <el-table :data="previewData.slice(0, 5)" size="small" max-height="200">
                     <el-table-column prop="title" label="书名" />
                     <el-table-column prop="author" label="作者" />
                     <el-table-column prop="publisher" label="出版社" />
