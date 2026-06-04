@@ -271,6 +271,7 @@ const breadcrumbs = computed(() => {
 <style lang="less" scoped>
 .layout-aside {
     background-color: var(--sidebar-bg);
+    box-shadow: var(--sidebar-shadow);
     transition: width 0.3s ease;
     white-space: nowrap;
     overflow: hidden;
@@ -282,7 +283,7 @@ const breadcrumbs = computed(() => {
         align-items: center;
         justify-content: center;
         gap: 10px;
-        padding: 22px 12px 18px;
+        padding: 20px 12px 16px;
         border-bottom: 1px solid var(--sidebar-border);
 
         .logo-mark {
@@ -298,18 +299,19 @@ const breadcrumbs = computed(() => {
             overflow: hidden;
 
             .title-main {
-                font-size: 16px;
-                font-weight: 700;
+                font-size: 15px;
+                font-weight: 600;
                 color: var(--sidebar-text-main);
-                letter-spacing: -.3px;
+                letter-spacing: -.2px;
                 white-space: nowrap;
             }
 
             .title-sub {
-                font-size: 11px;
+                font-size: 10px;
                 color: var(--sidebar-text);
-                margin-top: 1px;
+                margin-top: 2px;
                 white-space: nowrap;
+                opacity: 0.7;
             }
         }
     }
@@ -323,8 +325,12 @@ const breadcrumbs = computed(() => {
         background-color: var(--sidebar-bg);
 
         >.el-menu-item,
+        >.el-sub-menu .el-sub-menu__title,
         .el-sub-menu .el-menu-item {
-            border-left: 5px solid transparent;
+            border-left: 3px solid transparent;
+            margin: 2px 8px;
+            border-radius: 6px;
+            font-size: 13px;
 
             .el-icon {
                 transition: transform 0.25s ease;
@@ -334,13 +340,14 @@ const breadcrumbs = computed(() => {
                 background-color: var(--sidebar-hover-bg);
 
                 .el-icon {
-                    transform: scale(1.15);
+                    transform: scale(1.1);
                 }
             }
 
             &:focus,
             &.is-active {
-                border-left: 5px solid var(--sidebar-active-border);
+                border-left: 3px solid var(--sidebar-active-border);
+                border-radius: 0 6px 6px 0;
                 background-color: var(--sidebar-hover-bg);
             }
         }
@@ -348,13 +355,14 @@ const breadcrumbs = computed(() => {
 
     .aside-footer {
         position: absolute;
-        bottom: 10px;
+        bottom: 12px;
         width: 100%;
         text-align: center;
 
         .version {
-            color: var(--el-text-color-secondary);
-            font-size: 12px;
+            color: var(--sidebar-text);
+            font-size: 11px;
+            opacity: 0.5;
         }
     }
 }

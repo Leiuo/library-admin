@@ -52,16 +52,32 @@ body,
 
     --el-bg-color-page: #f1f5f9;
 
-    /* 侧边栏（始终为深色，不随明暗主题变化） */
-    --sidebar-bg: #0f172a;
-    --sidebar-text: #94a3b8;
-    --sidebar-text-active: #2dd4bf;
-    --sidebar-text-main: #fff;
-    --sidebar-border: rgba(148, 163, 184, 0.15);
-    --sidebar-hover-bg: rgba(45, 212, 191, 0.1);
-    --sidebar-active-border: #2dd4bf;
-    --sidebar-logo-start: #0d9488;
-    --sidebar-logo-end: #14b8a6;
+    /* 侧边栏 — 浅色模式（清新简约） */
+    --sidebar-bg: #ffffff;
+    --sidebar-text: #64748b;
+    --sidebar-text-active: #0891b2;
+    --sidebar-text-main: #0f172a;
+    --sidebar-border: #e2e8f0;
+    --sidebar-hover-bg: #f0f9ff;
+    --sidebar-active-border: #0891b2;
+    --sidebar-logo-start: #0891b2;
+    --sidebar-logo-end: #06b6d4;
+
+    --sidebar-shadow: 1px 0 0 0 #f1f5f9, 0 0 20px rgba(0,0,0,0.03);
+}
+
+html.dark {
+    /* 侧边栏 — 深色模式 */
+    --sidebar-bg: #0f1823;
+    --sidebar-text: #7c8aa2;
+    --sidebar-text-active: #22d3ee;
+    --sidebar-text-main: #e2e8f0;
+    --sidebar-border: rgba(148, 163, 184, 0.1);
+    --sidebar-hover-bg: rgba(34, 211, 238, 0.08);
+    --sidebar-active-border: #22d3ee;
+    --sidebar-logo-start: #06b6d4;
+    --sidebar-logo-end: #22d3ee;
+    --sidebar-shadow: none;
 }
 
 
