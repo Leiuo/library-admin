@@ -38,6 +38,12 @@
             </div>
             <el-menu :default-active="$route.path" :collapse="!isMobile && isCollapse" :collapse-transition="false"
                 router class="aside-menu" @select="onMenuSelect">
+                <el-menu-item index="/announcements">
+                    <el-icon>
+                        <Bell />
+                    </el-icon>
+                    <span>通知公告</span>
+                </el-menu-item>
                 <el-menu-item index="/dashboard">
                     <el-icon>
                         <DataLine />
@@ -200,7 +206,7 @@ const handleClose = (tag) => {
             const nextTab = tags[Math.min(index, tags.length - 1)];
             router.push(nextTab.fullPath || nextTab.path);
         } else {
-            router.push('/dashboard');
+            router.push('/announcements');
         }
     }
 };

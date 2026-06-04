@@ -16,7 +16,13 @@ const routes = [
         children: [
             {
                 path: '',
-                redirect: '/dashboard'
+                redirect: '/announcements'
+            },
+            {
+                path: 'announcements',
+                name: 'AnnouncementList',
+                component: () => import('../views/AnnouncementList.vue'),
+                meta: { title: '通知公告', KeepAlive: false }
             },
             {
                 path: 'books',

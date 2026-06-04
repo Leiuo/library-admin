@@ -557,6 +557,60 @@ export const deleteCategories = (ids) => {
     return Promise.resolve(ids.length);
 };
 
+// -------------------- 通知公告模块 --------------------
+const STORAGE_ANNOUNCEMENTS_KEY = 'library_announcements';
+
+function initAnnouncements() {
+    if (!localStorage.getItem(STORAGE_ANNOUNCEMENTS_KEY)) {
+        const now = new Date();
+        const fmt = d => `${d.getFullYear()}-${String(d.getMonth() + 1).padStart(2, '0')}-${String(d.getDate()).padStart(2, '0')}`;
+        const announcements = [
+            { id: 1, title: '欢迎使用图书馆管理系统', content: '系统已正式上线运行，各位管理员可进行图书借阅、读者管理等日常操作。如有问题请联系系统管理员。', priority: 'important', publishDate: fmt(now), publisher: '超级管理员' },
+            { id: 2, title: '端午节开闭馆时间调整通知', content: '端午节期间（6月8日至6月10日），图书馆开放时间调整为 9:00-17:00，6月11日起恢复正常。', priority: 'urgent', publishDate: fmt(now), publisher: '超级管理员' },
+            { id: 3, title: '六月新书上架公告', content: '本月新增科技编程类图书 12 本、文学小说类 8 本，欢迎读者前来借阅。', priority: 'normal', publishDate: fmt(now), publisher: '超级管理员' }
+        ];
+        localStorage.setItem(STORAGE_ANNOUNCEMENTS_KEY, JSON.stringify(announcements));
+    }
+}
+initAnnouncements();
+
+export const getAnnouncements = () => {
+    initAnnouncements();
+    return Promise.resolve(getData(STORAGE_ANNOUNCEMENTS_KEY));
+};
+
+export const addAnnouncement = (data) => {
+    const list = getData(STORAGE_ANNOUNCEMENTS_KEY);
+    const newId = list.length ? Math.max(...list.map(a => a.id)) + 1 : 1;
+    const item = { ...data, id: newId };
+    list.push(item);
+    setData(STORAGE_ANNOUNCEMENTS_KEY, list);
+    return Promise.resolve(item);
+};
+
+export const updateAnnouncement = (id, data) => {
+    const list = getData(STORAGE_ANNOUNCEMENTS_KEY);
+    const idx = list.findIndex(a => a.id === id);
+    if (idx === -1) return Promise.reject(new Error('公告不存在'));
+    list[idx] = { ...list[idx], ...data };
+    setData(STORAGE_ANNOUNCEMENTS_KEY, list);
+    return Promise.resolve(list[idx]);
+};
+
+export const deleteAnnouncement = (id) => {
+    let list = getData(STORAGE_ANNOUNCEMENTS_KEY);
+    list = list.filter(a => a.id !== id);
+    setData(STORAGE_ANNOUNCEMENTS_KEY, list);
+    return Promise.resolve();
+};
+
+export const deleteAnnouncements = (ids) => {
+    let list = getData(STORAGE_ANNOUNCEMENTS_KEY);
+    list = list.filter(a => !ids.includes(a.id));
+    setData(STORAGE_ANNOUNCEMENTS_KEY, list);
+    return Promise.resolve(ids.length);
+};
+
 // -------------------- 罚款管理模块 --------------------
 const STORAGE_FINE_PAID_KEY = 'library_fine_paid';
 
