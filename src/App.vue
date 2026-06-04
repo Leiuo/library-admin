@@ -34,13 +34,13 @@ body,
 
 /* ===== Element Plus 主题色覆盖 ===== */
 :root {
-    --el-color-primary: #0d9488;
-    --el-color-primary-light-3: #5eead4;
-    --el-color-primary-light-5: #99f6e4;
-    --el-color-primary-light-7: #ccfbf1;
-    --el-color-primary-light-8: #f0fdfa;
-    --el-color-primary-light-9: #f0fdfa;
-    --el-color-primary-dark-2: #0f766e;
+    --el-color-primary: #0891b2;
+    --el-color-primary-light-3: #67e8f9;
+    --el-color-primary-light-5: #a5f3fc;
+    --el-color-primary-light-7: #cffafe;
+    --el-color-primary-light-8: #ecfeff;
+    --el-color-primary-light-9: #ecfeff;
+    --el-color-primary-dark-2: #0e7490;
 
     --el-color-success: #22c55e;
     --el-color-warning: #f59e0b;
@@ -83,20 +83,20 @@ html.dark {
 
 /* el-button primary 的 hover/active 状态 */
 .el-button--primary {
-    --el-button-hover-bg-color: #0f766e;
-    --el-button-active-bg-color: #115e59;
-    --el-button-bg-color: #0d9488;
-    --el-button-border-color: #0d9488;
+    --el-button-hover-bg-color: #0e7490;
+    --el-button-active-bg-color: #155e75;
+    --el-button-bg-color: #0891b2;
+    --el-button-border-color: #0891b2;
 }
 
 .el-button--primary:hover {
-    background-color: #0f766e !important;
-    border-color: #0f766e !important;
+    background-color: #0e7490 !important;
+    border-color: #0e7490 !important;
 }
 
 .el-button--primary:active {
-    background-color: #115e59 !important;
-    border-color: #115e59 !important;
+    background-color: #155e75 !important;
+    border-color: #155e75 !important;
 }
 
 /* ===== 微交互 ===== */
@@ -112,7 +112,7 @@ html.dark {
 /* ===== 表格简约化 ===== */
 :root {
     --el-table-header-bg-color: #f8fafc;
-    --el-table-row-hover-bg-color: #f0fdfa;
+    --el-table-row-hover-bg-color: #ecfeff;
 }
 
 .el-table {
@@ -132,7 +132,7 @@ html.dark {
 }
 
 .el-table__body tr:hover > td {
-    background-color: #f0fdfa !important;
+    background-color: #ecfeff !important;
 }
 
 /* 表格行 hover 平滑过渡 */
@@ -150,7 +150,7 @@ html.dark .el-table td.el-table__cell {
 }
 
 html.dark .el-table__body tr:hover > td {
-    background-color: rgba(13, 148, 136, 0.12) !important;
+    background-color: rgba(8, 145, 178, 0.12) !important;
 }
 
 /* 对话框弹出: scale + fade */

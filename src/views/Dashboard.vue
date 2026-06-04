@@ -228,16 +228,16 @@ const renderTrendChart = () => {
             data: monthlyData,
             smooth: true,
             lineStyle: {
-                color: '#0d9488',
+                color: '#0891b2',
                 width: 3
             },
             areaStyle: {
                 opacity: 0.1,
-                color: '#0d9488'
+                color: '#0891b2'
             },
             symbol: 'circle',
             symbolSize: 8,
-            itemStyle: { color: '#0d9488' }
+            itemStyle: { color: '#0891b2' }
         }]
     });
 };
@@ -389,7 +389,7 @@ const renderTopReadersChart = () => {
             type: 'bar',
             data: counts,
             itemStyle: {
-                color: '#0d9488',
+                color: '#0891b2',
                 borderRadius: [0, 4, 4, 0]
             },
             label: {
@@ -422,7 +422,7 @@ const renderCategoryChart = () => {
     const names = data.map(d => d.name);
     const values = data.map(d => d.value);
 
-    const colors = ['#0d9488', '#f59e0b', '#6366f1', '#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316'];
+    const colors = ['#0891b2', '#f59e0b', '#6366f1', '#22c55e', '#ef4444', '#8b5cf6', '#06b6d4', '#f97316'];
     categoryChart.setOption({
         tooltip: {
             trigger: 'axis',

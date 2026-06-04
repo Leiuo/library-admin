@@ -59,7 +59,7 @@ defineProps({
         transform: scale(1.12);
     }
 
-    .blue   { background: linear-gradient(135deg, #0d9488 0%, #14b8a6 100%); }
+    .blue   { background: linear-gradient(135deg, #0891b2 0%, #06b6d4 100%); }
     .green  { background: linear-gradient(135deg, #22c55e 0%, #4ade80 100%); }
     .orange { background: linear-gradient(135deg, #f59e0b 0%, #fbbf24 100%); }
     .purple { background: linear-gradient(135deg, #6366f1 0%, #818cf8 100%); }

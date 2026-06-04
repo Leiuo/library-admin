@@ -100,7 +100,7 @@ const goBack = () => {
                 transform: translateX(-50%);
                 width: 16px;
                 height: 90px;
-                background: linear-gradient(180deg, #ccfbf1 0%, #0d9488 100%);
+                background: linear-gradient(180deg, #cffafe 0%, #0891b2 100%);
                 border-radius: 3px 3px 0 0;
                 z-index: 2;
             }
@@ -111,7 +111,7 @@ const goBack = () => {
                 right: 50%;
                 width: 56px;
                 height: 78px;
-                background: linear-gradient(135deg, #f0fdfa, #ccfbf1);
+                background: linear-gradient(135deg, #ecfeff, #cffafe);
                 border-radius: 4px 0 0 4px;
                 transform: perspective(80px) rotateY(8deg);
                 transform-origin: right center;
@@ -125,7 +125,7 @@ const goBack = () => {
                 left: 50%;
                 width: 56px;
                 height: 78px;
-                background: linear-gradient(225deg, #f0fdfa, #ccfbf1);
+                background: linear-gradient(225deg, #ecfeff, #cffafe);
                 border-radius: 0 4px 4px 0;
                 transform: perspective(80px) rotateY(-8deg);
                 transform-origin: left center;
@@ -163,7 +163,7 @@ const goBack = () => {
     .error-code {
         font-size: 96px;
         font-weight: 800;
-        background: linear-gradient(135deg, #0d9488 0%, #14b8a6 50%, #2dd4bf 100%);
+        background: linear-gradient(135deg, #0891b2 0%, #06b6d4 50%, #22d3ee 100%);
         -webkit-background-clip: text;
         -webkit-text-fill-color: transparent;
         background-clip: text;
@@ -196,7 +196,7 @@ const goBack = () => {
             align-items: center;
             gap: 6px;
             padding: 10px 24px;
-            background: linear-gradient(135deg, #0d9488, #14b8a6);
+            background: linear-gradient(135deg, #0891b2, #06b6d4);
             color: #fff;
             text-decoration: none;
             border-radius: 8px;
@@ -206,7 +206,7 @@ const goBack = () => {
 
             &:hover {
                 transform: translateY(-2px);
-                box-shadow: 0 6px 20px rgba(13, 148, 136, 0.35);
+                box-shadow: 0 6px 20px rgba(8, 145, 178, 0.35);
                 color: #fff;
             }
         }

@@ -24,8 +24,8 @@
                         <line x1="27" y1="25" x2="31" y2="25" stroke="#94a3b8" stroke-width="1" stroke-linecap="round" />
                         <defs>
                             <linearGradient id="login-logo-grad" x1="0" y1="0" x2="44" y2="44">
-                                <stop offset="0%" stop-color="#0d9488" />
-                                <stop offset="100%" stop-color="#2dd4bf" />
+                                <stop offset="0%" stop-color="#0891b2" />
+                                <stop offset="100%" stop-color="#22d3ee" />
                             </linearGradient>
                         </defs>
                     </svg>
@@ -146,8 +146,8 @@ const handleLogin = async () => {
         position: relative;
         overflow: hidden;
         background:
-            radial-gradient(circle, rgba(148, 163, 184, 0.06) 1px, transparent 1px),
-            linear-gradient(160deg, #0f172a 0%, #0c2333 45%, #0a1628 100%);
+            radial-gradient(circle, rgba(8, 145, 178, 0.05) 1px, transparent 1px),
+            linear-gradient(160deg, #ecfeff 0%, #f0f9ff 45%, #f8fafc 100%);
         background-size: 28px 28px, 100% 100%;
 
         .brand-glow {
@@ -158,7 +158,7 @@ const handleLogin = async () => {
             &--top {
                 width: 360px;
                 height: 360px;
-                background: radial-gradient(circle, rgba(13, 148, 136, 0.12), transparent 70%);
+                background: radial-gradient(circle, rgba(8, 145, 178, 0.15), transparent 70%);
                 top: -100px;
                 right: -80px;
             }
@@ -166,7 +166,7 @@ const handleLogin = async () => {
             &--bottom {
                 width: 280px;
                 height: 280px;
-                background: radial-gradient(circle, rgba(45, 212, 191, 0.08), transparent 70%);
+                background: radial-gradient(circle, rgba(34, 211, 238, 0.12), transparent 70%);
                 bottom: -80px;
                 left: -60px;
             }
@@ -179,12 +179,12 @@ const handleLogin = async () => {
 
             .brand-logo {
                 margin-bottom: 28px;
-                filter: drop-shadow(0 8px 24px rgba(13, 148, 136, 0.3));
+                filter: drop-shadow(0 8px 24px rgba(8, 145, 178, 0.3));
                 animation: fadeInUp 0.5s ease backwards;
             }
 
             .brand-name {
-                color: #fff;
+                color: #0f172a;
                 font-size: 44px;
                 font-weight: 800;
                 letter-spacing: -1.5px;
@@ -196,14 +196,14 @@ const handleLogin = async () => {
             .brand-divider {
                 width: 40px;
                 height: 3px;
-                background: linear-gradient(90deg, #0d9488, #2dd4bf);
+                background: linear-gradient(90deg, #0891b2, #22d3ee);
                 border-radius: 2px;
                 margin: 20px auto;
                 animation: fadeInUp 0.5s 0.18s ease backwards;
             }
 
             .brand-slogan {
-                color: #94a3b8;
+                color: #64748b;
                 font-size: 15px;
                 line-height: 1.6;
                 margin: 0;
@@ -275,10 +275,10 @@ const handleLogin = async () => {
                 height: 44px;
                 font-size: 16px;
                 border-radius: 8px;
-                background: #0d9488;
+                background: #0891b2;
 
                 &:hover {
-                    background: #0f766e;
+                    background: #0e7490;
                 }
             }
         }
@@ -299,7 +299,7 @@ const handleLogin = async () => {
                 width: 5px;
                 height: 5px;
                 border-radius: 50%;
-                background-color: #0d9488;
+                background-color: #0891b2;
             }
         }
     }
@@ -326,11 +326,14 @@ html.dark {
         background-size: 28px 28px, 100% 100%;
 
         .brand-glow--top {
-            background: radial-gradient(circle, rgba(13, 148, 136, 0.08), transparent 70%);
+            background: radial-gradient(circle, rgba(8, 145, 178, 0.08), transparent 70%);
         }
         .brand-glow--bottom {
-            background: radial-gradient(circle, rgba(45, 212, 191, 0.05), transparent 70%);
+            background: radial-gradient(circle, rgba(34, 211, 238, 0.05), transparent 70%);
         }
     }
+
+    .brand-name { color: #e2e8f0 !important; }
+    .brand-slogan { color: #94a3b8 !important; }
 }
 </style>
