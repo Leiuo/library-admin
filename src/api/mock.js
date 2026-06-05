@@ -470,14 +470,21 @@ const STORAGE_CATEGORIES_KEY = 'library_categories';
 function initCategories() {
     if (!localStorage.getItem(STORAGE_CATEGORIES_KEY)) {
         const categories = [
-            { id: 1, name: '文学小说', description: '中外文学名著及畅销小说' },
-            { id: 2, name: '科技编程', description: '计算机科学与编程技术书籍' },
-            { id: 3, name: '历史哲学', description: '历史研究与哲学思想著作' },
-            { id: 4, name: '科学科普', description: '自然科学与科普读物' },
-            { id: 5, name: '经济管理', description: '经济学与管理学书籍' },
-            { id: 6, name: '艺术设计', description: '绘画、设计、音乐等艺术类' },
-            { id: 7, name: '教育学习', description: '教材教辅与学习参考书' },
-            { id: 8, name: '生活百科', description: '生活常识、健康养生等' }
+            { id: 1, name: '文学小说', description: '中外文学名著及畅销小说', parentId: null },
+            { id: 2, name: '中国文学', description: '中国古典及现当代文学', parentId: 1 },
+            { id: 3, name: '外国文学', description: '外国经典及现代文学', parentId: 1 },
+            { id: 4, name: '科技编程', description: '计算机科学与编程技术书籍', parentId: null },
+            { id: 5, name: '前端开发', description: 'HTML/CSS/JavaScript/框架', parentId: 4 },
+            { id: 6, name: '后端开发', description: '服务端语言与数据库技术', parentId: 4 },
+            { id: 7, name: '人工智能', description: '机器学习与深度学习', parentId: 4 },
+            { id: 8, name: '历史哲学', description: '历史研究与哲学思想著作', parentId: null },
+            { id: 9, name: '中国历史', description: '中国古代及近现代历史', parentId: 8 },
+            { id: 10, name: '西方哲学', description: '西方哲学思想与流派', parentId: 8 },
+            { id: 11, name: '科学科普', description: '自然科学与科普读物', parentId: null },
+            { id: 12, name: '经济管理', description: '经济学与管理学书籍', parentId: null },
+            { id: 13, name: '艺术设计', description: '绘画、设计、音乐等艺术类', parentId: null },
+            { id: 14, name: '教育学习', description: '教材教辅与学习参考书', parentId: null },
+            { id: 15, name: '生活百科', description: '生活常识、健康养生等', parentId: null }
         ];
         localStorage.setItem(STORAGE_CATEGORIES_KEY, JSON.stringify(categories));
     }
@@ -488,10 +495,28 @@ export const getCategories = () => {
     initCategories();
     const categories = getData(STORAGE_CATEGORIES_KEY);
     const books = getData(STORAGE_KEYS.BOOKS);
-    return Promise.resolve(categories.map(cat => ({
-        ...cat,
-        bookCount: books.filter(b => b.category === cat.name).length
-    })));
+
+    // 每个分类自身的直接图书数量
+    const directCount = {};
+    categories.forEach(cat => {
+        directCount[cat.id] = books.filter(b => b.category === cat.name).length;
+    });
+
+    // 递归收集子孙分类 ID
+    const getDescendantIds = (parentId) => {
+        const children = categories.filter(c => c.parentId === parentId);
+        return children.reduce((acc, c) => acc.concat(c.id, getDescendantIds(c.id)), []);
+    };
+
+    return Promise.resolve(categories.map(cat => {
+        const allIds = [cat.id, ...getDescendantIds(cat.id)];
+        const totalCount = allIds.reduce((sum, id) => sum + (directCount[id] || 0), 0);
+        return {
+            ...cat,
+            parentId: cat.parentId ?? null,
+            bookCount: totalCount
+        };
+    }));
 };
 
 export const addCategory = (category) => {
@@ -499,8 +524,11 @@ export const addCategory = (category) => {
     if (categories.some(c => c.name === category.name)) {
         return Promise.reject(new Error('该分类名称已存在'));
     }
+    if (category.parentId != null && !categories.some(c => c.id === category.parentId)) {
+        return Promise.reject(new Error('父分类不存在'));
+    }
     const newId = categories.length ? Math.max(...categories.map(c => c.id)) + 1 : 1;
-    const newCategory = { ...category, id: newId };
+    const newCategory = { ...category, parentId: category.parentId ?? null, id: newId };
     categories.push(newCategory);
     setData(STORAGE_CATEGORIES_KEY, categories);
     return Promise.resolve(newCategory);
@@ -512,6 +540,17 @@ export const updateCategory = (id, data) => {
     if (idx === -1) return Promise.reject(new Error('分类不存在'));
     if (data.name && data.name !== categories[idx].name && categories.some(c => c.name === data.name)) {
         return Promise.reject(new Error('该分类名称已存在'));
+    }
+    // 防止循环引用：parentId 不能是自己或自己的子孙
+    if (data.parentId !== undefined && data.parentId != null) {
+        if (data.parentId === id) return Promise.reject(new Error('不能将自己设为父分类'));
+        const getDescendantIds = (pid) => {
+            const children = categories.filter(c => c.parentId === pid);
+            return children.reduce((acc, c) => acc.concat(c.id, getDescendantIds(c.id)), []);
+        };
+        if (getDescendantIds(id).includes(data.parentId)) {
+            return Promise.reject(new Error('不能将子分类设为父分类'));
+        }
     }
     const oldName = categories[idx].name;
     categories[idx] = { ...categories[idx], ...data };
@@ -532,6 +571,9 @@ export const deleteCategory = (id) => {
     const categories = getData(STORAGE_CATEGORIES_KEY);
     const target = categories.find(c => c.id === id);
     if (!target) return Promise.reject(new Error('分类不存在'));
+    if (categories.some(c => c.parentId === id)) {
+        return Promise.reject(new Error('该分类下有子分类，请先删除子分类'));
+    }
     const books = getData(STORAGE_KEYS.BOOKS);
     if (books.some(b => b.category === target.name)) {
         return Promise.reject(new Error(`该分类下有 ${books.filter(b => b.category === target.name).length} 本图书，不能删除`));
@@ -546,12 +588,15 @@ export const deleteCategories = (ids) => {
     const failedNames = [];
     ids.forEach(id => {
         const cat = categories.find(c => c.id === id);
-        if (cat && books.some(b => b.category === cat.name)) {
+        if (!cat) return;
+        if (categories.some(c => c.parentId === id)) {
+            failedNames.push(`${cat.name}(有子分类)`);
+        } else if (books.some(b => b.category === cat.name)) {
             failedNames.push(cat.name);
         }
     });
     if (failedNames.length) {
-        return Promise.reject(new Error(`分类"${failedNames.join('、')}"下尚有图书，不能删除`));
+        return Promise.reject(new Error(`分类"${failedNames.join('、')}"下尚有图书或子分类，不能删除`));
     }
     setData(STORAGE_CATEGORIES_KEY, categories.filter(c => !ids.includes(c.id)));
     return Promise.resolve(ids.length);

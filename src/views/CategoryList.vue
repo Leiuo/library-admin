@@ -14,14 +14,30 @@
 
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="4" />
-            <el-empty v-else-if="filteredCategories.length === 0" description="暂无分类数据" />
-            <el-table v-else :data="paginatedCategories"
+            <el-empty v-else-if="flatDisplayList.length === 0" description="暂无分类数据" />
+            <el-table v-else :data="flatDisplayList" row-key="id"
                 @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" />
-                <el-table-column prop="id" label="ID" width="70" />
-                <el-table-column prop="name" label="分类名称" width="140">
+                <el-table-column label="ID" width="100">
                     <template #default="{ row }">
-                        <el-tag size="default" type="primary">{{ row.name }}</el-tag>
+                        <span :style="{ paddingLeft: row.level * 24 + 'px', whiteSpace: 'nowrap' }">
+                            <span v-if="row.hasChildren" class="tree-toggle"
+                                @click="toggleExpand(row.id)">
+                                <el-icon :size="14">
+                                    <ArrowRight v-if="!expandedIds.includes(row.id)" />
+                                    <ArrowDown v-else />
+                                </el-icon>
+                            </span>
+                            <span v-else class="tree-toggle tree-toggle--placeholder"></span>
+                            {{ row.id }}
+                        </span>
+                    </template>
+                </el-table-column>
+                <el-table-column prop="name" label="分类名称" width="160">
+                    <template #default="{ row }">
+                        <el-tag :type="row.parentId == null ? 'primary' : 'info'">
+                            {{ row.name }}
+                        </el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
@@ -33,16 +49,22 @@
                     </template>
                 </el-table-column>
             </el-table>
-            <PaginationBox
-                v-if="filteredCategories.length > 0"
-                v-model:current-page="currentPage"
-                v-model:page-size="pageSize"
-                :total="filteredCategories.length"
-            />
         </div>
 
         <el-dialog v-model="dialogVisible" :title="dialogTitle" width="30%">
             <el-form :model="categoryForm" :rules="rules" ref="formRef" label-width="80px">
+                <el-form-item label="父分类" prop="parentId">
+                    <el-tree-select
+                        v-model="categoryForm.parentId"
+                        :data="parentOptions"
+                        :props="{ label: 'name', children: 'children', value: 'id' }"
+                        placeholder="无（一级分类）"
+                        clearable
+                        check-strictly
+                        value-key="id"
+                        style="width: 100%"
+                    />
+                </el-form-item>
                 <el-form-item label="分类名称" prop="name">
                     <el-input v-model="categoryForm.name" placeholder="请输入分类名称" />
                 </el-form-item>
@@ -59,10 +81,10 @@
 </template>
 
 <script setup>
-import { ref, computed, onMounted, onUnmounted, watch } from 'vue';
+import { ref, computed, onMounted, onUnmounted } from 'vue';
 import { ElMessage, ElMessageBox } from 'element-plus';
+import { ArrowRight, ArrowDown } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
-import PaginationBox from '../components/PaginationBox.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';
 import { getCategories, addCategory, updateCategory, deleteCategory, deleteCategories, addLog } from '../api/mock';
 import { useUserStore } from '../stores/user';
@@ -74,14 +96,42 @@ const searchQuery = ref('');
 const categories = ref([]);
 const loading = ref(false);
 
-const handleSearch = () => {
-    searchQuery.value = searchKeyword.value;
+const buildTree = (flatList) => {
+    const map = {};
+    const roots = [];
+    flatList.forEach(item => {
+        map[item.id] = { ...item, children: [] };
+    });
+    flatList.forEach(item => {
+        if (item.parentId != null && map[item.parentId]) {
+            map[item.parentId].children.push(map[item.id]);
+        } else {
+            roots.push(map[item.id]);
+        }
+    });
+    return roots;
+};
+
+const getAncestorIds = (id, flatList) => {
+    const ids = [];
+    let current = flatList.find(c => c.id === id);
+    while (current && current.parentId != null) {
+        ids.push(current.parentId);
+        current = flatList.find(c => c.id === current.parentId);
+    }
+    return ids;
+};
+
+const getDescendantIds = (id, flatList) => {
+    const children = flatList.filter(c => c.parentId === id);
+    return children.reduce((acc, c) => acc.concat(c.id, getDescendantIds(c.id, flatList)), []);
 };
 
 const fetchCategories = async () => {
     loading.value = true;
     try {
         categories.value = await getCategories();
+        expandedIds.value = [];
     } catch (error) {
         ElMessage.error('获取分类列表失败');
     } finally {
@@ -89,23 +139,61 @@ const fetchCategories = async () => {
     }
 };
 
-const filteredCategories = computed(() => {
-    if (!searchQuery.value) return categories.value;
-    const keyword = searchQuery.value.toLowerCase();
-    return categories.value.filter(c => c.name.toLowerCase().includes(keyword));
+const categoryTree = computed(() => buildTree(categories.value));
+
+// 展开/折叠状态
+const expandedIds = ref([]);
+
+const toggleExpand = (id) => {
+    const idx = expandedIds.value.indexOf(id);
+    if (idx >= 0) {
+        expandedIds.value.splice(idx, 1);
+    } else {
+        expandedIds.value.push(id);
+    }
+};
+
+// 将树扁平化为显示列表，根据展开状态决定是否包含子节点
+const flattenForDisplay = (nodes, level, result) => {
+    nodes.forEach(node => {
+        const hasChildren = node.children && node.children.length > 0;
+        const { children, ...rest } = node;
+        result.push({ ...rest, level, hasChildren });
+        if (hasChildren && expandedIds.value.includes(node.id)) {
+            flattenForDisplay(node.children, level + 1, result);
+        }
+    });
+};
+
+// 搜索过滤：收集匹配节点 + 祖先 + 子孙，然后构建过滤树再扁平化
+const flatDisplayList = computed(() => {
+    let sourceTree;
+    if (searchQuery.value) {
+        const keyword = searchQuery.value.toLowerCase();
+        const matched = categories.value.filter(c => c.name.toLowerCase().includes(keyword));
+        const matchedIds = new Set(matched.map(c => c.id));
+        matched.forEach(c => {
+            getAncestorIds(c.id, categories.value).forEach(id => matchedIds.add(id));
+            getDescendantIds(c.id, categories.value).forEach(id => matchedIds.add(id));
+        });
+        sourceTree = buildTree(categories.value.filter(c => matchedIds.has(c.id)));
+    } else {
+        sourceTree = categoryTree.value;
+    }
+
+    const result = [];
+    flattenForDisplay(sourceTree, 0, result);
+    return result;
 });
 
-const currentPage = ref(1);
-const pageSize = ref(10);
-const paginatedCategories = computed(() => {
-    const start = (currentPage.value - 1) * pageSize.value;
-    return filteredCategories.value.slice(start, start + pageSize.value);
-});
-watch(searchQuery, () => { currentPage.value = 1; });
+const handleSearch = () => {
+    searchQuery.value = searchKeyword.value;
+};
 
+// ---- 新增 / 编辑对话框 ----
 const dialogVisible = ref(false);
 const dialogTitle = ref('');
-const categoryForm = ref({ name: '', description: '' });
+const categoryForm = ref({ parentId: null, name: '', description: '' });
 const formRef = ref(null);
 let editingId = null;
 
@@ -113,9 +201,20 @@ const rules = {
     name: [{ required: true, message: '分类名称不能为空', trigger: 'blur' }]
 };
 
+const parentOptions = computed(() => {
+    if (editingId == null) return categoryTree.value;
+    const excludeIds = new Set([editingId, ...getDescendantIds(editingId, categories.value)]);
+    const filterTree = (nodes) => {
+        return nodes
+            .filter(n => !excludeIds.has(n.id))
+            .map(n => ({ ...n, children: filterTree(n.children || []) }));
+    };
+    return filterTree(JSON.parse(JSON.stringify(categoryTree.value)));
+});
+
 const openAddDialog = () => {
     editingId = null;
-    categoryForm.value = { name: '', description: '' };
+    categoryForm.value = { parentId: null, name: '', description: '' };
     if (formRef.value) formRef.value.resetFields();
     dialogTitle.value = '新增分类';
     dialogVisible.value = true;
@@ -123,7 +222,7 @@ const openAddDialog = () => {
 
 const openEditDialog = (row) => {
     editingId = row.id;
-    categoryForm.value = { name: row.name, description: row.description || '' };
+    categoryForm.value = { parentId: row.parentId ?? null, name: row.name, description: row.description || '' };
     dialogTitle.value = '编辑分类';
     dialogVisible.value = true;
 };
@@ -149,12 +248,17 @@ const handleDelete = (id) => {
 const submitForm = async () => {
     await formRef.value.validate();
     try {
+        const data = {
+            name: categoryForm.value.name,
+            description: categoryForm.value.description,
+            parentId: categoryForm.value.parentId || null
+        };
         if (editingId) {
-            await updateCategory(editingId, categoryForm.value);
+            await updateCategory(editingId, data);
             addLog(userStore.user_name, 'edit_category', categoryForm.value.name);
             ElMessage.success('更新成功');
         } else {
-            await addCategory(categoryForm.value);
+            await addCategory(data);
             addLog(userStore.user_name, 'add_category', categoryForm.value.name);
             ElMessage.success('添加成功');
         }
@@ -165,6 +269,7 @@ const submitForm = async () => {
     }
 };
 
+// ---- 批量删除 ----
 const selectedIds = ref([]);
 const handleSelectionChange = (rows) => {
     selectedIds.value = rows.map(r => r.id);
@@ -193,6 +298,7 @@ const handleBatchDelete = () => {
     }).catch(() => { });
 };
 
+// ---- 撤销删除 ----
 const undoState = ref(null);
 let undoTimer = null;
 
@@ -249,6 +355,28 @@ onUnmounted(() => {
 
     .table-wrapper {
         overflow-x: auto;
+    }
+}
+
+.tree-toggle {
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    width: 20px;
+    height: 20px;
+    cursor: pointer;
+    color: #909399;
+    vertical-align: middle;
+    border-radius: 4px;
+    transition: background 0.2s;
+
+    &:hover {
+        background: #e5e7eb;
+        color: #303133;
+    }
+
+    &--placeholder {
+        visibility: hidden;
     }
 }
 
