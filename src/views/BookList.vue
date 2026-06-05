@@ -2,9 +2,9 @@
     <div class="booklist-container">
         <div class="search-area">
             <el-input v-model="searchKeyword" placeholder="按书名/作者搜索" clearable @keyup.enter="handleSearch" />
-            <el-select v-model="categoryFilter" placeholder="全部分类" clearable style="width: 140px;">
-                <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
-            </el-select>
+            <el-tree-select v-model="categoryFilter" :data="categoryTree"
+                :props="{ label: 'name', children: 'children', value: 'name' }"
+                placeholder="全部分类" clearable check-strictly style="width: 180px;" />
             <el-button type="primary" @click="handleSearch" class="search-btn">搜索</el-button>
             <el-button type="success" @click="openAddDialog">+ 新增图书</el-button>
             <el-button type="warning" @click="openImportDialog">批量导入</el-button>
@@ -26,9 +26,14 @@
                 <el-table-column prop="title" label="书名" />
                 <el-table-column prop="author" label="作者" />
                 <el-table-column prop="publisher" label="出版社" />
-                <el-table-column prop="category" label="分类" width="100">
+                <el-table-column label="分类" width="160">
                     <template #default="{ row }">
-                        <el-tag size="small" type="info">{{ row.category || '未分类' }}</el-tag>
+                        <span v-if="row.category" style="font-size: 13px;">
+                            <el-tag size="small" type="primary" style="margin-right: 2px;">{{ getParentName(row.category) }}</el-tag>
+                            <span v-if="getParentName(row.category) !== row.category" style="color: #909399;">/</span>
+                            <el-tag v-if="getParentName(row.category) !== row.category" size="small" type="info" style="margin-left: 2px;">{{ row.category }}</el-tag>
+                        </span>
+                        <el-tag v-else size="small" type="info">未分类</el-tag>
                     </template>
                 </el-table-column>
                 <el-table-column prop="quantity" label="数量" width="80" />
@@ -67,10 +72,10 @@
                     <el-input v-model="bookForm.publisher" />
                 </el-form-item>
                 <el-form-item label="分类" prop="category">
-                    <el-select v-model="bookForm.category" placeholder="请选择分类" filterable allow-create
-                        style="width: 100%;">
-                        <el-option v-for="cat in categories" :key="cat" :label="cat" :value="cat" />
-                    </el-select>
+                    <el-tree-select v-model="bookForm.category" :data="categoryTree"
+                        :props="{ label: 'name', children: 'children', value: 'name' }"
+                        placeholder="请选择分类" filterable allow-create check-strictly
+                        style="width: 100%;" />
                 </el-form-item>
                 <el-form-item label="数量" prop="quantity">
                     <el-input v-model.number="bookForm.quantity" type="number" min="0" />
@@ -132,6 +137,31 @@ const categories = computed(() => {
     books.value.forEach(b => { if (b.category) set.add(b.category); });
     return [...set].sort();
 });
+
+// 分类树（用于 el-tree-select）
+const categoryTree = computed(() => {
+    const map = {};
+    const roots = [];
+    centralCategories.value.forEach(c => {
+        map[c.id] = { ...c, children: [] };
+    });
+    centralCategories.value.forEach(c => {
+        if (c.parentId != null && map[c.parentId]) {
+            map[c.parentId].children.push(map[c.id]);
+        } else {
+            roots.push(map[c.id]);
+        }
+    });
+    return roots;
+});
+
+// 获取某分类名称的父分类名称（没有父分类则返回自身）
+const getParentName = (catName) => {
+    const cat = centralCategories.value.find(c => c.name === catName);
+    if (!cat || cat.parentId == null) return catName;
+    const parent = centralCategories.value.find(c => c.id === cat.parentId);
+    return parent ? parent.name : catName;
+};
 
 const searchKeyword = ref('');
 const categoryFilter = ref('');

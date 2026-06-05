@@ -41,7 +41,7 @@
                     </template>
                 </el-table-column>
                 <el-table-column prop="description" label="描述" min-width="200" show-overflow-tooltip />
-                <el-table-column prop="bookCount" label="图书数量" width="100" align="center" />
+                <el-table-column prop="bookCount" label="不同图书数量" width="120" align="center" />
                 <el-table-column label="操作" width="120">
                     <template #default="{ row }">
                         <el-button link type="primary" @click="openEditDialog(row)">编辑</el-button>
