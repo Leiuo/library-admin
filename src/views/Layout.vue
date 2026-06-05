@@ -366,6 +366,16 @@ const breadcrumbs = computed(() => {
                 background-color: var(--sidebar-hover-bg);
             }
         }
+
+        // 折叠状态下图标居中
+        &.el-menu--collapse {
+            >.el-menu-item,
+            >.el-sub-menu .el-sub-menu__title {
+                justify-content: center;
+                padding: 0;
+                margin: 4px 8px;
+            }
+        }
     }
 
     .aside-footer {
