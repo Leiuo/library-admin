@@ -277,6 +277,8 @@ npm run preview
 ## Deployment
 
 The project is configured for **GitHub Pages** deployment via GitHub Actions.
+<br>
+It is also deployed on **Vercel**, with automatic deployment triggered by pushing to the remote repository.
 
 ### Configuration
 
@@ -284,12 +286,12 @@ In `vite.config.js`:
 
 ```js
 export default defineConfig({
-  base: '/library-admin/',  // Set to your repo name
+  base: process.env.VERCEL ? '/' : '/repo name/',
   // ...
 })
 ```
 
-In `.github/workflows/deploy.yml` — triggers on push to `main` branch, builds with Vite, deploys to GitHub Pages automatically.
+In `.github/workflows/deploy.yml` — triggers on push to `main` branch, builds with Vite, deploys to GitHub Pages automatically, while automatically deploying to Vercel.
 
 ### Manual Deployment
 

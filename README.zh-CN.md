@@ -277,6 +277,8 @@ npm run preview
 ## 部署
 
 项目已配置 **GitHub Pages** 自动部署，通过 GitHub Actions 实现。
+<br>
+同时也部署在了 **Vercel**，推送到远程仓库自动部署。
 
 ### 配置说明
 
@@ -284,12 +286,12 @@ npm run preview
 
 ```js
 export default defineConfig({
-  base: '/library-admin/',  // 修改为你的仓库名称
+  base: process.env.VERCEL ? '/' : '/仓库名称/',
   // ...
 })
 ```
 
-`.github/workflows/deploy.yml` — 推送 `main` 分支时自动触发，使用 Vite 构建后部署至 GitHub Pages。
+`.github/workflows/deploy.yml` — 推送 `main` 分支时自动触发，使用 Vite 构建后部署至 GitHub Pages，同时自动部署到 Vercel。
 
 ### 手动部署
 
