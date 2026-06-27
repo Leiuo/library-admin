@@ -101,9 +101,6 @@
                     <span>操作日志</span>
                 </el-menu-item>
             </el-menu>
-            <div class="aside-footer">
-                <span class="version">v 1.1.0</span>
-            </div>
         </el-aside>
 
         <el-container class="layout-right">
@@ -375,19 +372,6 @@ const breadcrumbs = computed(() => {
                 padding: 0;
                 margin: 4px 8px;
             }
-        }
-    }
-
-    .aside-footer {
-        position: absolute;
-        bottom: 12px;
-        width: 100%;
-        text-align: center;
-
-        .version {
-            color: var(--sidebar-text);
-            font-size: 11px;
-            opacity: 0.5;
         }
     }
 }

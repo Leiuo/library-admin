@@ -86,7 +86,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { ArrowRight, ArrowDown } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';
-import { getCategories, addCategory, updateCategory, deleteCategory, deleteCategories, addLog } from '../api/mock';
+import { getCategories, addCategory, updateCategory, deleteCategory, deleteCategories } from '../api/categories';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 
 const userStore = useUserStore();

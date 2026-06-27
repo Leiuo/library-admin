@@ -1,6 +1,6 @@
 import { defineStore } from "pinia";
 import { computed, ref } from "vue";
-import { verifyLogin } from "../api/mock";
+import { verifyLogin } from "../api/admins";
 
 export const useUserStore = defineStore('user', () => {
     let token = ref(localStorage.getItem('admin_token') || '');
@@ -13,7 +13,7 @@ export const useUserStore = defineStore('user', () => {
 
     const login = async (username, password) => {
         const admin = await verifyLogin(username, password);
-        token.value = 'mock_token-' + Date.now();
+        token.value = admin.token;
         user_name.value = admin.username;
         user_role.value = admin.role;
         user_avatar.value = `https://i.pravatar.cc/150?img=${Math.floor(Math.random() * 100)}`;

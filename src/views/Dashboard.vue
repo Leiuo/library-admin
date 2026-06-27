@@ -87,7 +87,9 @@
 <script setup>
 import { reactive, ref, onMounted, onUnmounted, nextTick, watch } from 'vue';
 import * as echarts from 'echarts';
-import { getBooks, getBorrows, getReaders } from '../api/mock';
+import { getBooks } from '../api/books';
+import { getBorrows } from '../api/borrows';
+import { getReaders } from '../api/readers';
 import { Notebook, User, Stamp, TrendCharts } from '@element-plus/icons-vue';
 import StatCard from '../components/StatCard.vue';
 import { useThemeStore } from '../stores/theme';

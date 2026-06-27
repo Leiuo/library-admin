@@ -125,7 +125,9 @@ import { UploadFilled } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';
-import { getBooks, getCategories, deleteBook, updateBook, addBook, deleteBooks, importBooks, addLog } from '../api/mock';
+import { getBooks, deleteBook, updateBook, addBook, deleteBooks, importBooks } from '../api/books';
+import { getCategories } from '../api/categories';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 
 const userStore = useUserStore();

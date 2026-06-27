@@ -69,7 +69,10 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { getBorrows, getSettings, getPaidFines, payFines, addLog } from '../api/mock';
+import { getBorrows } from '../api/borrows';
+import { getSettings } from '../api/settings';
+import { getPaidFines, payFines } from '../api/fines';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 import { WarningFilled, Money, CircleCheckFilled } from '@element-plus/icons-vue';
 import StatCard from '../components/StatCard.vue';

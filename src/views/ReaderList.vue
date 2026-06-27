@@ -94,7 +94,8 @@ import { UploadFilled } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';
-import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders, addLog } from '../api/mock';
+import { getReaders, addReader, updateReader, deleteReader, deleteReaders, importReaders } from '../api/readers';
+import { addLog } from '../api/logs';
 import { useRouter } from 'vue-router';
 import { useUserStore } from '../stores/user';
 

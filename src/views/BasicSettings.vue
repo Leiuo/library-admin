@@ -61,7 +61,8 @@
 
 <script setup>
 import { reactive, ref, onMounted } from 'vue';
-import { getSettings, saveSettings, addLog } from '../api/mock';
+import { getSettings, saveSettings } from '../api/settings';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 
 const userStore = useUserStore();

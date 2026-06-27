@@ -42,7 +42,7 @@
 
 <script setup>
 import { ref, computed, onMounted, watch } from 'vue';
-import { getLogs, clearLogs } from '../api/mock';
+import { getLogs, clearLogs } from '../api/logs';
 import { ElMessage } from 'element-plus';
 import PaginationBox from '../components/PaginationBox.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';

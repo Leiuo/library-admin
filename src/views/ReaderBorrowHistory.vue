@@ -41,7 +41,8 @@
 <script setup>
 import { computed, reactive, ref, onMounted, watch } from 'vue';
 import { useRouter, useRoute } from 'vue-router';
-import { getReaders, getBorrows } from '../api/mock';
+import { getReaders } from '../api/readers';
+import { getBorrows } from '../api/borrows';
 import { ElMessage } from 'element-plus';
 import { Collection, Reading, CircleCheckFilled, WarningFilled } from '@element-plus/icons-vue';
 import StatCard from '../components/StatCard.vue';

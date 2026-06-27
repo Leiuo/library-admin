@@ -64,7 +64,7 @@
 
             <div class="tip">
                 <span class="tip-dot" />
-                用户名：任意用户名 / 密码：123456
+                用户名：admin / 密码：123456
             </div>
         </div>
     </div>
@@ -77,15 +77,15 @@ import { useUserStore } from '../stores/user';
 import { useThemeStore } from '../stores/theme';
 import { ElMessage } from 'element-plus';
 import { Sunny, Moon } from '@element-plus/icons-vue';
-import { getAdmins } from '../api/mock';
+import { getAdmins } from '../api/admins';
 
 const router = useRouter();
 const userStore = useUserStore();
 const themeStore = useThemeStore();
 
 const loginForm = reactive({
-    username: 'LEI',
-    password: 'qiuyue@080701'
+    username: 'admin',
+    password: '123456'
 });
 
 const loginFormRef = ref(null);

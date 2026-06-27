@@ -104,7 +104,11 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
 import TableSkeleton from '../components/TableSkeleton.vue';
-import { getBooks, getBorrows, returnBook, getReaders, addBorrow, updateBorrow, deleteBorrows, getSettings, addLog } from '../api/mock';
+import { getBorrows, returnBook, addBorrow, updateBorrow, deleteBorrows } from '../api/borrows';
+import { getBooks } from '../api/books';
+import { getReaders } from '../api/readers';
+import { getSettings } from '../api/settings';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 
 const userStore = useUserStore();

@@ -122,7 +122,8 @@ import { ElMessage, ElMessageBox } from 'element-plus';
 import { Search } from '@element-plus/icons-vue';
 import UndoBar from '../components/UndoBar.vue';
 import PaginationBox from '../components/PaginationBox.vue';
-import { getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement, deleteAnnouncements, addLog } from '../api/mock';
+import { getAnnouncements, addAnnouncement, updateAnnouncement, deleteAnnouncement, deleteAnnouncements } from '../api/announcements';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 
 const userStore = useUserStore();

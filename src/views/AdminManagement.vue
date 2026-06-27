@@ -54,7 +54,8 @@
 
 <script setup>
 import { ref, onMounted } from 'vue';
-import { getAdmins, addAdmin, updateAdmin, deleteAdmin, addLog } from '../api/mock';
+import { getAdmins, addAdmin, updateAdmin, deleteAdmin } from '../api/admins';
+import { addLog } from '../api/logs';
 import { useUserStore } from '../stores/user';
 import { ElMessage, ElMessageBox } from 'element-plus';
 import TableSkeleton from '../components/TableSkeleton.vue';
