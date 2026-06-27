@@ -10,18 +10,16 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn' // 引入中文语言包
 import App from './App.vue'
 
 async function bootstrap() {
-    // 开发环境启动 MSW 拦截
-    if (import.meta.env.DEV) {
-        const { worker } = await import('./mocks/browser')
-        await worker.start({
-            serviceWorker: {
-                url: '/library-admin/mockServiceWorker.js',
-            },
-            onUnhandledRequest: 'bypass', // 未匹配的请求放行
-            quiet: true,
-        })
-        console.log('[MSW] Mock Service Worker 已启动')
-    }
+    // 启动 MSW（开发 & 生产均启用，拦截所有 /api/* 请求）
+    const { worker } = await import('./mocks/browser')
+    await worker.start({
+        serviceWorker: {
+            url: `${import.meta.env.BASE_URL}mockServiceWorker.js`,
+        },
+        onUnhandledRequest: 'bypass',
+        quiet: true,
+    })
+    console.log('[MSW] Mock Service Worker 已启动')
 
     const app = createApp(App)
     for (const [key, component] of Object.entries(ElementPlusIconsVue)) {
