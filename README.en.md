@@ -63,6 +63,7 @@
 | Vue Router | 5.0+ | Vue routing (hash mode) |
 | ECharts | 6.0+ | Data visualization charts |
 | Less | 4.6+ | CSS preprocessor |
+| MSW | 2.14+ | Mock Service Worker — intercepts /api/* requests, simulates real frontend-backend separation |
 
 ---
 
@@ -72,16 +73,34 @@
 library-admin/
 ├── .github/workflows/           # GitHub Actions CI/CD (auto-deploy to Pages)
 ├── .vscode/                     # VS Code editor config
-├── public/                      # Static assets
+├── public/
+│   ├── favicon.svg              # Browser tab icon
+│   ├── icons.svg                # SVG icon set
+│   └── mockServiceWorker.js     # MSW Service Worker script
 ├── src/
 │   ├── api/
-│   │   └── mock.js              # Mock API & localStorage persistence
+│   │   ├── client.ts            # Fetch wrapper (auth header, error handling)
+│   │   ├── admins.ts            # Admin API
+│   │   ├── announcements.ts     # Announcement API
+│   │   ├── books.ts             # Book API
+│   │   ├── borrows.ts           # Borrowing API
+│   │   ├── categories.ts        # Category API
+│   │   ├── fines.ts             # Fine API
+│   │   ├── logs.ts              # Operation log API
+│   │   ├── readers.ts           # Reader API
+│   │   ├── settings.ts          # System settings API
+│   │   └── mock.js              # Mock data init & localStorage persistence
 │   ├── assets/                  # Static resource files
 │   ├── components/
 │   │   ├── PaginationBox.vue    # Reusable pagination component
 │   │   ├── StatCard.vue         # Statistics card component
 │   │   ├── TableSkeleton.vue    # Table loading skeleton
 │   │   └── UndoBar.vue          # Undo notification bar
+│   ├── mocks/
+│   │   ├── browser.ts           # MSW browser startup config
+│   │   ├── handlers.ts          # /api/* request handlers (intercepts all API calls)
+│   │   ├── data.ts              # Seed data
+│   │   └── storage.ts           # localStorage read/write utilities
 │   ├── router/
 │   │   └── index.js             # Route definitions & auth guards
 │   ├── stores/
@@ -148,12 +167,13 @@ npm run preview
 
 ## Login Credentials
 
-| Field    | Value        |
-|----------|--------------|
-| Username | Any username |
-| Password | `123456`     |
+| Username | Password | Role |
+|----------|----------|------|
+| `admin` | `123456` | Super Admin |
+| `librarian` | `123456` | Normal Admin |
+| `LEI` | `qiuyue@080701` | Super Admin |
 
-> **Note:** The system uses mock data stored in localStorage. Login only verifies that the password matches `123456`.
+> **Note:** The system uses MSW to intercept all `/api/*` requests and persists data in localStorage. Login validates both username and password against the seeded accounts above.
 
 ---
 
@@ -163,7 +183,7 @@ npm run preview
 
 ![Login Page](./docs/screenshots/login.png)
 
-*Gradient background, centered login card with form validation and loading states*
+*Two-panel layout: animated characters with eye-tracking on the left, login form on the right, with password show/hide toggle, form validation and loading states*
 
 ### Announcement Management (Home)
 
@@ -175,7 +195,7 @@ npm run preview
 
 ![Dashboard](./docs/screenshots/dashboard.png)
 
-*Stat cards (total books, borrowed count), book status pie chart, monthly borrowing trend line chart, top 5 popular books, top 5 active readers*
+*4 stat cards (total books, registered readers, total borrows, active borrows), book status pie chart, monthly borrowing trend line chart with year switcher, top 5 popular books bar chart, top 5 readers ranking, category distribution chart*
 
 ### Book Management
 
@@ -263,7 +283,9 @@ npm run preview
 - [x] Table skeleton loading placeholders
 - [x] Responsive layout (desktop / tablet / mobile)
 - [x] Custom theme colors (Cyan primary palette)
-- [x] Sidebar version number display
+- [x] Dashboard year switcher for trend chart
+- [x] Dashboard skeleton loading for stats & charts
+- [x] Animated login characters (eye-tracking interaction)
 - [x] 404 Not Found page
 - [x] Page transition animations (fade)
 - [x] Micro-interactions (button scale, icon rotation, dialog animation)

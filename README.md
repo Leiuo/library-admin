@@ -63,6 +63,7 @@
 | Vue Router | 5.0+ | Vue 路由管理器（Hash 模式） |
 | ECharts | 6.0+ | 数据可视化图表库 |
 | Less | 4.6+ | CSS 预处理器 |
+| MSW | 2.14+ | Mock Service Worker，拦截 /api/* 请求，模拟真实前后端分离 |
 
 ---
 
@@ -72,16 +73,34 @@
 library-admin/
 ├── .github/workflows/           # GitHub Actions CI/CD（自动部署到 Pages）
 ├── .vscode/                     # VS Code 编辑器配置
-├── public/                      # 静态资源
+├── public/
+│   ├── favicon.svg              # 浏览器标签图标
+│   ├── icons.svg                # SVG 图标集
+│   └── mockServiceWorker.js     # MSW Service Worker 脚本
 ├── src/
 │   ├── api/
-│   │   └── mock.js              # Mock 数据接口与 localStorage 持久化
+│   │   ├── client.ts            # fetch 请求封装（认证头、错误处理）
+│   │   ├── admins.ts            # 管理员 API
+│   │   ├── announcements.ts     # 通知公告 API
+│   │   ├── books.ts             # 图书 API
+│   │   ├── borrows.ts           # 借阅 API
+│   │   ├── categories.ts        # 分类 API
+│   │   ├── fines.ts             # 罚款 API
+│   │   ├── logs.ts              # 操作日志 API
+│   │   ├── readers.ts           # 读者 API
+│   │   ├── settings.ts          # 系统设置 API
+│   │   └── mock.js              # Mock 数据初始化与 localStorage 持久化
 │   ├── assets/                  # 静态资源文件
 │   ├── components/
 │   │   ├── PaginationBox.vue    # 可复用分页组件
 │   │   ├── StatCard.vue         # 统计卡片组件
 │   │   ├── TableSkeleton.vue    # 表格加载骨架屏
 │   │   └── UndoBar.vue          # 撤销操作提示条
+│   ├── mocks/
+│   │   ├── browser.ts           # MSW 浏览器端启动配置
+│   │   ├── handlers.ts          # /api/* 请求处理器（拦截所有 API 调用）
+│   │   ├── data.ts              # 基础种子数据
+│   │   └── storage.ts           # localStorage 读写工具
 │   ├── router/
 │   │   └── index.js             # 路由定义与鉴权守卫
 │   ├── stores/
@@ -148,12 +167,13 @@ npm run preview
 
 ## 登录信息
 
-| 字段 | 值 |
-|------|-----|
-| 用户名 | 任意用户名 |
-| 密码 | `123456` |
+| 用户名 | 密码 | 角色 |
+|--------|------|------|
+| `admin` | `123456` | 超级管理员 |
+| `librarian` | `123456` | 普通管理员 |
+| `LEI` | `qiuyue@080701` | 超级管理员 |
 
-> **提示：** 系统使用 Mock 数据并存储在 localStorage 中，登录验证仅检查密码是否为 `123456`。
+> **提示：** 系统使用 MSW 拦截所有 `/api/*` 请求并将数据持久化到 localStorage。登录时验证用户名与密码，上表为预置种子账号。
 
 ---
 
@@ -163,7 +183,7 @@ npm run preview
 
 ![登录页面](./docs/screenshots/login.png)
 
-*渐变背景、居中登录卡片，支持表单验证与加载状态*
+*双栏布局：左侧动画角色（眼球追踪鼠标交互）、右侧登录表单，支持密码显隐切换、表单验证与加载状态*
 
 ### 通知公告（首页）
 
@@ -175,7 +195,7 @@ npm run preview
 
 ![仪表盘](./docs/screenshots/dashboard.png)
 
-*统计卡片（馆藏总量、借出数量）、图书状态饼图、月度借阅趋势折线图、热门图书 TOP5、活跃读者 TOP5*
+*4 个统计卡片（馆藏总量、注册读者、总借阅数量、进行中借阅）、图书状态饼图、月度借阅趋势折线图（支持年份切换）、热门图书 TOP5 柱状图、读者借阅排行 TOP5、图书分类分布图*
 
 ### 图书管理
 
@@ -263,7 +283,9 @@ npm run preview
 - [x] 表格加载骨架屏
 - [x] 响应式布局（桌面端 / 平板 / 手机端）
 - [x] 自定义主题色（青色主色调）
-- [x] 侧边栏版本号显示
+- [x] Dashboard 年份切换器（趋势图按年筛选）
+- [x] Dashboard 统计卡片与图表骨架屏加载
+- [x] 登录页动画角色（眼球追踪交互）
 - [x] 404 未找到页面
 - [x] 页面切换过渡动画（淡入淡出）
 - [x] 微交互（按钮缩放、图标旋转、弹窗动画）
