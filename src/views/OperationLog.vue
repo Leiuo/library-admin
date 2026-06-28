@@ -80,7 +80,9 @@ const actionOptions = [
     { label: '删除分类', value: 'delete_category' },
     { label: '撤销删除分类', value: 'restore_category' },
     { label: '删除公告', value: 'delete_announcement' },
-    { label: '撤销删除公告', value: 'restore_announcement' }
+    { label: '撤销删除公告', value: 'restore_announcement' },
+    { label: '编辑公告', value: 'edit_announcement' },
+    { label: '发布公告', value: 'add_announcement' }
 ];
 
 const actionLabel = (action) => {
