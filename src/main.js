@@ -10,6 +10,7 @@ import zhCn from 'element-plus/es/locale/lang/zh-cn' // 引入中文语言包
 import App from './App.vue'
 
 let worker = null
+let mswRestarting = false // 防止并发重启
 
 async function startMSW() {
     // 启动 MSW（开发 & 生产均启用，拦截所有 /api/* 请求）
@@ -25,23 +26,37 @@ async function startMSW() {
     console.log('[MSW] Mock Service Worker 已启动')
 }
 
-// 检查 Service Worker 是否仍在控制页面（休眠唤醒后 SW 可能已被浏览器终止）
-function isSWActive() {
-    return !!navigator.serviceWorker.controller
-}
-
-// 页面可见性变化时（如休眠唤醒），检查并恢复 MSW
+// 页面可见性变化时（如休眠唤醒），无条件重新注册 MSW
+// 注意：休眠后 navigator.serviceWorker.controller 可能返回过期引用，
+// 不能依赖它判断 SW 是否存活，所以直接重启
 async function handleVisibilityChange() {
-    if (document.visibilityState === 'visible') {
-        if (!isSWActive()) {
-            console.warn('[MSW] Service Worker 已丢失（可能因休眠/挂起），正在重新注册...')
-            try {
-                await startMSW()
-                console.log('[MSW] Service Worker 恢复成功')
-            } catch (e) {
-                console.error('[MSW] Service Worker 恢复失败，请刷新页面', e)
-            }
+    if (document.visibilityState !== 'visible') return
+    if (mswRestarting) return
+
+    mswRestarting = true
+    try {
+        // 先尝试通过 getRegistration 获取真实的注册状态
+        const reg = await navigator.serviceWorker?.getRegistration()
+        if (reg) {
+            // 强制更新 SW（浏览器会重新激活被终止的 SW）
+            await reg.update()
+            console.log('[MSW] Service Worker 已更新（休眠恢复）')
+        } else {
+            // 注册完全丢失，重新启动 MSW
+            console.warn('[MSW] Service Worker 注册丢失，正在重新注册...')
+            await startMSW()
+            console.log('[MSW] Service Worker 恢复成功')
         }
+    } catch (e) {
+        console.warn('[MSW] 休眠恢复时 SW 更新失败，尝试完全重启...', e)
+        try {
+            await startMSW()
+            console.log('[MSW] Service Worker 重启成功')
+        } catch (e2) {
+            console.error('[MSW] Service Worker 恢复失败，请刷新页面', e2)
+        }
+    } finally {
+        mswRestarting = false
     }
 }
 

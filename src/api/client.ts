@@ -8,33 +8,6 @@ interface ApiResponse<T = any> {
     message: string
 }
 
-// 等待 MSW Service Worker 就绪（最长等待 3 秒）
-async function waitForMSW(): Promise<boolean> {
-    if (navigator.serviceWorker?.controller) return true
-
-    // SW 尚未控制页面，等待 registration
-    const registration = await navigator.serviceWorker?.getRegistration()
-    if (!registration?.active) {
-        // 尝试等待 SW 激活
-        const sw = registration?.waiting || registration?.installing
-        if (!sw) return false
-    }
-
-    // 等待 controllerchange 事件（最多 3 秒）
-    return new Promise((resolve) => {
-        const timeout = setTimeout(() => resolve(false), 3000)
-        navigator.serviceWorker.addEventListener('controllerchange', () => {
-            clearTimeout(timeout)
-            resolve(true)
-        }, { once: true })
-        // 如果已经有 controller，立即返回
-        if (navigator.serviceWorker.controller) {
-            clearTimeout(timeout)
-            resolve(true)
-        }
-    })
-}
-
 async function request<T = any>(url: string, options: RequestInit = {}, retryOnSWLoss = true): Promise<T> {
     const token = localStorage.getItem('admin_token') || ''
 
@@ -49,15 +22,14 @@ async function request<T = any>(url: string, options: RequestInit = {}, retryOnS
     })
 
     // 检测非 JSON 响应（MSW 未拦截时 GitHub Pages 返回 HTML 404 页面）
+    // 注意：休眠唤醒后 navigator.serviceWorker.controller 可能仍是非 null 的过期引用，
+    // 所以不能依赖它来判断 SW 是否存活，这里无条件重试一次
     const contentType = res.headers.get('content-type') || ''
     if (!contentType.includes('application/json')) {
-        if (retryOnSWLoss && !navigator.serviceWorker?.controller) {
-            // SW 丢失，等待恢复后重试一次
-            console.warn('[API] 检测到 Service Worker 丢失，等待恢复后重试...')
-            const recovered = await waitForMSW()
-            if (recovered) {
-                return request<T>(url, options, false) // 只重试一次，防止死循环
-            }
+        if (retryOnSWLoss) {
+            console.warn('[API] 响应非 JSON（MSW 可能未拦截），等待 500ms 后重试...')
+            await new Promise(r => setTimeout(r, 500))
+            return request<T>(url, options, false) // 只重试一次，防止死循环
         }
         throw new Error('服务连接异常：Mock Service Worker 未运行，请刷新页面后重试')
     }
