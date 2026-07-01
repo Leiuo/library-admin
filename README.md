@@ -63,7 +63,7 @@
 | Vue Router | 5.0+ | Vue 路由管理器（Hash 模式） |
 | ECharts | 6.0+ | 数据可视化图表库 |
 | Less | 4.6+ | CSS 预处理器 |
-| MSW | 2.14+ | Mock Service Worker，拦截 /api/* 请求，模拟真实前后端分离 |
+| Axios | 1.18+ | HTTP 客户端 + 请求拦截器模拟后端，/api/* 请求直接返回 localStorage 数据 |
 
 ---
 
@@ -75,11 +75,11 @@ library-admin/
 ├── .vscode/                     # VS Code 编辑器配置
 ├── public/
 │   ├── favicon.svg              # 浏览器标签图标
-│   ├── icons.svg                # SVG 图标集
-│   └── mockServiceWorker.js     # MSW Service Worker 脚本
+│   └── icons.svg                # SVG 图标集
 ├── src/
 │   ├── api/
-│   │   ├── client.ts            # fetch 请求封装（认证头、错误处理）
+│   │   ├── client.ts            # Axios 实例 + mock 拦截器
+│   │   ├── mock.ts              # Mock 后端（种子数据 + 全量 CRUD 路由）
 │   │   ├── admins.ts            # 管理员 API
 │   │   ├── announcements.ts     # 通知公告 API
 │   │   ├── books.ts             # 图书 API
@@ -88,19 +88,13 @@ library-admin/
 │   │   ├── fines.ts             # 罚款 API
 │   │   ├── logs.ts              # 操作日志 API
 │   │   ├── readers.ts           # 读者 API
-│   │   ├── settings.ts          # 系统设置 API
-│   │   └── mock.js              # Mock 数据初始化与 localStorage 持久化
+│   │   └── settings.ts          # 系统设置 API
 │   ├── assets/                  # 静态资源文件
 │   ├── components/
 │   │   ├── PaginationBox.vue    # 可复用分页组件
 │   │   ├── StatCard.vue         # 统计卡片组件
 │   │   ├── TableSkeleton.vue    # 表格加载骨架屏
 │   │   └── UndoBar.vue          # 撤销操作提示条
-│   ├── mocks/
-│   │   ├── browser.ts           # MSW 浏览器端启动配置
-│   │   ├── handlers.ts          # /api/* 请求处理器（拦截所有 API 调用）
-│   │   ├── data.ts              # 基础种子数据
-│   │   └── storage.ts           # localStorage 读写工具
 │   ├── router/
 │   │   └── index.js             # 路由定义与鉴权守卫
 │   ├── stores/
@@ -173,7 +167,7 @@ npm run preview
 | `librarian` | `123456` | 普通管理员 |
 | `LEI` | `qiuyue@080701` | 超级管理员 |
 
-> **提示：** 系统使用 MSW 拦截所有 `/api/*` 请求并将数据持久化到 localStorage。登录时验证用户名与密码，上表为预置种子账号。
+> **提示：** 系统使用 Axios 请求拦截器模拟后端，所有 `/api/*` 请求直接在请求层面短路返回 localStorage 数据，无 Service Worker 依赖。登录时验证用户名与密码，上表为预置种子账号。
 
 ---
 

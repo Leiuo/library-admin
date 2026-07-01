@@ -63,7 +63,7 @@
 | Vue Router | 5.0+ | Vue routing (hash mode) |
 | ECharts | 6.0+ | Data visualization charts |
 | Less | 4.6+ | CSS preprocessor |
-| MSW | 2.14+ | Mock Service Worker — intercepts /api/* requests, simulates real frontend-backend separation |
+| Axios | 1.18+ | HTTP client + request interceptor mock backend — /api/* requests return localStorage data directly |
 
 ---
 
@@ -75,11 +75,11 @@ library-admin/
 ├── .vscode/                     # VS Code editor config
 ├── public/
 │   ├── favicon.svg              # Browser tab icon
-│   ├── icons.svg                # SVG icon set
-│   └── mockServiceWorker.js     # MSW Service Worker script
+│   └── icons.svg                # SVG icon set
 ├── src/
 │   ├── api/
-│   │   ├── client.ts            # Fetch wrapper (auth header, error handling)
+│   │   ├── client.ts            # Axios instance + mock interceptor
+│   │   ├── mock.ts              # Mock backend (seed data + full CRUD routing)
 │   │   ├── admins.ts            # Admin API
 │   │   ├── announcements.ts     # Announcement API
 │   │   ├── books.ts             # Book API
@@ -88,19 +88,13 @@ library-admin/
 │   │   ├── fines.ts             # Fine API
 │   │   ├── logs.ts              # Operation log API
 │   │   ├── readers.ts           # Reader API
-│   │   ├── settings.ts          # System settings API
-│   │   └── mock.js              # Mock data init & localStorage persistence
+│   │   └── settings.ts          # System settings API
 │   ├── assets/                  # Static resource files
 │   ├── components/
 │   │   ├── PaginationBox.vue    # Reusable pagination component
 │   │   ├── StatCard.vue         # Statistics card component
 │   │   ├── TableSkeleton.vue    # Table loading skeleton
 │   │   └── UndoBar.vue          # Undo notification bar
-│   ├── mocks/
-│   │   ├── browser.ts           # MSW browser startup config
-│   │   ├── handlers.ts          # /api/* request handlers (intercepts all API calls)
-│   │   ├── data.ts              # Seed data
-│   │   └── storage.ts           # localStorage read/write utilities
 │   ├── router/
 │   │   └── index.js             # Route definitions & auth guards
 │   ├── stores/
@@ -173,7 +167,7 @@ npm run preview
 | `librarian` | `123456` | Normal Admin |
 | `LEI` | `qiuyue@080701` | Super Admin |
 
-> **Note:** The system uses MSW to intercept all `/api/*` requests and persists data in localStorage. Login validates both username and password against the seeded accounts above.
+> **Note:** The system uses Axios request interceptors to mock the backend — all `/api/*` requests are short-circuited at the request layer and return localStorage data, with no Service Worker dependency. Login validates both username and password against the seeded accounts above.
 
 ---
 
