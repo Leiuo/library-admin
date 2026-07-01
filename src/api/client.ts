@@ -1,47 +1,52 @@
-// API 请求封装 —— 统一 fetch + 认证头 + 错误处理
+// API 请求封装 —— 基于 axios + mock 拦截器（无 Service Worker 依赖）
+import axios from 'axios'
+import { installMockInterceptor } from './mock'
 
-const BASE_URL = '' // MSW 拦截，无需实际服务器
+const http = axios.create({
+    baseURL: '',
+    timeout: 10000,
+})
 
-interface ApiResponse<T = any> {
-    code: number
-    data: T
-    message: string
-}
+// 安装 mock 拦截器（拦截所有 /api/* 请求直接返回 localStorage 数据）
+installMockInterceptor(http)
 
-async function request<T = any>(url: string, options: RequestInit = {}, retryOnSWLoss = true): Promise<T> {
-    const token = localStorage.getItem('admin_token') || ''
+// 添加认证头拦截器
+http.interceptors.request.use((config) => {
+    const token = localStorage.getItem('admin_token')
+    if (token) {
+        config.headers.Authorization = `Bearer ${token}`
+    }
+    return config
+})
 
-    const res = await fetch(`${BASE_URL}${url}`, {
-        ...options,
-        headers: {
-            'Content-Type': 'application/json',
-            ...(token ? { Authorization: `Bearer ${token}` } : {}),
-            ...options.headers,
-        },
-        body: options.body ?? undefined,
-    })
-
-    // 检测非 JSON 响应（MSW 未拦截时 GitHub Pages 返回 HTML 404 页面）
-    // 注意：休眠唤醒后 navigator.serviceWorker.controller 可能仍是非 null 的过期引用，
-    // 所以不能依赖它来判断 SW 是否存活，这里无条件重试一次
-    const contentType = res.headers.get('content-type') || ''
-    if (!contentType.includes('application/json')) {
-        if (retryOnSWLoss) {
-            console.warn('[API] 响应非 JSON（MSW 可能未拦截），等待 500ms 后重试...')
-            await new Promise(r => setTimeout(r, 500))
-            return request<T>(url, options, false) // 只重试一次，防止死循环
+// 响应拦截器 —— 统一解包 { code, data, message }
+http.interceptors.response.use(
+    (response) => {
+        const json = response.data
+        if (json.code !== 200) {
+            throw new Error(json.message || '请求失败')
         }
-        throw new Error('服务连接异常：Mock Service Worker 未运行，请刷新页面后重试')
+        return json.data
+    },
+    (error) => {
+        // mock 拦截器抛出的错误（非 2xx 响应）
+        if (error.response?.data) {
+            const json = error.response.data
+            throw new Error(json.message || '请求失败')
+        }
+        throw new Error(error.message || '网络错误')
     }
+)
 
-    const json: ApiResponse<T> = await res.json()
+// 保持与原 fetch 版本兼容的函数签名
+async function request<T = any>(url: string, options?: { method?: string; body?: string; headers?: Record<string, string> }): Promise<T> {
+    const method = options?.method || 'GET'
+    const data = options?.body ? JSON.parse(options.body) : undefined
+    const headers = options?.headers || {}
 
-    if (json.code !== 200) {
-        throw new Error(json.message || '请求失败')
-    }
-
-    return json.data
+    const response = await http.request({ url, method, data, headers })
+    return response as T
 }
 
-export { request }
-export type { ApiResponse }
+export { request, http }
+export type ApiResponse<T = any> = { code: number; data: T; message: string }
