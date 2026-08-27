@@ -24,8 +24,7 @@
         <div class="table-wrapper">
             <TableSkeleton v-if="loading" :rows="8" :cols="6" />
             <el-empty v-else-if="filteredFines.length === 0" description="暂无罚款记录" />
-            <el-table v-else :data="paginatedFines"
-                @selection-change="handleSelectionChange">
+            <el-table v-else :data="paginatedFines" @selection-change="handleSelectionChange">
                 <el-table-column type="selection" width="50" :selectable="isUnpaid" />
                 <el-table-column prop="bookTitle" label="图书名称" show-overflow-tooltip />
                 <el-table-column prop="readerName" label="借阅人" width="140" />
@@ -57,11 +56,8 @@
                 </el-table-column>
             </el-table>
             <div v-if="filteredFines.length > 0" class="pagination-wrapper">
-                <PaginationBox
-                    v-model:current-page="currentPage"
-                    v-model:page-size="pageSize"
-                    :total="filteredFines.length"
-                />
+                <PaginationBox v-model:current-page="currentPage" v-model:page-size="pageSize"
+                    :total="filteredFines.length" />
             </div>
         </div>
     </div>
@@ -183,7 +179,7 @@ const handleBatchPay = async () => {
         ElMessage.success('罚款已缴纳');
         selectedIds.value = [];
         await fetchData();
-    }).catch(() => {});
+    }).catch(() => { });
 };
 
 onMounted(fetchData);
@@ -212,8 +208,15 @@ onMounted(fetchData);
     }
 
 
-    .overdue-days { color: #ef4444; font-weight: 500; }
-    .fine-amount { color: #f59e0b; font-weight: 500; }
+    .overdue-days {
+        color: #ef4444;
+        font-weight: 500;
+    }
+
+    .fine-amount {
+        color: #f59e0b;
+        font-weight: 500;
+    }
 }
 
 @media (max-width: 767px) {
@@ -222,6 +225,7 @@ onMounted(fetchData);
             gap: 8px;
             // StatCard 响应式由组件自身管理
         }
+
         .search-area .el-input {
             width: 100% !important;
         }
